@@ -142,7 +142,13 @@
     <div class="message" id="message"></div>
   </div>
   
-  <!-- Integração com Firebase (v9) -->
+  <!-- Elemento de áudio para reproduzir "pronto.mp3" -->
+  <audio id="audioPlayer" style="display: none;">
+    <source src="pronto.mp3" type="audio/mp3">
+    Seu navegador não suporta o elemento de áudio.
+  </audio>
+  
+  <!-- Integração com Firebase (v9) e lógica de redirecionamento -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
@@ -201,8 +207,18 @@
           timestamp: new Date()
         });
         document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
-        // Redireciona automaticamente após o primeiro clique
-        window.location.href = "/EE/Inscrições/concluido.html";
+        
+        // Toca o som "pronto.mp3" e, ao terminar, redireciona
+        const audio = document.getElementById("audioPlayer");
+        audio.play().then(() => {
+          audio.onended = function() {
+            window.location.href = "/EE/Inscrições/concluido.html";
+          };
+        }).catch((error) => {
+          console.log("Erro ao reproduzir áudio:", error);
+          // Se houver erro na reprodução, redireciona imediatamente
+          window.location.href = "/EE/Inscrições/concluido.html";
+        });
       } catch (error) {
         document.getElementById("message").textContent = "Erro ao inscrever: " + error.message;
       }
