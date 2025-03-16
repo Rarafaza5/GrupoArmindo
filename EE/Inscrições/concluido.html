@@ -81,20 +81,6 @@
     <p>Vemos-nos a 18/05/2025</p>
   </div>
   
-  <!-- Elemento de áudio para reproduzir "pronto.mp3" uma única vez -->
-  <audio id="audioPlayer" autoplay style="display: none;">
-    <source src="pronto.mp3" type="audio/mp3">
-    Seu navegador não suporta o elemento de áudio.
-  </audio>
-  
-  <script>
-    // Garante a reprodução do áudio ao carregar a página
-    window.addEventListener('load', function() {
-      const audio = document.getElementById('audioPlayer');
-      audio.play().catch(e => {
-        console.log("A reprodução automática foi bloqueada: " + e);
-      });
-    });
-  </script>
+
 </body>
 </html>
