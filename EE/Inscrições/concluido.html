@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscrição Concluída - Eurovisão Eleitoral 2025</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Animação de gradiente de fundo */
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(270deg, #2c3e50, #e74c3c, #f1c40f, #8e44ad);
+      background-size: 800% 800%;
+      animation: gradientAnimation 15s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 40px 50px;
+      border-radius: 15px;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      width: 350px;
+      border: 5px solid;
+      border-image-slice: 1;
+      border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff);
+      animation: neonClockwise 2s linear infinite, scaleUp 0.8s ease forwards;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes neonClockwise {
+      0% { border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+      25% { border-image-source: linear-gradient(90deg, #ffffff, #ff0000, #ffffff, #ff0000); }
+      50% { border-image-source: linear-gradient(180deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+      75% { border-image-source: linear-gradient(270deg, #ffffff, #ff0000, #ffffff, #ff0000); }
+      100% { border-image-source: linear-gradient(360deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #f1c40f;
+    }
+    p {
+      font-size: 1.2em;
+      color: white;
+      margin-top: 10px;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 25px;
+        width: 90%;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      p {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Inscrição Concluída</h1>
+    <p>Vemos-nos a 18/05/2025</p>
+  </div>
+</body>
+</html>
