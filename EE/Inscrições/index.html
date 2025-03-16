@@ -94,15 +94,8 @@
       color: white;
     }
     .checkbox-container {
-      display: flex;
-      align-items: center;
       font-size: 0.9em;
       color: white;
-    }
-    .checkbox-container input[type="checkbox"] {
-      margin-right: 10px;
-      width: 18px;
-      height: 18px;
     }
     /* Transições de fade para as páginas */
     .page {
@@ -117,10 +110,9 @@
       opacity: 1;
       position: relative;
     }
-
     a {
-  color: white;
-}
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -134,13 +126,13 @@
       </form>
     </div>
     
-    <!-- Página 2: Checkbox e confirmação -->
-    <div id="page2" class="page">
+    <!-- Página 2: Consentimento (sem checkbox) -->
+    <div id="page2" class="page" style="display: none;">
       <h1>Consentimentos</h1>
       <form id="aceitarForm">
         <div class="checkbox-container">
-          <label for="compromisso">
-            Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing">Termos e Condições e Politicas de Privacidade</a> do evento e <strong>comprometo-me a não assistir a Final do Festival da Eurovisão da Canção.</
+          <label>
+            Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento e <strong>comprometo-me a não assistir a Final do Festival da Eurovisão da Canção.</strong>
           </label>
         </div>
         <button type="submit">Aceitar e Continuar</button>
@@ -172,7 +164,7 @@
     
     let userName = "";
     
-    // Tratamento do clique no botão "Seguinte" (Página 1)
+    // Transição da Página 1 para a Página 2
     document.getElementById("seguinteBtn").addEventListener("click", () => {
       const nomeInput = document.getElementById("nome").value.trim();
       if (nomeInput === "") {
@@ -180,37 +172,37 @@
         return;
       }
       userName = nomeInput;
-      
-      const page1 = document.getElementById("page1");
-      const page2 = document.getElementById("page2");
-      
-      // Inicia a transição: fade out na página 1
-      page1.classList.remove("active");
-      
-      // Após a transição (0.5s), alterna para a página 2
+      document.getElementById("page1").classList.remove("active");
       setTimeout(() => {
-        page1.style.display = "none";
-        page2.style.display = "block";
-        // Força o reflow para garantir que a transição ocorra
-        void page2.offsetWidth;
-        page2.classList.add("active");
+        document.getElementById("page1").style.display = "none";
+        document.getElementById("page2").style.display = "block";
+        void document.getElementById("page2").offsetWidth;
+        document.getElementById("page2").classList.add("active");
       }, 500);
     });
     
-    // Submissão da Página 2
+    // Tratamento da submissão da Página 2
     document.getElementById("aceitarForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!document.getElementById("compromisso").checked) {
-        alert("Você precisa aceitar o compromisso para continuar.");
-        return;
-      }
+      const submitButton = document.querySelector("#aceitarForm button[type='submit']");
+      
+      // Impede múltiplos cliques caso o botão já esteja desabilitado
+      if (submitButton.disabled) return;
+      
+      // Desabilita o botão por 10 segundos
+      submitButton.disabled = true;
+      setTimeout(() => {
+        submitButton.disabled = false;
+      }, 10000);
+      
       try {
         await addDoc(collection(db, "inscricoes"), {
           nome: userName,
           timestamp: new Date()
         });
         document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
-        document.getElementById("aceitarForm").reset();
+        // Redireciona automaticamente após o primeiro clique
+        window.location.href = "/EE/Inscrições/concluido.html";
       } catch (error) {
         document.getElementById("message").textContent = "Erro ao inscrever: " + error.message;
       }
