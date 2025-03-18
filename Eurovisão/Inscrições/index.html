@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Inscrição - Eurovisão Eleitoral 2025</title>
+  <title>Inscrição - Eurovisão 2025</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* Animação de gradiente de fundo */
@@ -119,7 +119,7 @@
   <div class="container">
     <!-- Página 1: Coleta do nome -->
     <div id="page1" class="page active">
-      <h1>Eurovisão Eleitoral</h1>
+      <h1>Eurovisão 2025</h1>
       <form id="nomeForm">
         <input type="text" id="nome" placeholder="Seu Nome" required>
         <button type="button" id="seguinteBtn">Seguinte</button>
@@ -212,12 +212,12 @@
         const audio = document.getElementById("audioPlayer");
         audio.play().then(() => {
           audio.onended = function() {
-            window.location.href = "/EE/Inscrições/concluido.html";
+            window.location.href = "/Eurovisão/Inscrições/concluido.html";
           };
         }).catch((error) => {
           console.log("Erro ao reproduzir áudio:", error);
           // Se houver erro na reprodução, redireciona imediatamente
-          window.location.href = "/EE/Inscrições/concluido.html";
+          window.location.href = "/Eurovisão/Inscrições/concluido.html";
         });
       } catch (error) {
         document.getElementById("message").textContent = "Erro ao inscrever: " + error.message;
