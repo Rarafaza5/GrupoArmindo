@@ -1,79 +1,310 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <link rel="icon" type="image/png" href="andorinha.png">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AndorinhasCraft</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script>
+
+  <link rel="icon" type="image/png" href="armindo.png">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hub do Grupo Armindo</title>
+  <!-- Fonte Poppins (exemplo). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc, #6a11cb, #2575fc);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+      overflow-x: hidden;
+      color: #fff;
+      position: relative;
+      min-height: 100vh;
+    }
+    @keyframes gradientBG {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Splash Screen */
+    .splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      animation: splashAnimation 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes splashAnimation {
+      0% {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+      30% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(0.95);
+        opacity: 1;
+      }
+      70% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+    .splash-logo {
+      width: 300px;
+      max-width: 80%;
+      animation: logoPulse 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes logoPulse {
+      0% { transform: scale(0.8); }
+      30% { transform: scale(1.1); }
+      50% { transform: scale(1); }
+      70% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Conteúdo Principal */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: containerFadeIn 1s ease forwards;
+      animation-delay: 2.5s;
+    }
+    @keyframes containerFadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Main Logo */
+    .main-logo {
+      width: 280px;
+      max-width: 80%;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: logoAppear 1s ease forwards;
+      animation-delay: 2.5s;
+    }
+    @keyframes logoAppear {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Grid de Projetos */
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    /* Cartões de Projeto */
+    .card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: cardFloat 4s ease-in-out infinite;
+    }
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .card:hover {
+      transform: scale(1.08) translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation-play-state: paused;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .card:hover::before {
+      opacity: 1;
+      animation: cardShimmer 1s forwards;
+    }
+    @keyframes cardShimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .card h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: textFadeIn 1s ease forwards;
+      animation-delay: 2.7s;
+    }
+    @keyframes textFadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .card button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 50px;
+      background: #fff;
+      color: #2575fc;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      animation: textFadeIn 1s ease forwards;
+      animation-delay: 2.8s;
+    }
+    .card button:hover {
+      background: #e0e0e0;
+      transform: scale(1.1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+ 
+
+
+
+
+
+
+
+
+    html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .content {
+    flex: 1;
+  }
+  footer {
+    position: relative;
+  }
+  .projects {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 300px;
+  }
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  @keyframes footerFadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+
+
+
+  </style>
 </head>
 <body>
-  <header>
-    
-    <div class="header-content">
-      <h1>🌍 Bem-vindo ao AndorinhasCraft</h1><br>
-      <p>Cria a tua nação, explora um mundo único e jogua com teus amigos no melhor servidor RP do Minecraft!</p>
-      <br> <button class="btn copy-btn" onclick="copiarIP()">📋 Copiar IP</button>
+  <!-- Splash Screen -->
+  <div class="splash" id="splash">
+    <img src="logo-grupo-armindo.png" alt="Logo Grupo Armindo" class="splash-logo" />
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <div class="container">
+    <img src="logo-grupo-armindo.png" alt="Logo Grupo Armindo" class="main-logo" />
+    <div class="projects">
+      <div class="card" data-link="https://grupoarmindo.site/Eurovisão">
+        <h2>Eurovisão Eleitoral 2025</h2>
+        <button>Acessar</button>
+      </div>
+      <div class="card" data-link="https://grupoarmindo.site/armindonews">
+        <h2>Armindo News</h2>
+        <button>Acessar</button>
+      </div>
+      <div class="card" data-link="https://grupoarmindo.site/andorinhascraft">
+        <h2>Andorinhas Craft</h2>
+        <button>Acessar</button>
+      </div>
+      
     </div>
-  </header>
-
-  <main>
-    <section id="sobre-servidor" class="card">
-      <h2>🔹 Sobre o Servidor</h2>
-      <div class="card-content">
-        <article id="mods">
-          <h3>🛠️ Mods</h3><br>
-          <p>
-            <li>Fabric 1.19.4</li>
-            <li>Just Enough Items</li>
-            <li>MrCrayfish's Furniture Mod Refurbished</li>
-            <li>AppleSkin</li>
-            <li>Jade</li>
-            <li>Macaw's Doors & Windows</li>
-          </p>
-        </article>
-
-        <article id="endereco-ip">
-            <br> <h3>🌍 Endereço IP</h3><br>
-          <p>Servidor administrado por <strong>@Jorge</strong> e <strong>@Ana</strong></p>
-          <p>🎮 Versão: <strong>1.19.4 Java Edition</strong></p><br>
-          <p>🔗 IP: <strong id="ip-text">AndorinhasCraft.aternos.me:33119</strong></p>
-          
-        </article>
-      </div>
-    </section>
+  </div>
+  <footer style="
+  text-align: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 1rem;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  animation: footerFadeIn 1.5s ease forwards;">
+  <p>&copy; Grupo Armindo | Todos os direitos reservados</p>
+</footer>
 
 
-    <section id="regras" class="card">
-        <h2>📜 Regras do Servidor</h2>
-        <div class="card-content">
-          <ol>
-            <li>🚫 Não é autorizado qualquer tipo de roubo contra outros players.</li>
-            <li>📢 Não spammar o chat (ban temporário de 5 min por cada 10 mensagens de spam).</li>
-            <li>❌ Não entrar no The End (ban permanente).</li>
-            <li>⚔️ PvP não é autorizado.</li>
-            <li>🏛️ Respeite as regras universais e as regras da sua nação.</li>
-            <li>🚜 Não podem fazer farms.</li>
-          </ol>
-        </div>
-      </section>
-    </main>
+  <script>
+    // Após o fim da animação do splash, remove-o para liberar a tela
+    document.getElementById('splash').addEventListener('animationend', () => {
+      document.getElementById('splash').style.display = 'none';
+    });
 
-    <section id="nacoes-paises" class="card">
-      <h2>🏛️ Nações e Países</h2><br>
-      <div class="card-content">
-        <p>Queres criar a tua nação? Preenche o formulário e aguarda a aprovação!</p><br><br><p>
-            <strong>Nações já criadas:</strong><br>
-            <br> - Estados unidos de Glória - Presidente: Jorge Figueira
-        </p><br><br>
-        <a href="https://forms.gle/3Dchxq4Jh3junRMY8" class="btn" target="_blank">📜 Formulário</a>
-      </div>
-    </section>
-
-
-  <footer>
-    <p>© Grupo Armindo | Todos os direitos reservados</p>
-  </footer>
+    // Redirecionamento: clique no cartão ou no botão
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if(e.target.tagName !== 'BUTTON'){
+          const link = card.getAttribute('data-link');
+          if(link) window.location.href = link;
+        }
+      });
+    });
+    document.querySelectorAll('.card button').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const link = button.parentElement.getAttribute('data-link');
+        if(link) window.location.href = link;
+      });
+    });
+  </script>
+  
 </body>
 </html>
