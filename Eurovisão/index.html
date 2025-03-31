@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eurovisão 2025 - Informativo</title>
+  <title>Eurovisão 2025</title>
   <link rel="icon" type="image/x-icon" href="/farinhacon.png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -13,10 +13,24 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    /* Fade in para os elementos */
+    /* Animação de Fade In */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    /* Animação de Pulse para a logo */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    /* Animação de Shake para botões ao hover */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
     body {
       margin: 0;
@@ -38,13 +52,10 @@
       z-index: 100;
       box-shadow: 0 2px 5px rgba(0,0,0,0.7);
     }
-    header h1 {
-      margin: 0;
-      font-size: 2.5em;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #f1c40f;
-      text-shadow: 0 0 10px rgba(241, 196, 15, 0.8);
+    header img {
+      width: 180px;
+      height: auto;
+      animation: pulse 2s infinite;
     }
     nav {
       margin-top: 10px;
@@ -54,10 +65,11 @@
       text-decoration: none;
       margin: 0 15px;
       font-size: 1.2em;
-      transition: color 0.3s;
+      transition: color 0.3s, transform 0.3s;
     }
     nav a:hover {
       color: #d4ac0d;
+      transform: scale(1.05);
     }
     /* Estilo dos containers neon */
     .neon-container {
@@ -124,6 +136,7 @@
     .btn:hover {
       background: #d4ac0d;
       transform: scale(1.05);
+      animation: shake 0.5s;
     }
     .btn:active {
       transform: scale(0.95);
@@ -134,33 +147,31 @@
       padding: 20px;
       background: rgba(0, 0, 0, 0.85);
       border-top: 1px solid #444;
+      animation: fadeIn 2s ease;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Eurovisão 2025</h1>
+    <img src="logoesc.png" alt="Logo Eurovisão 2025">
     <nav>
       <a href="https://discord.gg/GV2nRgQQkV">SA</a>
       <a href="#napa">Vencedor Festival da Canção 2025</a>
       <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&dates=20250517T194500%2F20250517T194500&details=&location=Discord%3A%20servidor%20𝐒𝐞𝐫𝐯𝐢𝐝𝐨𝐫%20𝐝𝐚𝐬%20𝐀𝐧𝐝𝐨𝐫𝐢𝐧𝐡𝐚𝐬%2C%20𝐏𝐚𝐥𝐜𝐨&text=Eurovisão%20Eleitoral%202025">Adicionar ao Calendário</a>
-          </nav>
+    </nav>
   </header>
 
   <!-- Seção de Boas-Vindas com botão de inscrição -->
   <section id="home">
     <div class="neon-container">
-      <div class="banner">Bem-vindo à Eurovisão 2025!</div>
+      <div class="banner">Bem-vindo à Eurovisão Eleitoral 2025!</div>
       <div class="info">
         Mais uma vez juntos pela música, este ano o Festival vai ser muito melhor do que o ano passado, mas para isso primeiro tens de te inscrever até dia 16/05/2025!
-      
       </div>
       <!-- Botão de Inscrição -->
       <a href="https://grupoarmindo.site/Eurovisão/Inscrições" class="btn">Inscreve-te</a>
     </div>
   </section>
-
-  
 
   <!-- Seção Sobre o Evento -->
   <section id="sobre">
@@ -183,9 +194,8 @@
     <div class="neon-container">
       <div class="banner">Vencedor Festival da Canção RTP 2025</div>
       <div class="info">
-        
         <iframe width="840" height="472" src="https://www.youtube.com/embed/MGsJ8wHvTSM?si=Ek4727BIz6nIaS2T" title="Vencedor Festival da Canção" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-      <p>Artistas: NAPA | Musica: Deslocado</p>
+        <p>Artistas: NAPA | Musica: Deslocado</p>
       </div>
     </div>
   </section>
@@ -199,13 +209,13 @@
         <br><br>
         Discord: <a href="https://discord.gg/GV2nRgQQkV" style="color: #f1c40f; text-decoration: underline;">Servidor das Andorinhas</a>
         <br>
-       
       </div>
     </div>
   </section>
 
   <footer>
-    &copy; Grupo Armindo. Todos os direitos reservados.
+    O Grupo Armindo não detem direitos sobre o evento Eurovisão Eleitoral<br>
+    &copy União Europeia de Radiodifusão | Todos os direitos reservados
   </footer>
 
   <script>
