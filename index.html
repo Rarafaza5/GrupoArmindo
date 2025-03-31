@@ -1,315 +1,234 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
-
-  <link rel="icon" type="image/png" href="armindo.png">
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hub do Grupo Armindo</title>
-  <!-- Fonte Poppins (exemplo). -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eurovisão 2025</title>
+  <link rel="icon" type="image/x-icon" href="/farinhacon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc, #6a11cb, #2575fc);
-      background-size: 400% 400%;
-      animation: gradientBG 10s ease infinite;
-      overflow-x: hidden;
-      color: #fff;
-      position: relative;
-      min-height: 100vh;
-    }
-    @keyframes gradientBG {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
+    /* Fundo animado com gradiente */
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-    /* Splash Screen */
-    .splash {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      animation: splashAnimation 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    /* Animação de Fade In */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes splashAnimation {
-      0% {
-        transform: scale(0.3);
-        opacity: 0;
-      }
-      30% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(0.95);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-    .splash-logo {
-      width: 300px;
-      max-width: 80%;
-      animation: logoPulse 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-    @keyframes logoPulse {
-      0% { transform: scale(0.8); }
-      30% { transform: scale(1.1); }
-      50% { transform: scale(1); }
-      70% { transform: scale(1.05); }
+    /* Animação de Pulse para a logo */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
-
-    /* Conteúdo Principal */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
+    /* Animação de Shake para botões ao hover */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(270deg, #2c3e50, #e74c3c, #f1c40f, #8e44ad);
+      background-size: 800% 800%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #fff;
+      line-height: 1.6;
+    }
+    /* Cabeçalho e Navegação */
+    header {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+    }
+    header img {
+      width: 180px;
+      height: auto;
+      animation: pulse 2s infinite;
+    }
+    nav {
+      margin-top: 10px;
+    }
+    nav a {
+      color: #f1c40f;
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 1.2em;
+      transition: color 0.3s, transform 0.3s;
+    }
+    nav a:hover {
+      color: #d4ac0d;
+      transform: scale(1.05);
+    }
+    /* Estilo dos containers neon */
+    .neon-container {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 40px;
+      border-radius: 15px;
+      margin: 40px auto;
+      max-width: 1000px;
+      border: 5px solid;
+      border-image-slice: 1;
+      border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff);
+      animation: neonClockwise 2s linear infinite, scaleUp 0.8s ease forwards, fadeIn 1s ease;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.7);
       text-align: center;
       opacity: 0;
-      transform: translateY(20px);
-      animation: containerFadeIn 1s ease forwards;
-      animation-delay: 2.5s;
+      transform: translateY(50px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
     }
-    @keyframes containerFadeIn {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
+    @keyframes scaleUp {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
-
-    /* Main Logo */
-    .main-logo {
-      width: 280px;
-      max-width: 80%;
-      margin-bottom: 2rem;
-      opacity: 0;
-      animation: logoAppear 1s ease forwards;
-      animation-delay: 2.5s;
+    @keyframes neonClockwise {
+      0% { border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+      25% { border-image-source: linear-gradient(90deg, #ffffff, #ff0000, #ffffff, #ff0000); }
+      50% { border-image-source: linear-gradient(180deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+      75% { border-image-source: linear-gradient(270deg, #ffffff, #ff0000, #ffffff, #ff0000); }
+      100% { border-image-source: linear-gradient(360deg, #ff0000, #ffffff, #ff0000, #ffffff); }
     }
-    @keyframes logoAppear {
-      0% { opacity: 0; transform: translateY(-20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Grid de Projetos */
-    .projects {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-
-    /* Cartões de Projeto */
-    .card {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: cardFloat 4s ease-in-out infinite;
-    }
-    @keyframes cardFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    .card:hover {
-      transform: scale(1.08) translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      animation-play-state: paused;
-    }
-    .card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-    .card:hover::before {
+    .neon-container.visible {
       opacity: 1;
-      animation: cardShimmer 1s forwards;
+      transform: translateY(0);
     }
-    @keyframes cardShimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
+    /* Estilo dos títulos e textos */
+    .banner {
+      font-size: 2em;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #f1c40f;
+      text-shadow: 0 0 10px rgba(241, 196, 15, 0.8);
     }
-
-    .card h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      opacity: 0;
-      animation: textFadeIn 1s ease forwards;
-      animation-delay: 2.7s;
+    .info {
+      font-size: 1.2em;
+      margin-bottom: 20px;
     }
-    @keyframes textFadeIn {
-      0% { opacity: 0; transform: translateY(10px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    .card button {
-      padding: 0.75rem 2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 50px;
-      background: #fff;
-      color: #2575fc;
+    /* Botão de Inscrição */
+    .btn {
+      display: inline-block;
+      background: #f1c40f;
+      color: #000;
+      padding: 15px 30px;
+      font-size: 1.5em;
       font-weight: bold;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-      opacity: 0;
-      animation: textFadeIn 1s ease forwards;
-      animation-delay: 2.8s;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+      box-shadow: 0 0 15px rgba(241,196,15,0.7);
+      text-shadow: 0 0 10px rgba(0,0,0,0.3);
+      margin-top: 20px;
     }
-    .card button:hover {
-      background: #e0e0e0;
-      transform: scale(1.1);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    .btn:hover {
+      background: #d4ac0d;
+      transform: scale(1.05);
+      animation: shake 0.5s;
     }
-
- 
-
-
-
-
-
-
-
-
-    html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .content {
-    flex: 1;
-  }
-  footer {
-    position: relative;
-  }
-  .projects {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
-  }
-  .card {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 2rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    width: 300px;
-  }
-  .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  }
-  @keyframes footerFadeIn {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-
-
-
-
+    .btn:active {
+      transform: scale(0.95);
+    }
+    /* Rodapé */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.85);
+      border-top: 1px solid #444;
+      animation: fadeIn 2s ease;
+    }
   </style>
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div class="splash" id="splash">
-    <img src="logo-grupo-armindo.png" alt="Logo Grupo Armindo" class="splash-logo" />
-  </div>
+  <header>
+    <img src="logoesc.png" alt="Logo Eurovisão 2025">
+    <nav>
+      <a href="https://discord.gg/GV2nRgQQkV">SA</a>
+      <a href="#napa">Vencedor Festival da Canção 2025</a>
+      <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&dates=20250517T194500%2F20250517T194500&details=&location=Discord%3A%20servidor%20𝐒𝐞𝐫𝐯𝐢𝐝𝐨𝐫%20𝐝𝐚𝐬%20𝐀𝐧𝐝𝐨𝐫𝐢𝐧𝐡𝐚𝐬%2C%20𝐏𝐚𝐥𝐜𝐨&text=Eurovisão%20Eleitoral%202025">Adicionar ao Calendário</a>
+    </nav>
+  </header>
 
-  <!-- Conteúdo Principal -->
-  <div class="container">
-    <img src="logo-grupo-armindo.png" alt="Logo Grupo Armindo" class="main-logo" />
-    <div class="projects">
-      <div class="card" data-link="https://grupoarmindo.site/Eurovisão">
-        <h2>Eurovisão Eleitoral 2025</h2>
-        <button>Acessar</button>
+  <!-- Seção de Boas-Vindas com botão de inscrição -->
+  <section id="home">
+    <div class="neon-container">
+      <div class="banner">Bem-vindo à Eurovisão Eleitoral 2025!</div>
+      <div class="info">
+        Mais uma vez juntos pela música, este ano o Festival vai ser muito melhor do que o ano passado, mas para isso primeiro tens de te inscrever até dia 16/05/2025!
       </div>
-      <div class="card" data-link="https://grupoarmindo.site/armindonews">
-        <h2>Armindo News</h2>
-        <button>Acessar</button>
-      </div>
-      <div class="card" data-link="https://grupoarmindo.site/andorinhascraft">
-        <h2>Andorinhas Craft</h2>
-        <button>Acessar</button>
-      </div>
-      
+      <!-- Botão de Inscrição -->
+      <a href="https://grupoarmindo.site/Eurovisão/Inscrições" class="btn">Inscreve-te</a>
     </div>
-  </div>
-  <footer style="
-  text-align: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  color: #fff;
-  font-size: 1rem;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  animation: footerFadeIn 1.5s ease forwards;">
-  <p>&copy; Grupo Armindo | Todos os direitos reservados</p>
-</footer>
+  </section>
 
+  <!-- Seção Sobre o Evento -->
+  <section id="sobre">
+    <div class="neon-container">
+      <div class="banner">Sobre o Evento</div>
+      <div class="info">
+        A Eurovisão 2025 é o palco onde os melhores artistas se encontram para uma celebração única da música. Com cantores e partidos diversos.
+        <br><br>
+        <strong>Data:</strong> 17 de Maio de 2025<br>
+        <strong>Hora:</strong> 19:45<br>
+        <strong>Local:</strong> Servidor das Andorinhas
+        <br><br>
+        <a href="https://discord.com/events/1237449699095613531/1354123506698289315" class="btn">Entra no Servidor</a>
+      </div>
+    </div>
+  </section>
 
-<meta content="Grupo Armindo" property="og:title" />
-<meta content="Visita o Painel do Grupo Armindo" property="og:description" />
-<meta content="https://grupoarmindo.site" property="og:url" />
-<meta content="#43B581" data-react-helmet="true" name="theme-color" />
+  <!-- Seção de Programação -->
+  <section id="napa">
+    <div class="neon-container">
+      <div class="banner">Vencedor Festival da Canção RTP 2025</div>
+      <div class="info">
+        <iframe width="840" height="472" src="https://www.youtube.com/embed/MGsJ8wHvTSM?si=Ek4727BIz6nIaS2T" title="Vencedor Festival da Canção" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <p>Artistas: NAPA | Musica: Deslocado</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção de Contato -->
+  <section id="contato">
+    <div class="neon-container">
+      <div class="banner">Contato</div>
+      <div class="info">
+        Para mais informações, entra em contato:
+        <br><br>
+        Discord: <a href="https://discord.gg/GV2nRgQQkV" style="color: #f1c40f; text-decoration: underline;">Servidor das Andorinhas</a>
+        <br>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    O Grupo Armindo não detem direitos sobre o evento Eurovisão Eleitoral<br>
+    &copy União Europeia de Radiodifusão | Todos os direitos reservados
+  </footer>
 
   <script>
-    // Após o fim da animação do splash, remove-o para liberar a tela
-    document.getElementById('splash').addEventListener('animationend', () => {
-      document.getElementById('splash').style.display = 'none';
-    });
-
-    // Redirecionamento: clique no cartão ou no botão
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        if(e.target.tagName !== 'BUTTON'){
-          const link = card.getAttribute('data-link');
-          if(link) window.location.href = link;
+    // Utiliza Intersection Observer para revelar os containers neon conforme rolam na página
+    const containers = document.querySelectorAll('.neon-container');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
         }
       });
-    });
-    document.querySelectorAll('.card button').forEach(button => {
-      button.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const link = button.parentElement.getAttribute('data-link');
-        if(link) window.location.href = link;
-      });
-    });
+    }, { threshold: 0.1 });
+    containers.forEach(container => observer.observe(container));
   </script>
-  
 </body>
 </html>
