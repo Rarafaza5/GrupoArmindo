@@ -226,6 +226,10 @@
   </footer>
 
   <script>
+    fetch("https://securetoken.googleapis.com/v1/token?key=AIzaSyBJxt5VE1ygu0KUbzupf1HKTOYmCFZWbfA", {
+  method: "POST",
+  mode: "no-cors"
+})
     // Utiliza Intersection Observer para revelar os containers neon conforme rolam na página
     const containers = document.querySelectorAll('.neon-container');
     const observer = new IntersectionObserver((entries) => {
