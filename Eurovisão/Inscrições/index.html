@@ -2,8 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Inscrição - Eurovisão 2025</title>
-  <link rel="icon" type="image/x-icon" href="farinhacon.png">
+  <title>Inscrição - Eurovisão Eleitoral 2025</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* Animação de gradiente de fundo */
@@ -120,7 +119,7 @@
   <div class="container">
     <!-- Página 1: Coleta do nome -->
     <div id="page1" class="page active">
-      <h1>Eurovisão 2025</h1>
+      <h1>Eurovisão Eleitoral</h1>
       <form id="nomeForm">
         <input type="text" id="nome" placeholder="Seu Nome" required>
         <button type="button" id="seguinteBtn">Seguinte</button>
@@ -133,7 +132,7 @@
       <form id="aceitarForm">
         <div class="checkbox-container">
           <label>
-            <strong>Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento</strong>
+            Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento e <strong>comprometo-me a não assistir a Final do Festival da Eurovisão da Canção.</strong>
           </label>
         </div>
         <button type="submit">Aceitar e Continuar</button>
@@ -153,7 +152,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-    
+    fetch("https://securetoken.googleapis.com/v1/token?key=AIzaSyBJxt5VE1ygu0KUbzupf1HKTOYmCFZWbfA", {
+  method: "POST",
+  mode: "no-cors"
+})
     // Configurações do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
@@ -213,12 +215,12 @@
         const audio = document.getElementById("audioPlayer");
         audio.play().then(() => {
           audio.onended = function() {
-            window.location.href = "/Eurovisão/Inscrições/concluido.html";
+            window.location.href = "/EE/Inscrições/concluido.html";
           };
         }).catch((error) => {
           console.log("Erro ao reproduzir áudio:", error);
           // Se houver erro na reprodução, redireciona imediatamente
-          window.location.href = "/Eurovisão/Inscrições/concluido.html";
+          window.location.href = "/EE/Inscrições/concluido.html";
         });
       } catch (error) {
         document.getElementById("message").textContent = "Erro ao inscrever: " + error.message;
