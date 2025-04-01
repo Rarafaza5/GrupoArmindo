@@ -144,7 +144,7 @@
   
   <!-- Elemento de áudio para reproduzir "pronto.mp3" -->
   <audio id="audioPlayer" style="display: none;">
-    <source src="pronto.mp3" type="audio/mp3">
+    <source src="https://grupoarmindo.site/Eurovisão/Inscrições/pronto.mp3" type="audio/mp3">
     Seu navegador não suporta o elemento de áudio.
   </audio>
   
@@ -215,12 +215,12 @@
         const audio = document.getElementById("audioPlayer");
         audio.play().then(() => {
           audio.onended = function() {
-            window.location.href = "/EE/Inscrições/concluido.html";
+            window.location.href = "/Eurovisão/Inscrições/concluido.html";
           };
         }).catch((error) => {
           console.log("Erro ao reproduzir áudio:", error);
           // Se houver erro na reprodução, redireciona imediatamente
-          window.location.href = "/EE/Inscrições/concluido.html";
+          window.location.href = "/Eurovisão/Inscrições/concluido.html";
         });
       } catch (error) {
         document.getElementById("message").textContent = "Erro ao inscrever: " + error.message;
