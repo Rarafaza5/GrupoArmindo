@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>OBS - Partidos Vencedores</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Estilo otimizado para transmissão no OBS */
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow: hidden;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: #f1c40f;
+      text-transform: uppercase;
+    }
+    .lista {
+      font-size: 2em;
+      list-style: none;
+      padding: 0;
+    }
+    .lista li {
+      margin: 10px 0;
+    }
+    .loading {
+      font-size: 1.5em;
+      color: #ccc;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Partidos Vencedores</h1>
+    <ul id="listaPartidos" class="lista">
+      <!-- Os resultados serão inseridos dinamicamente -->
+    </ul>
+    <div class="loading" id="loading">Carregando resultados...</div>
+  </div>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    fetch("https://securetoken.googleapis.com/v1/token?key=AIzaSyBJxt5VE1ygu0KUbzupf1HKTOYmCFZWbfA", {
+  method: "POST",
+  mode: "no-cors"
+})
+    // Configurações do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+      authDomain: "aawards.firebaseapp.com",
+      databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+      projectId: "aawards",
+      storageBucket: "aawards.firebasestorage.app",
+      messagingSenderId: "839334918366",
+      appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+      measurementId: "G-Z9YLSTGHST"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Função auxiliar para atribuir ranking com empates
+    function atribuirRanking(votosOrdenados) {
+      const resultados = [];
+      let posicao = 1;
+      votosOrdenados.forEach((item, index) => {
+        if (index > 0 && item[1] === votosOrdenados[index - 1][1]) {
+          resultados.push({ nome: item[0], votos: item[1], posicao });
+        } else {
+          posicao = index + 1;
+          resultados.push({ nome: item[0], votos: item[1], posicao });
+        }
+      });
+      return resultados;
+    }
+
+    async function carregarResultados() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "votos"));
+        const votosPartidos = {};
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if(data.partido) {
+            votosPartidos[data.partido] = (votosPartidos[data.partido] || 0) + 1;
+          }
+        });
+
+        // Ordena os partidos por votos (decrescente) e atribui ranking com empates
+        const partidosOrdenados = Object.entries(votosPartidos).sort((a, b) => b[1] - a[1]);
+        const partidosComRanking = atribuirRanking(partidosOrdenados);
+
+        // Atualiza a lista de partidos (sem exibir pontos)
+        const listaPartidos = document.getElementById("listaPartidos");
+        listaPartidos.innerHTML = "";
+        partidosComRanking.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = `${item.posicao}º Lugar: ${item.nome} – ${item.votos} votos`;
+          listaPartidos.appendChild(li);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar resultados:", error);
+      } finally {
+        document.getElementById("loading").style.display = "none";
+      }
+    }
+
+    // Carrega os resultados ao iniciar e atualiza a cada 30 segundos
+    window.addEventListener("load", () => {
+      carregarResultados();
+      setInterval(carregarResultados, 30000);
+    });
+  </script>
+</body>
+</html>
