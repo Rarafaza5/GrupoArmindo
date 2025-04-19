@@ -1,104 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eurovisão 2025</title>
-  <link rel="icon" type="image/x-icon" href="/farinhacon.png">
+  <title>Eurovisão Eleitoral 2025</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Fundo animado com gradiente */
+    /* Animação de gradiente de fundo */
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    /* Animação de Fade In */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Animação de Pulse para a logo */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    /* Animação de Shake para botões ao hover */
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-      100% { transform: translateX(0); }
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Montserrat', sans-serif;
-
-/* Fundo Colorido Eurovisão UAAAAUu!!!! */
-
-      background: linear-gradient(270deg, #e74c3c,#ff9e9e, #ff4040, #ffff);
-      
-      
-      background-size: 800% 800%;
-      animation: gradientAnimation 15s ease infinite;
-      color: #fff;
-      line-height: 1.6;
-    }
-    /* Cabeçalho e Navegação */
-    header {
-      background: rgba(0, 0, 0, 0.85);
-      padding: 20px;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.7);
-    }
-    header img {
-      width: 17%;
-      height: auto;
-      animation: pulse 2s infinite;
-    }
-    nav {
-      margin-top: 10px;
-    }
-    nav a {
-      
-      text-shadow: 10 10 10px #ff0000;
-      color: #ffff;
-      text-decoration: none;
-      margin: 0 15px;
-      font-size: 1.2em;
-      transition: color 0.3s, transform 0.3s;
-    }
-    nav a:hover {
-      color: #ff0000;
-      transform: scale(1.05);
-    }
-    /* Estilo dos containers neon */
-    .neon-container {
-      background: rgba(0, 0, 0, 0.75);
-      padding: 40px;
-      border-radius: 15px;
-      margin: 40px auto;
-      max-width: 1000px;
-      border: 5px solid;
-      border-image-slice: 1;
-      border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff);
-      animation: neonClockwise 2s linear infinite, scaleUp 0.8s ease forwards, fadeIn 1s ease;
-      box-shadow: 0 0 10px rgba(255, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.7);
-      text-align: center;
-      opacity: 0;
-      transform: translateY(50px);
-      transition: opacity 1s ease-out, transform 1s ease-out;
-    }
+    /* Animação de entrada */
     @keyframes scaleUp {
       from { transform: scale(0.85); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
+    /* Animação de borda neon giratória */
     @keyframes neonClockwise {
       0% { border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff); }
       25% { border-image-source: linear-gradient(90deg, #ffffff, #ff0000, #ffffff, #ff0000); }
@@ -106,140 +24,245 @@
       75% { border-image-source: linear-gradient(270deg, #ffffff, #ff0000, #ffffff, #ff0000); }
       100% { border-image-source: linear-gradient(360deg, #ff0000, #ffffff, #ff0000, #ffffff); }
     }
-    .neon-container.visible {
-      opacity: 1;
-      transform: translateY(0);
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(270deg, #e74c3c,#ff9e9e, #ff4040, #ffff);background-size: 800% 800%;
+      animation: gradientAnimation 15s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
     }
-    /* Estilo dos títulos e textos */
-    .banner {
-      font-size: 2em;
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 40px 50px;
+      border-radius: 15px;
+      width: 350px;
+      max-width: 90%;
+      text-align: center;
+      border: 5px solid;
+      border-image-slice: 1;
+      border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff);
+      animation: neonClockwise 2s linear infinite, scaleUp 0.8s ease forwards;
+      box-shadow: 0 0 20px rgba(255,255,255,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 1.8em;
       margin-bottom: 20px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #ffff;
-      text-shadow: 0 0 10px #ff0000;
+      letter-spacing: 2px;
+      color: #ff0000;
     }
-    .info {
+    .page {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    .page.active {
+      opacity: 1;
+      position: relative;
+    }
+    .question {
       font-size: 1.2em;
-      margin-bottom: 20px;
-    }
-    /* Botão de Inscrição */
-    .btn {
-      display: inline-block;
-      background: #ff0000;
       color: #fff;
-      padding: 15px 30px;
-      font-size: 1.5em;
-      font-weight: bold;
-      border: none;
+      margin-bottom: 25px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+    /* Oculta os inputs radio padrão */
+    .options input[type="radio"] {
+      display: none;
+    }
+    .options label {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 15px;
       border-radius: 8px;
       cursor: pointer;
-      text-decoration: none;
-      transition: background 0.3s, transform 0.3s;
-      box-shadow: 0 0 15px #fff(241,196,15,0.7);
-      text-shadow: 0 0 10px rgba(0,0,0,0.3);
-      margin-top: 20px;
+      transition: background 0.3s, transform 0.2s;
+      color: #fff;
+      border: 2px solid transparent;
     }
-    .btn:hover {
-      background: #ffff;
-      color: #ff0000;
+    .options label:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+    }
+    /* Feedback visual quando a opção é selecionada */
+    .options input[type="radio"]:checked + label {
+      color: #fa2222;
+      background: #ffd8d8;
+      border-color: #ff0000;
+      box-shadow: 0 0 10px #ff0000;
+    }
+    button {
+      padding: 12px 20px;
+      background: #f1c40f;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    button:hover {
+      background: #d4ac0d;
       transform: scale(1.05);
     }
-    .btn:active {
-      transform: scale(0.95);
+    .message {
+      margin-top: 15px;
+      font-size: 1em;
+      color: #fff;
     }
-    /* Rodapé */
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.85);
-      border-top: 1px solid #444;
-      animation: fadeIn 2s ease;
+    /* Feedback visual para botões desabilitados */
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logoesc.png" alt="Logo Eurovisão 2025">
-    <nav>
-      <a href="https://discord.gg/GV2nRgQQkV">SA</a>
-      <a href="#napa">Vencedor Festival da Canção 2025</a>
-      <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&dates=20250517T194500%2F20250517T194500&details=&location=Discord%3A%20servidor%20𝐒𝐞𝐫𝐯𝐢𝐝𝐨𝐫%20𝐝𝐚𝐬%20𝐀𝐧𝐝𝐨𝐫𝐢𝐧𝐡𝐚𝐬%2C%20𝐏𝐚𝐥𝐜𝐨&text=Eurovisão%20Eleitoral%202025">Adicionar ao Calendário</a>
-    </nav>
-  </header>
+  <div class="container">
+    <!-- Página 1: País da Eurovisão -->
+    <div id="page1" class="page active">
+      <h1>Eurovisão Eleitoral 2025</h1>
+      <div class="question">Selecione o País da Eurovisão</div>
+      <form id="paisForm">
+        <div class="options">
+          <input type="radio" id="pais-reinounido" name="pais" value="Reino Unido" required>
+          <label for="pais-reinounido">Reino Unido</label>
 
-  <!-- Seção de Boas-Vindas com botão de inscrição -->
-  <section id="home">
-    <div class="neon-container">
-      <div class="banner">Bem-vindo à Eurovisão Eleitoral 2025!</div>
-      <div class="info">
-        Mais uma vez juntos pela música, este ano o Festival vai ser muito melhor do que o ano passado, mas para isso primeiro tens de te inscrever até dia 16/05/2025!
-      </div>
-      <!-- Botão de Inscrição -->
-      <a href="https://grupoarmindo.site/Eurovisão/Inscrições" class="btn">Inscreve-te</a>
+          <input type="radio" id="pais-espanha" name="pais" value="Espanha">
+          <label for="pais-espanha">Espanha</label>
+
+          <input type="radio" id="pais-italia" name="pais" value="Itália">
+          <label for="pais-italia">Itália</label>
+
+          <input type="radio" id="pais-franca" name="pais" value="França">
+          <label for="pais-franca">França</label>
+
+          <input type="radio" id="pais-alemanha" name="pais" value="Alemanha">
+          <label for="pais-alemanha">Alemanha</label>
+
+          <input type="radio" id="pais-suiça" name="pais" value="Suiça">
+          <label for="pais-suiça">Suiça</label>
+        </div>
+        <button type="button" id="nextBtn">Seguinte</button>
+      </form>
     </div>
-  </section>
+    
+    <!-- Página 2: Partido -->
+    <div id="page2" class="page" style="display: none;">
+      <h1>Eurovisão Eleitoral</h1>
+      <div class="question">Selecione o Partido</div>
+      <form id="partidoForm">
+        <div class="options">
+          <input type="radio" id="partido-a" name="partido" value="Partido A" required>
+          <label for="partido-a">Partido A</label>
 
-  <!-- Seção Sobre o Evento -->
-  <section id="sobre">
-    <div class="neon-container">
-      <div class="banner">Sobre o Evento</div>
-      <div class="info">
-        A Eurovisão 2025 é o palco onde os melhores artistas se encontram para uma celebração única da música. Com cantores e partidos diversos.
-        <br><br>
-        <strong>Data:</strong> 17 de Maio de 2025<br>
-        <strong>Hora:</strong> 19:45<br>
-        <strong>Local:</strong> Servidor das Andorinhas
-        <br><br>
-        <a href="https://discord.com/events/1237449699095613531/1354123506698289315" class="btn">Entra no Servidor</a>
-      </div>
+          <input type="radio" id="partido-b" name="partido" value="Partido B">
+          <label for="partido-b">Partido B</label>
+
+          <input type="radio" id="partido-c" name="partido" value="Partido C">
+          <label for="partido-c">Partido C</label>
+
+          <input type="radio" id="partido-d" name="partido" value="Partido D">
+          <label for="partido-d">Partido D</label>
+        </div>
+        <button type="submit" id="submitBtn">Submeter</button>
+      </form>
     </div>
-  </section>
-
-  <!-- Seção de Programação -->
-  <section id="napa">
-    <div class="neon-container">
-      <div class="banner">Vencedor Festival RTP da Canção 2025</div>
-      <div class="info">
-        <iframe width="840" height="472" src="https://www.youtube.com/embed/MGsJ8wHvTSM?si=Ek4727BIz6nIaS2T" title="Vencedor Festival da Canção" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        <p>Artistas: NAPA | Musica: Deslocado</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Seção de Contato -->
-  <section id="contato">
-    <div class="neon-container">
-      <div class="banner">Contacto</div>
-      <div class="info">
-        Para mais informações, entra em contato:
-        <br><br>
-        Discord: <a href="https://discord.gg/GV2nRgQQkV" style="color: #ff0000; text-decoration: underline #ff0000;">Servidor das Andorinhas</a>
-        <br>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    O Grupo Armindo não detem direitos sobre o evento Eurovisão Eleitoral<br>
-    &copy <a href="https://ebu.ch" style="color: #ffff; text-decoration: #ffff;">União Europeia de Radiodifusão</a> | Todos os direitos reservados
-  </footer>
-
-  <script>
+    
+    <div class="message" id="message"></div>
+  </div>
+  
+  <!-- Elemento de áudio para reproduzir "pronto.mp3" (opcional) -->
+  <audio id="audioPlayer" style="display: none;">
+    <source src="pronto.mp3" type="audio/mp3">
+    Seu navegador não suporta o elemento de áudio.
+  </audio>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
     fetch("https://securetoken.googleapis.com/v1/token?key=AIzaSyBJxt5VE1ygu0KUbzupf1HKTOYmCFZWbfA", {
   method: "POST",
   mode: "no-cors"
 })
-    // Utiliza Intersection Observer para revelar os containers neon conforme rolam na página
-    const containers = document.querySelectorAll('.neon-container');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.1 });
-    containers.forEach(container => observer.observe(container));
+    // Configurações do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+      authDomain: "aawards.firebaseapp.com",
+      databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+      projectId: "aawards",
+      storageBucket: "aawards.firebasestorage.app",
+      messagingSenderId: "839334918366",
+      appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+      measurementId: "G-Z9YLSTGHST"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let selectedPais = "";
+    
+    // Transição da Página 1 para Página 2 com feedback suave
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      const pais = document.querySelector('input[name="pais"]:checked');
+      if (!pais) {
+        alert("Por favor, selecione um país.");
+        return;
+      }
+      selectedPais = pais.value;
+      document.getElementById("page1").classList.remove("active");
+      setTimeout(() => {
+        document.getElementById("page1").style.display = "none";
+        document.getElementById("page2").style.display = "block";
+        void document.getElementById("page2").offsetWidth;
+        document.getElementById("page2").classList.add("active");
+      }, 500);
+    });
+    
+    // Submissão do formulário na Página 2
+    document.getElementById("partidoForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const partido = document.querySelector('input[name="partido"]:checked');
+      if (!partido) {
+        alert("Por favor, selecione um partido.");
+        return;
+      }
+      const selectedPartido = partido.value;
+      
+      try {
+        await addDoc(collection(db, "votos"), {
+          pais: selectedPais,
+          partido: selectedPartido,
+          timestamp: new Date()
+        });
+        document.getElementById("message").textContent = "Voto registrado com sucesso!";
+        
+        // Toca áudio (caso o arquivo esteja disponível) e redireciona após término
+        const audio = document.getElementById("audioPlayer");
+        audio.play().then(() => {
+          audio.onended = () => window.location.href = "/EE/Inscricoes/concluido.html";
+        }).catch((error) => {
+          console.error("Erro ao reproduzir áudio:", error);
+          window.location.href = "/EE/Inscricoes/concluido.html";
+        });
+      } catch (error) {
+        document.getElementById("message").textContent = "Erro ao registrar voto: " + error.message;
+      }
+    });
   </script>
 </body>
 </html>
