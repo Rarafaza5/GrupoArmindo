@@ -204,7 +204,7 @@
   
   <!-- Elemento de áudio para reproduzir "pronto.mp3" (opcional) -->
   <audio id="audioPlayer" style="display: none;">
-    <source src="Votar/pronto.mp3" type="audio/mp3">
+    <source src="/pronto.mp3" type="audio/mp3">
     Seu navegador não suporta o elemento de áudio.
   </audio>
   
@@ -264,7 +264,7 @@
   
       if (!querySnapshot.empty) {
         alert("Este IP já foi utilizado para votar. Voto não permitido.");
-        window.location.href = "Votar/concluido.html";
+        window.location.href = "/concluido.html";
         return;
       }
   
@@ -297,10 +297,10 @@
   
         const audio = document.getElementById("audioPlayer");
         audio.play().then(() => {
-          audio.onended = () => window.location.href = "Votar/concluido.html";
+          audio.onended = () => window.location.href = "/concluido.html";
         }).catch((error) => {
           console.error("Erro ao reproduzir áudio:", error);
-          window.location.href = "Votar/concluido.html";
+          window.location.href = "/concluido.html";
         });
   
       } catch (error) {
