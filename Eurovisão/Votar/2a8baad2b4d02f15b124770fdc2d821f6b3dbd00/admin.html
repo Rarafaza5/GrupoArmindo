@@ -152,6 +152,8 @@
 
       <div style="text-align: center; margin-top: 30px;">
         <button id="btnResetar">🗑️ Resetar Votação</button>
+        <button id="btnApurar">🧹 Apurar (1 voto por IP)</button>
+
       </div>
 
       
@@ -160,8 +162,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
+    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  
     const firebaseConfig = {
       apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
       authDomain: "aawards.firebaseapp.com",
@@ -170,12 +172,12 @@
       messagingSenderId: "839334918366",
       appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
     };
-
+  
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
+  
     const pontosEurovisao = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1];
-
+  
     async function carregarResultados() {
       try {
         const querySnapshot = await getDocs(collection(db, "votos"));
@@ -183,7 +185,7 @@
         const votosPartidos = {};
         const ipSet = new Set();
         let total = 0;
-
+  
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           total++;
@@ -191,12 +193,12 @@
           if (data.partido) votosPartidos[data.partido] = (votosPartidos[data.partido] || 0) + 1;
           if (data.ip) ipSet.add(data.ip);
         });
-
+  
         document.getElementById("statTotalVotos").textContent = `Total de votos: ${total}`;
         document.getElementById("statPaises").textContent = `Países distintos: ${Object.keys(votosPaises).length}`;
         document.getElementById("statPartidos").textContent = `Partidos distintos: ${Object.keys(votosPartidos).length}`;
         document.getElementById("statIPs").textContent = `IPs únicos: ${ipSet.size}`;
-
+  
         const paisesOrdenados = Object.entries(votosPaises).sort((a, b) => b[1] - a[1]);
         const listaPaises = document.getElementById("listaPaises");
         listaPaises.innerHTML = "";
@@ -206,7 +208,7 @@
           li.textContent = `${nome} – ${votos} votos (${pts} pts)`;
           listaPaises.appendChild(li);
         });
-
+  
         const partidosOrdenados = Object.entries(votosPartidos).sort((a, b) => b[1] - a[1]);
         const listaPartidos = document.getElementById("listaPartidos");
         listaPartidos.innerHTML = "";
@@ -215,22 +217,17 @@
           li.textContent = `${index + 1}º Lugar: ${nome} – ${votos} votos`;
           listaPartidos.appendChild(li);
         });
-
+  
         document.getElementById("statTopPais").textContent = paisesOrdenados.length ? `País mais votado: ${paisesOrdenados[0][0]} (${paisesOrdenados[0][1]} votos)` : "-";
         document.getElementById("statTopPartido").textContent = partidosOrdenados.length ? `Partido mais votado: ${partidosOrdenados[0][0]} (${partidosOrdenados[0][1]} votos)` : "-";
-
-        const ipSnapshot = await getDocs(collection(db, "ips"));
-        const ips = [];
-        ipSnapshot.forEach((doc) => ips.push(doc.id));
-        document.getElementById("ipLista").value = ips.join("\n");
-
+  
       } catch (error) {
         console.error("Erro ao carregar os resultados: ", error);
       } finally {
         document.getElementById("loading").style.display = "none";
       }
     }
-
+  
     async function resetarVotacao() {
       if (!confirm("Tem certeza que deseja apagar todos os votos? Esta ação não pode ser desfeita.")) return;
       try {
@@ -244,31 +241,66 @@
         alert("Erro ao resetar a votação: " + error.message);
       }
     }
-
-    
-
+  
+    async function apurarVotacao() {
+      if (!confirm("Deseja manter apenas o voto mais recente de cada IP? Esta ação não pode ser desfeita.")) return;
+  
+      try {
+        const votosSnap = await getDocs(collection(db, "votos"));
+        const votosPorIP = new Map();
+  
+        votosSnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          const ip = data.ip;
+          const timestamp = data.timestamp || data.data || null;
+          if (!ip || !timestamp) return;
+  
+          if (!votosPorIP.has(ip) || votosPorIP.get(ip).data.timestamp.toMillis() < timestamp.toMillis()) {
+            votosPorIP.set(ip, { id: docSnap.id, data });
+          }
+        });
+  
+        const votosAmanter = new Set([...votosPorIP.values()].map((v) => v.id));
+        let apagados = 0;
+  
+        for (const docSnap of votosSnap.docs) {
+          if (!votosAmanter.has(docSnap.id)) {
+            await deleteDoc(doc(db, "votos", docSnap.id));
+            apagados++;
+          }
+        }
+  
+        alert(`Apuração completa. ${apagados} votos antigos removidos.`);
+        carregarResultados();
+  
+      } catch (error) {
+        alert("Erro ao apurar votos: " + error.message);
+      }
+    }
+  
     window.addEventListener("load", carregarResultados);
-
+  
     document.getElementById("btnEurovisao").addEventListener("click", () => {
       document.getElementById("secaoPaises").style.display = "block";
       document.getElementById("secaoPartidos").style.display = "none";
       document.getElementById("painelAdmin").style.display = "none";
     });
-
+  
     document.getElementById("btnPoliticos").addEventListener("click", () => {
       document.getElementById("secaoPaises").style.display = "none";
       document.getElementById("secaoPartidos").style.display = "block";
       document.getElementById("painelAdmin").style.display = "none";
     });
-
+  
     document.getElementById("btnAdmin").addEventListener("click", () => {
       document.getElementById("secaoPaises").style.display = "none";
       document.getElementById("secaoPartidos").style.display = "none";
       document.getElementById("painelAdmin").style.display = "block";
     });
-
+  
     document.getElementById("btnResetar").addEventListener("click", resetarVotacao);
-    document.getElementById("btnSalvarIPs").addEventListener("click", salvarIPs);
+    document.getElementById("btnApurar").addEventListener("click", apurarVotacao);
   </script>
+  
 </body>
 </html>
