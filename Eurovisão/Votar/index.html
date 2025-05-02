@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Eurovisão Eleitoral 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Animação de gradiente de fundo */
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Animação de entrada */
+    @keyframes scaleUp {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    /* Animação de borda neon giratória */
+    @keyframes neonClockwise {
+      0% { border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+      25% { border-image-source: linear-gradient(90deg, #ffffff, #ff0000, #ffffff, #ff0000); }
+      50% { border-image-source: linear-gradient(180deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+      75% { border-image-source: linear-gradient(270deg, #ffffff, #ff0000, #ffffff, #ff0000); }
+      100% { border-image-source: linear-gradient(360deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(270deg, #e74c3c,#ff9e9e, #ff4040, #ffff);background-size: 800% 800%;
+      animation: gradientAnimation 15s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 40px 50px;
+      border-radius: 15px;
+      width: 350px;
+      max-width: 90%;
+      text-align: center;
+      border: 5px solid;
+      border-image-slice: 1;
+      border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff);
+      animation: neonClockwise 2s linear infinite, scaleUp 0.8s ease forwards;
+      box-shadow: 0 0 20px rgba(255,255,255,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ff0000;
+    }
+    .page {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    .page.active {
+      opacity: 1;
+      position: relative;
+    }
+    .question {
+      font-size: 1.2em;
+      color: #fff;
+      margin-bottom: 25px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+    /* Oculta os inputs radio padrão */
+    .options input[type="radio"] {
+      display: none;
+    }
+    .options label {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      color: #fff;
+      border: 2px solid transparent;
+    }
+    .options label:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+    }
+    /* Feedback visual quando a opção é selecionada */
+    .options input[type="radio"]:checked + label {
+      color: #fa2222;
+      background: #ffd8d8;
+      border-color: #ff0000;
+      box-shadow: 0 0 10px #ff0000;
+    }
+    button {
+      padding: 12px 20px;
+      background: #f1c40f;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    button:hover {
+      background: #d4ac0d;
+      transform: scale(1.05);
+    }
+    .message {
+      margin-top: 15px;
+      font-size: 1em;
+      color: #fff;
+    }
+    /* Feedback visual para botões desabilitados */
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Página 1: País da Eurovisão -->
+    <div id="page1" class="page active">
+      <h1>Eurovisão Eleitoral 2025</h1>
+      <div class="question">Selecione o País da Eurovisão</div>
+      <form id="paisForm">
+        <div class="options">
+          <input type="radio" id="pais-reinounido" name="pais" value="Reino Unido" required>
+          <label for="pais-reinounido">Reino Unido</label>
+
+          <input type="radio" id="pais-espanha" name="pais" value="Espanha">
+          <label for="pais-espanha">Espanha</label>
+
+          <input type="radio" id="pais-italia" name="pais" value="Itália">
+          <label for="pais-italia">Itália</label>
+
+          <input type="radio" id="pais-franca" name="pais" value="França">
+          <label for="pais-franca">França</label>
+
+          <input type="radio" id="pais-alemanha" name="pais" value="Alemanha">
+          <label for="pais-alemanha">Alemanha</label>
+
+          <input type="radio" id="pais-suiça" name="pais" value="Suiça">
+          <label for="pais-suiça">Suiça</label>
+        </div>
+        <button type="button" id="nextBtn">Seguinte</button>
+      </form>
+    </div>
+    
+    <!-- Página 2: Partido -->
+    <div id="page2" class="page" style="display: none;">
+      <h1>Eurovisão Eleitoral</h1>
+      <div class="question">Selecione o Partido</div>
+      <form id="partidoForm">
+        <div class="options">
+          <input type="radio" id="AD - Coligação PSD-CDS" name="partido" value="AD - Coligação PSD-CDS" required>
+      <label for="AD - Coligação PSD-CDS">AD<br>Coligação PSD/CDS</label>
+
+      <input type="radio" id="Coligação Democrática Unitária" name="partido" value="Coligação Democrática Unitária">
+      <label for="Coligação Democrática Unitária">Coligação Democrática Unitária</label>
+
+      <input type="radio" id="Bloco de Esquerda" name="partido" value="Bloco de Esquerda">
+      <label for="Bloco de Esquerda">Bloco de Esquerda</label>
+
+      <input type="radio" id="CHEGA" name="partido" value="CHEGA">
+      <label for="CHEGA">CHEGA</label>
+
+      <input type="radio" id="Iniciativa Liberal" name="partido" value="Iniciativa Liberal">
+      <label for="Iniciativa Liberal">Iniciativa Liberal</label>
+
+      <input type="radio" id="LIVRE" name="partido" value="LIVRE">
+      <label for="LIVRE">LIVRE</label>
+
+      <input type="radio" id="Partido Socialista" name="partido" value="Partido Socialista">
+      <label for="Partido Socialista">Partido Socialista</label>
+
+      <input type="radio" id="Pessoas-Animais-Natureza" name="partido" value="Pessoas-Animais-Natureza">
+      <label for="Pessoas-Animais-Natureza">Pessoas-Animais-Natureza</label>
+
+        </div>
+        <button type="submit" id="submitBtn">Submeter</button><br>
+        <div class="message" style="margin-top: 10px; font-size: 0.9em; color: white;">
+          Ao clicar em "Submeter" concordas com os <a href="https://grupoarmindo.site/Eurovisão/Termos%20e%20Condições%20e%20Políticas%20de%20Privacidade%20e%20Regulamento%20do%20Evento%20Eurovisão%20Eleitoral%202025.pdf" target="_blank" style="color: white; text-decoration: underline;">Termos e Condições, Políticas de Privacidade e Regulamento</a> do Evento "Eurovisão Eleitoral".
+        </div>
+      </form>
+    </div>
+    
+    <div class="message" id="message"></div>
+  </div>
+  
+  <!-- Elemento de áudio para reproduzir "pronto.mp3" (opcional) -->
+  <audio id="audioPlayer" style="display: none;">
+    <source src="Votar/pronto.mp3" type="audio/mp3">
+    Seu navegador não suporta o elemento de áudio.
+  </audio>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  
+    // Configurações do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+      authDomain: "aawards.firebaseapp.com",
+      databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+      projectId: "aawards",
+      storageBucket: "aawards.firebasestorage.app",
+      messagingSenderId: "839334918366",
+      appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+      measurementId: "G-Z9YLSTGHST"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let selectedPais = "";
+    let userIP = "";
+  
+    // Obter IP do utilizador
+    async function getIP() {
+      try {
+        const response = await fetch("https://api.ipify.org?format=json");
+        const data = await response.json();
+        return data.ip;
+      } catch (err) {
+        console.error("Erro ao obter IP:", err);
+        return null;
+      }
+    }
+  
+    // Transição Página 1 → Página 2
+    document.getElementById("nextBtn").addEventListener("click", async () => {
+      const pais = document.querySelector('input[name="pais"]:checked');
+      if (!pais) {
+        alert("Por favor, selecione um país.");
+        return;
+      }
+  
+      selectedPais = pais.value;
+      userIP = await getIP();
+  
+      if (!userIP) {
+        alert("Erro ao identificar o IP. Tente novamente.");
+        return;
+      }
+  
+      // Verificar se já existe voto com esse IP
+      const votosRef = collection(db, "votos");
+      const q = query(votosRef, where("ip", "==", userIP));
+      const querySnapshot = await getDocs(q);
+  
+      if (!querySnapshot.empty) {
+        alert("Este IP já foi utilizado para votar. Voto não permitido.");
+        window.location.href = "Votar/concluido.html";
+        return;
+      }
+  
+      // Prossegue para página 2
+      document.getElementById("page1").classList.remove("active");
+      setTimeout(() => {
+        document.getElementById("page1").style.display = "none";
+        document.getElementById("page2").style.display = "block";
+        void document.getElementById("page2").offsetWidth;
+        document.getElementById("page2").classList.add("active");
+      }, 500);
+    });
+  
+    // Submissão do voto
+    document.getElementById("partidoForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const partido = document.querySelector('input[name="partido"]:checked');
+      if (!partido) {
+        alert("Por favor, selecione um partido.");
+        return;
+      }
+  
+      try {
+        await addDoc(collection(db, "votos"), {
+          pais: selectedPais,
+          partido: partido.value,
+          ip: userIP,
+          timestamp: new Date()
+        });
+  
+        const audio = document.getElementById("audioPlayer");
+        audio.play().then(() => {
+          audio.onended = () => window.location.href = "Votar/concluido.html";
+        }).catch((error) => {
+          console.error("Erro ao reproduzir áudio:", error);
+          window.location.href = "Votar/concluido.html";
+        });
+  
+      } catch (error) {
+        document.getElementById("message").textContent = "Erro ao registrar voto: " + error.message;
+      }
+    });
+  </script>
+  
+</body>
+</html>

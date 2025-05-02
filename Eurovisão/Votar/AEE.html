@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Inserir Password</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex, nofollow">
+
+        <style>
+            *,
+            *:after,
+            *:before {
+                box-sizing: border-box;
+            }
+            body,
+            html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+                font-weight: 300;
+                font-size: 16px;
+                background: #f2f2f2;
+                color: #2D3737;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100%;
+            }
+
+            .protected {
+                background: #fff;
+                box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+                border-radius: 3px;
+                min-width: 500px;
+            }
+
+            .protected__content {
+                padding: 24px 28px;
+            }
+
+            .protected__content__heading {
+                font-size: 16px;
+                font-weight: 500;
+                margin: 0 0 12px;
+                line-height: 1;
+            }
+
+            .protected__alert {
+                display: none;
+                border-bottom: 1px solid transparent;
+                border-radius: 3px 3px 0 0;
+                padding: 12px 14px;
+                color: #a94442;
+                background-color: #f2dede;
+                border-color: #ebccd1;
+            }
+
+            .protected__content__input {
+                display: block;
+                border: solid 1px #ccc;
+                padding: 12px 14px;
+                box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+                font-size: 16px;
+                width: 100%;
+                border-radius: 3px;
+                margin-bottom: 12px;
+            }
+
+            .protected__content__input:focus {
+                outline: none;
+                border-color: #228843;
+            }
+
+            .protected__content__btn {
+                background-color: #228843;
+                border-radius: 3px;
+                cursor: pointer;
+                border: none;
+                color: #fff;
+                padding: 12px 14px;
+                font-size: 16px;
+                font-weight: 500;
+            }
+
+            .protected__content__btn:hover {
+                background-color: #1C6D36;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="protected">
+            <div class="protected__alert" id="alert">Password Errada</div>
+            <div class="protected__content">
+                <h1 class="protected__content__heading">Eurovisão Eleitoral</h1>
+                <input class="protected__content__input" id="password" type="password" placeholder="Password"/>
+                <button id="button" type="button" class="protected__content__btn">Seguinte</button>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-sha1/0.6.0/sha1.min.js"></script>
+        <script type="text/javascript">
+            "use strict";
+            
+
+
+
+
+
+
+
+
+
+
+
+            //Alterar Palavra-passe
+            var password = "Armindo2025#"
+
+
+
+
+
+
+
+
+
+
+            // Selecionar os elementos
+            var button = document.getElementById('button');
+            var passwordInput = document.getElementById('password');
+            var alert = document.getElementById('alert');
+
+            // Função de login
+            function login(secret) {
+                // Verifica se a senha inserida é "Armindo2025#"
+                if (secret === password) {
+                    window.location.href = "/2a8baad2b4d02f15b124770fdc2d821f6b3dbd00/admin.html"; // Redireciona para a URL
+                } else {
+                    showError(); // Se a senha for incorreta, exibe a mensagem de erro
+                }
+            }
+
+            // Função para exibir o erro
+            function showError() {
+                alert.style.display = 'block';
+                passwordInput.setAttribute('placeholder', 'Password Incorreta');
+                passwordInput.value = '';
+            }
+
+            // Ação ao clicar no botão
+            button.addEventListener("click", function () {
+                login(passwordInput.value);
+            });
+            fetch("https://securetoken.googleapis.com/v1/token?key=AIzaSyBJxt5VE1ygu0KUbzupf1HKTOYmCFZWbfA", {
+  method: "POST",
+  mode: "no-cors"
+})
+            // Ação ao pressionar a tecla Enter
+            document.onkeydown = function (e) {
+                e = e || window.event;
+                if (e.keyCode == 13) {
+                    login(passwordInput.value);
+                }
+            };
+        </script>
+
+    </body>
+</html>
