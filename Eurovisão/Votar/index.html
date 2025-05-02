@@ -309,5 +309,32 @@
     });
   </script>
   
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('votarForm');
+    const btn  = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();  // previne envio múltiplo imediato :contentReference[oaicite:0]{index=0}
+      
+      // Se já estiver desativado, sai sem fazer nada
+      if (btn.disabled) return;
+
+      // Aqui colocas o teu AJAX/fetch para registar o voto...
+      // fetch('/registar-voto', { method: 'POST', body: new FormData(form) })
+      //   .then(res => { /* feedback ao utilizador */ });
+
+      // Desativa o botão imediatamente
+      btn.disabled = true;                 // atributo disabled bloqueia cliques :contentReference[oaicite:1]{index=1}
+      btn.innerText = 'Aguarde 30 s…';
+
+      // Reativa após 30s
+      setTimeout(() => {                   // executa callback decorrido o tempo :contentReference[oaicite:2]{index=2}
+        btn.disabled = false;
+        btn.innerText = 'Submeter';
+      }, 30 * 1000);  // 30 000 ms = 30 s
+    });
+  });
+</script>
 </body>
 </html>
