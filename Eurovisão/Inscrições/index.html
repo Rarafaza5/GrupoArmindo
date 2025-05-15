@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Inscrições Fechadas - Eurovisão Eleitoral 2025</title>
+  <title>Inscrição - Eurovisão Eleitoral 2025</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* Animação de gradiente de fundo */
@@ -56,24 +56,175 @@
       letter-spacing: 2px;
       color: #f1c40f;
     }
-    .message {
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    input[type="text"],
+    input[type="email"] {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
       font-size: 1em;
-      color: #fff;
+      transition: box-shadow 0.3s;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
+    }
+    button {
+      padding: 12px;
+      background: #f1c40f;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    button:hover {
+      background: #d4ac0d;
+      transform: scale(1.05);
+    }
+    .message {
+      margin-top: 15px;
+      font-size: 1em;
+      color: white;
+    }
+    .checkbox-container {
+      font-size: 0.9em;
+      color: white;
+    }
+    /* Transições de fade para as páginas */
+    .page {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    .page.active {
+      opacity: 1;
+      position: relative;
+    }
+    a {
+      color: white;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Será preenchido via JavaScript -->
+    <!-- Página 1: Coleta do nome -->
+    <div id="page1" class="page active">
+      <h1>Eurovisão Eleitoral</h1>
+      <form id="nomeForm">
+        <input type="text" id="nome" placeholder="Seu Nome" required>
+        <button type="button" id="seguinteBtn">Seguinte</button>
+      </form>
+    </div>
+    
+    <!-- Página 2: Consentimento (sem checkbox) -->
+    <div id="page2" class="page" style="display: none;">
+      <h1>Consentimentos</h1>
+      <form id="aceitarForm">
+        <div class="checkbox-container">
+          <label>
+            Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento e <strong>comprometo-me a não assistir a Final do Festival da Eurovisão da Canção.</strong>
+          </label>
+        </div>
+        <button type="submit">Aceitar e Continuar</button>
+      </form>
+    </div>
+    
+    <div class="message" id="message"></div>
   </div>
-
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const container = document.querySelector('.container');
-      container.innerHTML = `
-        <h1>Inscrições Fechadas</h1>
-        <p class="message">Agradecemos o seu interesse!</p>
-      `;
+  
+  <!-- Elemento de áudio para reproduzir "pronto.mp3" -->
+  <audio id="audioPlayer" style="display: none;">
+    <source src="https://grupoarmindo.site/Eurovisão/Inscrições/pronto.mp3" type="audio/mp3">
+    Seu navegador não suporta o elemento de áudio.
+  </audio>
+  
+  <!-- Integração com Firebase (v9) e lógica de redirecionamento -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    fetch("https://securetoken.googleapis.com/v1/token?key=AIzaSyBJxt5VE1ygu0KUbzupf1HKTOYmCFZWbfA", {
+  method: "POST",
+  mode: "no-cors"
+})
+    // Configurações do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+      authDomain: "aawards.firebaseapp.com",
+      databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+      projectId: "aawards",
+      storageBucket: "aawards.firebasestorage.app",
+      messagingSenderId: "839334918366",
+      appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+      measurementId: "G-Z9YLSTGHST"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let userName = "";
+    
+    // Transição da Página 1 para a Página 2
+    document.getElementById("seguinteBtn").addEventListener("click", () => {
+      const nomeInput = document.getElementById("nome").value.trim();
+      if (nomeInput === "") {
+        alert("Por favor, insira seu nome.");
+        return;
+      }
+      userName = nomeInput;
+      document.getElementById("page1").classList.remove("active");
+      setTimeout(() => {
+        document.getElementById("page1").style.display = "none";
+        document.getElementById("page2").style.display = "block";
+        void document.getElementById("page2").offsetWidth;
+        document.getElementById("page2").classList.add("active");
+      }, 500);
+    });
+    
+    // Tratamento da submissão da Página 2
+    document.getElementById("aceitarForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const submitButton = document.querySelector("#aceitarForm button[type='submit']");
+      
+      // Impede múltiplos cliques caso o botão já esteja desabilitado
+      if (submitButton.disabled) return;
+      
+      // Desabilita o botão por 10 segundos
+      submitButton.disabled = true;
+      setTimeout(() => {
+        submitButton.disabled = false;
+      }, 10000);
+      
+      try {
+        await addDoc(collection(db, "inscricoes"), {
+          nome: userName,
+          timestamp: new Date()
+        });
+        document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
+        
+        // Toca o som "pronto.mp3" e, ao terminar, redireciona
+        const audio = document.getElementById("audioPlayer");
+        audio.play().then(() => {
+          audio.onended = function() {
+            window.location.href = "/Eurovisão/Inscrições/concluido.html";
+          };
+        }).catch((error) => {
+          console.log("Erro ao reproduzir áudio:", error);
+          // Se houver erro na reprodução, redireciona imediatamente
+          window.location.href = "/Eurovisão/Inscrições/concluido.html";
+        });
+      } catch (error) {
+        document.getElementById("message").textContent = "Erro ao inscrever: " + error.message;
+      }
     });
   </script>
 </body>
