@@ -5,8 +5,8 @@
   <title>Inscrição - Eurovisão Eleitoral 2025</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Animação de gradiente de fundo */
-    @keyframes gradientAnimation {
+   /* Animação de gradiente de fundo */
+   @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
@@ -116,116 +116,109 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Página 1: Coleta do nome -->
-    <div id="page1" class="page active">
-      <h1>Eurovisão Eleitoral</h1>
-      <form id="nomeForm">
-        <input type="text" id="nome" placeholder="Seu Nome" required>
-        <button type="button" id="seguinteBtn">Seguinte</button>
-      </form>
-    </div>
-    
-    <!-- Página 2: Consentimento (sem checkbox) -->
-    <div id="page2" class="page" style="display: none;">
-      <h1>Consentimentos</h1>
-      <form id="aceitarForm">
-        <div class="checkbox-container">
-          <label>
-            Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento e <strong>comprometo-me a não assistir a Final do Festival da Eurovisão da Canção.</strong>
-          </label>
-        </div>
-        <button type="submit">Aceitar e Continuar</button>
-      </form>
-    </div>
-    
-    <div class="message" id="message"></div>
+  <div class="container" id="mainContainer">
+    <!-- Será preenchido pelo script -->
   </div>
-  
-  <!-- Elemento de áudio para reproduzir "pronto.mp3" -->
-  <audio id="audioPlayer" style="display: none;">
-    <source src="https://grupoarmindo.site/Eurovisão/Inscrições/pronto.mp3" type="audio/mp3">
-    Seu navegador não suporta o elemento de áudio.
-  </audio>
-  
-  <!-- Integração com Firebase (v9) e lógica de redirecionamento -->
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-    fetch("https://securetoken.googleapis.com/v1/token?key=AIzaSyBJxt5VE1ygu0KUbzupf1HKTOYmCFZWbfA", {
-  method: "POST",
-  mode: "no-cors"
-})
-    // Configurações do Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
-      authDomain: "aawards.firebaseapp.com",
-      databaseURL: "https://aawards-default-rtdb.firebaseio.com",
-      projectId: "aawards",
-      storageBucket: "aawards.firebasestorage.app",
-      messagingSenderId: "839334918366",
-      appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
-      measurementId: "G-Z9YLSTGHST"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    let userName = "";
-    
-    // Transição da Página 1 para a Página 2
-    document.getElementById("seguinteBtn").addEventListener("click", () => {
-      const nomeInput = document.getElementById("nome").value.trim();
-      if (nomeInput === "") {
-        alert("Por favor, insira seu nome.");
-        return;
-      }
-      userName = nomeInput;
-      document.getElementById("page1").classList.remove("active");
-      setTimeout(() => {
-        document.getElementById("page1").style.display = "none";
-        document.getElementById("page2").style.display = "block";
-        void document.getElementById("page2").offsetWidth;
-        document.getElementById("page2").classList.add("active");
-      }, 500);
-    });
-    
-    // Tratamento da submissão da Página 2
-    document.getElementById("aceitarForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const submitButton = document.querySelector("#aceitarForm button[type='submit']");
-      
-      // Impede múltiplos cliques caso o botão já esteja desabilitado
-      if (submitButton.disabled) return;
-      
-      // Desabilita o botão por 10 segundos
-      submitButton.disabled = true;
-      setTimeout(() => {
-        submitButton.disabled = false;
-      }, 10000);
-      
-      try {
-        await addDoc(collection(db, "inscricoes"), {
-          nome: userName,
-          timestamp: new Date()
+    async function main() {
+      const deadline = new Date('2025-05-16T12:00:00');
+      const now = new Date();
+      const container = document.getElementById('mainContainer');
+
+      if (now < deadline) {
+        // Mostrar formulário de inscrição
+        container.innerHTML = `
+          <div id="page1" class="page active">
+            <h1>Eurovisão Eleitoral</h1>
+            <form id="nomeForm">
+              <input type="text" id="nome" placeholder="Seu Nome" required>
+              <button type="button" id="seguinteBtn">Seguinte</button>
+            </form>
+          </div>
+          <div id="page2" class="page" style="display: none;">
+            <h1>Consentimentos</h1>
+            <form id="aceitarForm">
+              <div class="checkbox-container">
+                <label>
+                  Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento.</strong>
+                </label>
+              </div>
+              <button type="submit">Aceitar e Continuar</button>
+            </form>
+          </div>
+          <div class="message" id="message"></div>
+          <audio id="audioPlayer" style="display: none;">
+            <source src="https://grupoarmindo.site/Eurovisão/Inscrições/pronto.mp3" type="audio/mp3">
+          </audio>
+        `;
+
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js");
+        const { getFirestore, collection, addDoc } = await import("https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js");
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+          authDomain: "aawards.firebaseapp.com",
+          databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+          projectId: "aawards",
+          storageBucket: "aawards.firebasestorage.app",
+          messagingSenderId: "839334918366",
+          appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+          measurementId: "G-Z9YLSTGHST"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let userName = "";
+
+        document.getElementById("seguinteBtn").addEventListener("click", () => {
+          const nomeInput = document.getElementById("nome").value.trim();
+          if (!nomeInput) {
+            alert("Por favor, insira seu nome.");
+            return;
+          }
+          userName = nomeInput;
+          document.getElementById("page1").classList.remove("active");
+          setTimeout(() => {
+            document.getElementById("page1").style.display = "none";
+            document.getElementById("page2").style.display = "block";
+            void document.getElementById("page2").offsetWidth;
+            document.getElementById("page2").classList.add("active");
+          }, 500);
         });
-        document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
-        
-        // Toca o som "pronto.mp3" e, ao terminar, redireciona
-        const audio = document.getElementById("audioPlayer");
-        audio.play().then(() => {
-          audio.onended = function() {
-            window.location.href = "/Eurovisão/Inscrições/concluido.html";
-          };
-        }).catch((error) => {
-          console.log("Erro ao reproduzir áudio:", error);
-          // Se houver erro na reprodução, redireciona imediatamente
-          window.location.href = "/Eurovisão/Inscrições/concluido.html";
+
+        document.getElementById("aceitarForm").addEventListener("submit", async e => {
+          e.preventDefault();
+          const btn = document.querySelector("#aceitarForm button");
+          if (btn.disabled) return;
+          btn.disabled = true;
+          setTimeout(() => btn.disabled = false, 10000);
+
+          try {
+            await addDoc(collection(db, "inscricoes"), {
+              nome: userName,
+              timestamp: new Date()
+            });
+            document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
+            const audio = document.getElementById("audioPlayer");
+            await audio.play();
+            audio.onended = () => window.location.href = "/Eurovisão/Inscrições/concluido.html";
+          } catch (err) {
+            document.getElementById("message").textContent = "Erro ao inscrever: " + err.message;
+          }
         });
-      } catch (error) {
-        document.getElementById("message").textContent = "Erro ao inscrever: " + error.message;
+
+      } else {
+        // Mostrar mensagem de inscrições fechadas
+        container.innerHTML = `
+          <h1>Inscrições Fechadas</h1>
+          <p class="message">Agradecemos o seu interesse!</p>
+        `;
       }
-    });
+    }
+
+    window.addEventListener('DOMContentLoaded', main);
   </script>
 </body>
 </html>
