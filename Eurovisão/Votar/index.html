@@ -18,17 +18,17 @@
     }
     /* Animação de borda neon giratória */
     @keyframes neonClockwise {
-      0% { border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff); }
-      25% { border-image-source: linear-gradient(90deg, #ffffff, #ff0000, #ffffff, #ff0000); }
-      50% { border-image-source: linear-gradient(180deg, #ff0000, #ffffff, #ff0000, #ffffff); }
-      75% { border-image-source: linear-gradient(270deg, #ffffff, #ff0000, #ffffff, #ff0000); }
-      100% { border-image-source: linear-gradient(360deg, #ff0000, #ffffff, #ff0000, #ffffff); }
+      0% { border-image-source: linear-gradient(0deg, #571fa2, #0abfbb, #571fa2, #0abfbb); }
+      25% { border-image-source: linear-gradient(90deg, #571fa2, #0abfbb, #571fa2, #0abfbb); }
+      50% { border-image-source: linear-gradient(180deg, #571fa2, #0abfbb, #571fa2, #0abfbb); }
+      75% { border-image-source: linear-gradient(270deg, #571fa2, #0abfbb, #571fa2, #0abfbb); }
+      100% { border-image-source: linear-gradient(360deg, #571fa2, #0abfbb, #571fa2, #0abfbb); }
     }
     body {
       margin: 0;
       padding: 0;
       font-family: 'Montserrat', sans-serif;
-      background: linear-gradient(270deg, #e74c3c,#ff9e9e, #ff4040, #ffff);background-size: 800% 800%;
+      background: linear-gradient(270deg, #571fa2, #ae1ba9, #330535, #655579);background-size: 800% 800%;
       animation: gradientAnimation 15s ease infinite;
       display: flex;
       align-items: center;
@@ -44,7 +44,7 @@
       text-align: center;
       border: 5px solid;
       border-image-slice: 1;
-      border-image-source: linear-gradient(0deg, #ff0000, #ffffff, #ff0000, #ffffff);
+      border-image-source: linear-gradient(0deg, #571fa2, #0abfbb, #571fa2, #0abfbb);
       animation: neonClockwise 2s linear infinite, scaleUp 0.8s ease forwards;
       box-shadow: 0 0 20px rgba(255,255,255,0.8);
       position: relative;
@@ -55,7 +55,7 @@
       margin-bottom: 20px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: #ff0000;
+      color: #0abfbb;
     }
     .page {
       opacity: 0;
@@ -99,14 +99,14 @@
     }
     /* Feedback visual quando a opção é selecionada */
     .options input[type="radio"]:checked + label {
-      color: #fa2222;
-      background: #ffd8d8;
-      border-color: #ff0000;
-      box-shadow: 0 0 10px #ff0000;
+      color: #571fa2;
+      background: #0abfbb;
+      border-color: #571fa2;
+      box-shadow: 0 0 10px #571fa2;
     }
     button {
       padding: 12px 20px;
-      background: #f1c40f;
+      background: #0abfbb;
       border: none;
       border-radius: 8px;
       font-size: 1em;
@@ -114,10 +114,12 @@
       cursor: pointer;
       transition: background 0.3s, transform 0.3s;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      color:#571fa2;
     }
     button:hover {
-      background: #d4ac0d;
+      background: #571fa2;
       transform: scale(1.05);
+      color:#0abfbb;
     }
     .message {
       margin-top: 15px;
@@ -227,7 +229,7 @@
       <form id="partidoForm">
         <div class="options">
           <input type="radio" id="AD - Coligação PSD-CDS" name="partido" value="AD - Coligação PSD-CDS" required>
-      <label for="AD - Coligação PSD-CDS">AD<br>Coligação PSD-CDS</label>
+      <label for="AD - Coligação PSD-CDS">AD<br>Coligação PSD/CDS</label>
 
       <input type="radio" id="Coligação Democrática Unitária" name="partido" value="Coligação Democrática Unitária">
       <label for="Coligação Democrática Unitária">Coligação Democrática Unitária</label>
