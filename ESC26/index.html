@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eurovisão</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+  background: #000;
+  height: 100vh;
+  font-family: 'Gotham Black', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+  position: relative;
+}
+
+@font-face {
+  font-family: 'Gotham Black';
+  src:
+       url('Gotham-Black.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+    .container {
+      text-align: center;
+      animation: fadeIn 2s ease-out forwards;
+      z-index: 2;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      width: 50vw;
+      max-width: 600px;
+      margin-bottom: 20px;
+      animation: zoomIn 3s ease-in-out;
+    }
+
+    @keyframes zoomIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .subtitle {
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      text-shadow: 0 0 10px #000;
+    }
+
+    .location {
+      font-size: 1.4rem;
+      color: #eee;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #000;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    .countdown div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: pulse 2s infinite;
+    }
+
+   
+
+    .countdown label {
+      font-size: 0.9rem;
+      color: #ddd;
+      margin-top: 5px;
+      font-weight: normal;
+      text-shadow: 0 0 5px #000;
+    }
+
+    .glow-border {
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 40px 60px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      animation: borderGlow 4s ease-in-out infinite;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+      50% { box-shadow: 0 0 40px rgba(255, 255, 255, 0.5); }
+    }
+
+    /* ❤️ Corações animados */
+    .hearts-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: 0;
+      font-size: 20px;
+      opacity: 0.8;
+      animation: floatUp 6s linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container glow-border">
+    <img src="logofull26.png" alt="ESC 2026 Logo" class="logo" />
+
+    <div class="countdown">
+      <div><span id="days">0</span><label>DIAS</label></div>
+      <div><span id="hours">00</span><label>HORAS</label></div>
+      <div><span id="minutes">00</span><label>MINUTOS</label></div>
+      <div><span id="seconds">00</span><label>SEGUNDOS</label></div>
+    </div>
+  </div>
+
+  <!-- Corações -->
+  <div class="hearts-container" id="hearts"></div>
+
+  <script>
+    const eventDate = new Date("May 16, 2026 21:00:00").getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = eventDate - now;
+
+      if (distance < 0) {
+        document.querySelector('.countdown').innerHTML = "Event Started!";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").textContent = days;
+      document.getElementById("hours").textContent = String(hours).padStart(2, '0');
+      document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
+      document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Função para gerar corações vermelhos e brancos
+    const heartsContainer = document.getElementById('hearts');
+    const colors = ['#ffffff', '#d40000'];
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+      heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+      heart.textContent = '❤';
+      heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+
+      heartsContainer.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 7000);
+    }
+
+    setInterval(createHeart, 300);
+  </script>
+</body>
+</html>
