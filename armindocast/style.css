@@ -1,0 +1,256 @@
+/* Reset básico e fonte padrão */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    overflow-x: hidden;
+}
+
+/* Container para centralizar o conteúdo */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Estilização do cabeçalho */
+header {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.5));
+    color: #fff;
+    padding: 40px 20px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    z-index: 2;
+}
+
+header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4em;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #ff007f, #6a00f4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 25px;
+}
+
+nav ul li:last-child {
+    margin-right: 0;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: 600;
+    transition: color 0.3s ease, transform 0.3s ease;
+    position: relative;
+}
+
+nav ul li a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 2px;
+    width: 100%;
+    background: #ffa500;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: bottom right;
+}
+
+nav ul li a:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+/* Seção com efeito parallax */
+section.parallax {
+    background: url('images/parallax-background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    padding: 100px 20px;
+    text-align: center;
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.3);
+}
+
+section.parallax::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+section.parallax .container {
+    position: relative;
+    z-index: 2;
+}
+
+h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    color: #fff;
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background: #ffa500;
+    margin: 20px auto 0;
+    border-radius: 2px;
+    animation: pulse 1.5s infinite;
+}
+
+/* Estilização dos títulos nas seções Sobre e Contato */
+#about h2, #contact h2 {
+    color: #333; /* Cor escura para visibilidade */
+    font-family: 'Poppins', sans-serif; /* Fonte estilizada para um toque moderno */
+    font-size: 2.5em; /* Tamanho do texto ajustado para uma melhor leitura */
+}
+
+/* Estilização dos episódios */
+.episode {
+    background: #fff;
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.episode::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(0, 255, 255, 0.2));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.episode:hover::before {
+    opacity: 1;
+}
+
+.episode:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.episode h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #333;
+    position: relative;
+    z-index: 2;
+}
+
+audio {
+    width: 100%;
+    margin-top: 15px;
+}
+
+#about, #contact {
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+    position: relative;
+    overflow: hidden;
+}
+
+#about p, #contact p {
+    font-size: 1.2em;
+    line-height: 1.8;
+    color: #333;
+}
+
+footer {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.5));
+    color: #fff;
+    text-align: center;
+    padding: 30px 20px;
+    position: relative;
+    box-shadow: 0 -8px 16px rgba(0, 0, 0, 0.6);
+    border-radius: 15px 15px 0 0;
+    margin-top: 20px;
+}
+
+footer p {
+    font-size: 1.2em;
+    letter-spacing: 1px;
+}
+
+/* Animações e transições */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2.5em;
+    }
+
+    nav ul li {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    nav ul li:last-child {
+        margin-bottom: 0;
+    }
+
+    .episode {
+        padding: 15px;
+    }
+
+    #about, #contact {
+        padding: 40px 15px;
+    }
+}
