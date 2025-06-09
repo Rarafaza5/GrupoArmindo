@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8653418731294447"
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8653418731294447"
      crossorigin="anonymous"></script>
   <link rel="icon" type="image/png" href="armindo.png">
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hub do Grupo Armindo</title>
-  <!-- Fonte Poppins (exemplo). -->
+
+  <!-- Fonte Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
   <style>
     /* Reset */
     * {
@@ -22,19 +20,21 @@
       padding: 0;
       box-sizing: border-box;
     }
-    body {
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc, #6a11cb, #2575fc);
       background-size: 400% 400%;
       animation: gradientBG 10s ease infinite;
       overflow-x: hidden;
       color: #fff;
-      position: relative;
-      min-height: 100vh;
     }
     @keyframes gradientBG {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
@@ -50,25 +50,11 @@
       animation: splashAnimation 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
     @keyframes splashAnimation {
-      0% {
-        transform: scale(0.3);
-        opacity: 0;
-      }
-      30% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(0.95);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
+      0% { transform: scale(0.3); opacity: 0; }
+      30% { transform: scale(1.1); opacity: 1; }
+      50% { transform: scale(0.95); opacity: 1; }
+      70% { transform: scale(1); opacity: 1; }
+      100% { opacity: 0; }
     }
     .splash-logo {
       width: 300px;
@@ -115,8 +101,9 @@
 
     /* Grid de Projetos */
     .projects {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 2rem;
       margin-top: 2rem;
     }
@@ -127,6 +114,7 @@
       backdrop-filter: blur(10px);
       border-radius: 15px;
       padding: 2rem;
+      width: 300px;
       position: relative;
       overflow: hidden;
       cursor: pointer;
@@ -169,10 +157,6 @@
       animation: textFadeIn 1s ease forwards;
       animation-delay: 2.7s;
     }
-    @keyframes textFadeIn {
-      0% { opacity: 0; transform: translateY(10px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
     .card button {
       padding: 0.75rem 2rem;
       font-size: 1rem;
@@ -192,63 +176,33 @@
       transform: scale(1.1);
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
+    @keyframes textFadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
 
- 
-
-
-
-
-
-
-
-
-    html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .content {
-    flex: 1;
-  }
-  footer {
-    position: relative;
-  }
-  .projects {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
-  }
-  .card {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 2rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    width: 300px;
-  }
-  .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  }
-  @keyframes footerFadeIn {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-
-footer a {
-  color: #fff;
-  text-decoration: none;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-
-
-
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      font-size: 1rem;
+      position: relative;
+      animation: footerFadeIn 1.5s ease forwards;
+    }
+    @keyframes footerFadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    footer a {
+      color: #fff;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -261,7 +215,7 @@ footer a:hover {
   <div class="container">
     <img src="logo-grupo-armindo.png" alt="Logo Grupo Armindo" class="main-logo" />
     <div class="projects">
-           <div class="card" data-link="https://calendar.google.com/calendar/embed?src=6991aeb9cae9950f54a9728027c9b939d09b9e9189def409a9129598191293fe%40group.calendar.google.com&ctz=Europe%2FLisbon">
+      <div class="card" data-link="https://calendar.google.com/calendar/embed?src=6991aeb9cae9950f54a9728027c9b939d09b9e9189def409a9129598191293fe%40group.calendar.google.com&ctz=Europe%2FLisbon">
         <h2>Calendário Grupo Armindo</h2>
         <button>Acessar</button>
       </div>
@@ -281,53 +235,30 @@ footer a:hover {
         <h2>Armindo Cast</h2>
         <button>Acessar</button>
       </div>
-      
     </div>
   </div>
-  <footer style="
-  text-align: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  color: #fff;
-  font-size: 1rem;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  animation: footerFadeIn 1.5s ease forwards;">
-       <a href="https://grupoarmindo.site/Diretrizes%20do%20Grupo%20Armindo.pdf">Termos e Condições</a>
-  <p>&copy; Grupo Armindo | Todos os direitos reservados</p>
-</footer>
 
-
-<meta content="Grupo Armindo" property="og:title" />
-<meta content="Visita o Painel do Grupo Armindo" property="og:description" />
-<meta content="https://grupoarmindo.site" property="og:url" />
-<meta content="#43B581" data-react-helmet="true" name="theme-color" />
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Grupo Armindo. Todos os direitos reservados. | <a href="https://grupoarmindo.site">grupoarmindo.site</a></p>
+  </footer>
 
   <script>
-    // Após o fim da animação do splash, remove-o para liberar a tela
-    document.getElementById('splash').addEventListener('animationend', () => {
-      document.getElementById('splash').style.display = 'none';
+    // Splash timeout
+    window.addEventListener("load", () => {
+      const splash = document.getElementById("splash");
+      setTimeout(() => {
+        splash.style.display = "none";
+      }, 3000);
     });
 
-    // Redirecionamento: clique no cartão ou no botão
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        if(e.target.tagName !== 'BUTTON'){
-          const link = card.getAttribute('data-link');
-          if(link) window.location.href = link;
-        }
-      });
-    });
-    document.querySelectorAll('.card button').forEach(button => {
-      button.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const link = button.parentElement.getAttribute('data-link');
-        if(link) window.location.href = link;
+    // Click on cards
+    document.querySelectorAll(".card").forEach(card => {
+      card.addEventListener("click", () => {
+        const link = card.getAttribute("data-link");
+        if (link) window.open(link, "_blank");
       });
     });
   </script>
-  
 </body>
 </html>
