@@ -16,11 +16,11 @@
     html, body {
       height: 100%;
       font-family: 'Montserrat', sans-serif;
-      background: linear-gradient(-45deg, #084cac, #3131d6, #5c5ccc, #b86ce4);
-      background-size: 600% 600%;
+      background: linear-gradient(-45deg, #0b0c2a, #1b1464, #3a1c71, #602080);
+      background-size: 400% 400%;
       animation: gradientBG 20s ease infinite;
       overflow-x: hidden;
-      color: white;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -42,47 +42,48 @@
 
     header h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 2.8rem;
-      color: #fff;
-      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+      font-size: 3rem;
+      color: #f8e71c;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      letter-spacing: 2px;
     }
 
     .typewriter {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       max-width: 800px;
       white-space: pre-wrap;
       margin: 0 auto 40px;
-      line-height: 1.7;
+      line-height: 1.8;
       display: inline-block;
       overflow: hidden;
-      border-right: 2px solid white;
+      border-right: 2px solid #f8e71c;
       animation: blink-caret 0.75s step-end infinite;
     }
 
     @keyframes blink-caret {
       0%, 100% { border-color: transparent; }
-      50% { border-color: white; }
+      50% { border-color: #f8e71c; }
     }
 
     .invite-btn {
       display: inline-block;
-      padding: 14px 28px;
+      padding: 16px 32px;
       font-size: 1rem;
-      font-weight: 600;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px solid white;
-      border-radius: 30px;
+      font-weight: 700;
+      color: #0b0c2a;
+      background: #f8e71c;
+      border: none;
+      border-radius: 40px;
       text-decoration: none;
       transition: all 0.3s ease;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 8px 30px rgba(248, 231, 28, 0.4);
     }
 
     .invite-btn:hover {
-      background: white;
-      color: #084cac;
-      transform: scale(1.05);
+      background: #fff;
+      color: #1b1464;
+      transform: scale(1.08);
+      box-shadow: 0 10px 40px rgba(248, 231, 28, 0.6);
     }
 
     @keyframes fadeIn {
@@ -105,8 +106,8 @@
 
   <div class="typewriter" id="typewriter"></div>
 
-  <a href="https://discord.gg/2ZFBQAPsDk" class="invite-btn" target="_blank" rel="noopener noreferrer">
-    Entrar no Servidor das Andorinhas
+  <a href="https://discord.gg/vbfTNZjZWZ" class="invite-btn" target="_blank" rel="noopener noreferrer">
+    Link de Uso Unico
   </a>
 
   <footer>
@@ -116,9 +117,9 @@
   <script>
     const text = `Olá Melissa,
 
-Temos o prazer de te convidar para a *Semifinal* e a *Grande Final* dos **Armindo Awards** — o evento mais aguardado do ano!
+Temos o prazer de te convidar para a Semifinal e a Grande Final dos Armindo Awards — o evento mais aguardado do ano!
 
-🗓️ Data prevista: entre a 2ª e a 3ª semana de **janeiro de 2026**  
+🗓️ Data prevista: entre a 2ª e a 3ª semana de janeiro de 2026
 📍 Local: Servidor das Andorinhas no Discord (SA)
 
 Para confirmares a tua presença vais precisar de um link que será enviado, mais perto da data, no chat #comunicados no SA.
