@@ -7,6 +7,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@600&display=swap');
 
+    /* Base styles for all screen sizes */
     * {
       margin: 0;
       padding: 0;
@@ -14,18 +15,19 @@
     }
 
     html, body {
-      height: 100%;
+      /* Changed height to min-height to allow content to expand beyond viewport height if needed */
+      min-height: 100vh;
       font-family: 'Montserrat', sans-serif;
       background: linear-gradient(-45deg, #0b0c2a, #1b1464, #3a1c71, #602080);
       background-size: 400% 400%;
       animation: gradientBG 20s ease infinite;
-      overflow-x: hidden;
+      overflow-x: hidden; /* Prevent horizontal scrolling */
       color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 40px 20px; /* Responsive padding */
       text-align: center;
     }
 
@@ -42,22 +44,27 @@
 
     header h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 3rem;
+      font-size: 3rem; /* Base font size */
       color: #f8e71c;
       text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
       letter-spacing: 2px;
     }
 
     .typewriter {
-      font-size: 1.25rem;
+      font-size: 1.25rem; /* Base font size */
       max-width: 800px;
+      width: 100%; /* Ensure it takes full width within max-width */
       white-space: pre-wrap;
       margin: 0 auto 40px;
       line-height: 1.8;
       display: inline-block;
-      overflow: hidden;
+      /* Removed overflow: hidden to prevent text cutoff */
+      /* Added overflow-y: auto as a fallback if content still somehow exceeds visible area */
+      overflow-y: auto;
       border-right: 2px solid #f8e71c;
       animation: blink-caret 0.75s step-end infinite;
+      padding: 0 10px; /* Add some horizontal padding */
+      flex-shrink: 0; /* Prevent the typewriter from shrinking */
     }
 
     @keyframes blink-caret {
@@ -77,6 +84,7 @@
       text-decoration: none;
       transition: all 0.3s ease;
       box-shadow: 0 8px 30px rgba(248, 231, 28, 0.4);
+      white-space: nowrap; /* Prevent button text from wrapping */
     }
 
     .invite-btn:hover {
@@ -95,19 +103,72 @@
       margin-top: 60px;
       font-size: 0.85rem;
       color: rgba(255,255,255,0.6);
+      width: 100%; /* Ensure footer takes full width */
+    }
+
+    /* Media Queries for Responsiveness */
+
+    /* Small devices (e.g., phones) */
+    @media (max-width: 768px) {
+      html, body {
+        padding: 20px 15px; /* Reduce padding on smaller screens */
+      }
+
+      header h1 {
+        font-size: 2.2rem; /* Smaller heading for mobile */
+      }
+
+      .typewriter {
+        font-size: 1rem; /* Smaller text for mobile */
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .invite-btn {
+        padding: 14px 28px; /* Slightly smaller button */
+        font-size: 0.9rem;
+      }
+
+      footer {
+        margin-top: 40px;
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Extra small devices (e.g., very small phones) */
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .typewriter {
+        font-size: 0.9rem;
+        padding: 0 5px; /* Even less padding */
+      }
+
+      .invite-btn {
+        padding: 12px 24px;
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Convite Especial</h1>
+    <h1>Convite Armindo Awards</h1>
   </header>
 
   <div class="typewriter" id="typewriter"></div>
 
-  <a href="https://discord.gg/vbfTNZjZWZ" class="invite-btn" target="_blank" rel="noopener noreferrer">
-    Link de Uso Unico
+  <a href="https://discord.gg/tjTUDV5yHw" class="invite-btn" target="_blank" rel="noopener noreferrer">
+    Entrar no SA
+  </a>
+    <a href="https://grupoarmindo.site" class="invite-btn" target="_blank" rel="noopener noreferrer">
+    Hub do Grupo Armindo
+  </a>
+    <a href="https://docs.google.com/document/d/1RFJFEPlA73THO9OTceBOepKpY8yEPC1Wk0y0-ubjOfA/edit?usp=sharing" class="invite-btn" target="_blank" rel="noopener noreferrer">
+    História do Grupo Armindo
   </a>
 
   <footer>
@@ -115,9 +176,9 @@
   </footer>
 
   <script>
-    const text = `Olá Melissa,
+    const text = `Olá Mila,
 
-Temos o prazer de te convidar para a Semifinal e a Grande Final dos Armindo Awards — o evento mais aguardado do ano!
+Temos o prazer de te convidar para "A Grande Final dos Armindo Awards — o evento mais aguardado do ano!" e o "Grupo Armindo" (Se não entenderes é totalmente compreensivel, tens o link da história em baixo para entender melhor ;)
 
 🗓️ Data prevista: entre a 2ª e a 3ª semana de janeiro de 2026
 📍 Local: Servidor das Andorinhas no Discord (SA)
@@ -139,12 +200,21 @@ Anfitriões Armindo Awards 2025`;
 
     function typeWriterEffect() {
       if (i < text.length) {
-        typewriter.innerHTML += text.charAt(i);
+        // Handle new lines for pre-wrap to ensure proper display
+        if (text.charAt(i) === '\n') {
+          typewriter.innerHTML += '<br>';
+        } else {
+          typewriter.innerHTML += text.charAt(i);
+        }
         i++;
         setTimeout(typeWriterEffect, getDelay(text.charAt(i - 1)));
+      } else {
+        // Ensure the caret blinks even after typing is complete
+        typewriter.style.borderRight = '2px solid #f8e71c';
       }
     }
 
+    // Start typing effect when the window loads
     window.onload = typeWriterEffect;
   </script>
 
