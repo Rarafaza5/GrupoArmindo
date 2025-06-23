@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Convite Exclusivo - Armindo Awards</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(-45deg, #0b0c2a, #1b1464, #3a1c71, #602080);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+      overflow-x: hidden;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      margin-bottom: 30px;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      color: #f8e71c;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      letter-spacing: 2px;
+    }
+
+    .typewriter {
+      font-size: 1.25rem;
+      max-width: 800px;
+      white-space: pre-wrap;
+      margin: 0 auto 40px;
+      line-height: 1.8;
+      display: inline-block;
+      overflow: hidden;
+      border-right: 2px solid #f8e71c;
+      animation: blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes blink-caret {
+      0%, 100% { border-color: transparent; }
+      50% { border-color: #f8e71c; }
+    }
+
+    .invite-btn {
+      display: inline-block;
+      padding: 16px 32px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0b0c2a;
+      background: #f8e71c;
+      border: none;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 30px rgba(248, 231, 28, 0.4);
+    }
+
+    .invite-btn:hover {
+      background: #fff;
+      color: #1b1464;
+      transform: scale(1.08);
+      box-shadow: 0 10px 40px rgba(248, 231, 28, 0.6);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      margin-top: 60px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Convite Especial</h1>
+  </header>
+
+  <div class="typewriter" id="typewriter"></div>
+
+  <a href="https://discord.gg/vbfTNZjZWZ" class="invite-btn" target="_blank" rel="noopener noreferrer">
+    Link de Uso Unico
+  </a>
+
+  <footer>
+    © 2025 Grupo Armindo. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    const text = `Olá Melissa,
+
+Temos o prazer de te convidar para a Semifinal e a Grande Final dos Armindo Awards — o evento mais aguardado do ano!
+
+🗓️ Data prevista: entre a 2ª e a 3ª semana de janeiro de 2026
+📍 Local: Servidor das Andorinhas no Discord (SA)
+
+Para confirmares a tua presença vais precisar de um link que será enviado, mais perto da data, no chat #comunicados no SA.
+A tua presença será fundamental para tornar este momento ainda mais memorável.
+  
+Rafael Diogo e Jorge Figueira
+Anfitriões Armindo Awards 2025`;
+
+    const typewriter = document.getElementById('typewriter');
+    let i = 0;
+
+    function getDelay(char) {
+      if (char === '.' || char === '\n') return 60;
+      if (char === ',' || char === ';' || char === ':') return 30;
+      return 15 + Math.random() * 30;
+    }
+
+    function typeWriterEffect() {
+      if (i < text.length) {
+        typewriter.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typeWriterEffect, getDelay(text.charAt(i - 1)));
+      }
+    }
+
+    window.onload = typeWriterEffect;
+  </script>
+
+</body>
+</html>
