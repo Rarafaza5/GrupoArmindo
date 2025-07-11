@@ -763,6 +763,19 @@
                 if (cooldown && !popupShown) { // Se acabou de terminar e o pop-up ainda não foi mostrado
                     showCooldownPopup(); // Mostra o pop-up de cooldown
                     popupShown = true; // Define a flag como verdadeira
+
+                    // Tenta tocar o som. Se falhar por autoplay policy, o catch() lidará com isso.
+                    cooldownSound.currentTime = 0; // Reinicia o som para ter certeza que toca do início
+                    cooldownSound.play().catch(e => {
+                        // NotAllowedError significa que o navegador bloqueou o autoplay
+                        if (e.name === 'NotAllowedError') {
+                            console.warn("Autoplay bloqueado. Por favor, interaja com a página para ativar o som.");
+                            // Opcional: Adicionar uma mensagem visual para o utilizador
+                            // Por exemplo, um pequeno ícone de "mute" ou "clique para ativar som"
+                        } else {
+                            console.error("Erro ao tocar som: ", e);
+                        }
+                    });
                 }
                 cooldown = false;
                 cooldownText.textContent = 'PRONTO!';
@@ -1045,16 +1058,10 @@
         // Event listeners para os pop-ups
         closePopupButton.addEventListener('click', () => {
             hideCooldownPopup();
-            // Play the sound here, as it's directly tied to a user click
-            cooldownSound.currentTime = 0;
-            cooldownSound.play().catch(e => console.error("Erro ao tocar som: ", e));
         });
         notificationPopupOverlay.addEventListener('click', (e) => {
             if (e.target === notificationPopupOverlay) { // Só fecha se clicou diretamente no overlay, não no popup
                 hideCooldownPopup();
-                // Play the sound here, as it's directly tied to a user click on the overlay
-                cooldownSound.currentTime = 0;
-                cooldownSound.play().catch(e => console.error("Erro ao tocar som: ", e));
             }
         });
 
