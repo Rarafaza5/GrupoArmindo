@@ -408,54 +408,89 @@
             margin-left: 4px; /* Reduced margin */
         }
 
-        /* Responsividade básica */
+        /* ------------------------------------------- */
+        /* RESPONSIVE STYLES FOR MOBILE DEVICES */
+        /* ------------------------------------------- */
+
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
                 align-items: flex-start;
                 padding: 10px 15px;
-                height: auto;
+                height: auto; /* Allow header height to adapt */
                 gap: 10px;
             }
 
+            header h1 {
+                font-size: 1.4rem; /* Slightly smaller title */
+                margin-bottom: 5px; /* Space between title and controls */
+            }
+
+            header h1 .logo {
+                font-size: 1.8rem;
+            }
+
             .controls-info {
-                flex-direction: column;
+                flex-direction: column; /* Stack controls vertically */
                 align-items: flex-start;
-                gap: 8px;
-                font-size: 0.8rem;
+                gap: 5px; /* Smaller gap between info items */
+                font-size: 0.78rem; /* Smaller font for info */
+                width: 100%; /* Take full width */
+            }
+            
+            #instructions {
+                display: none; /* Hide lengthy instructions on mobile to save space */
             }
 
             #cooldown {
-                width: 100%;
-                margin-top: 10px;
+                width: 100%; /* Full width cooldown bar */
+                margin-top: 10px; /* Space from controls */
+                font-size: 0.9rem;
+                padding: 8px 10px;
+            }
+
+            /* Define a new header height variable for mobile */
+            body {
+                --header-height-mobile: 130px; /* Adjust based on collapsed header height */
             }
 
             #container {
-                top: auto;
-                height: calc(100vh - var(--header-height-mobile, 130px));
+                top: var(--header-height-mobile); /* Adjust canvas position below mobile header */
+                height: calc(100vh - var(--header-height-mobile));
             }
 
             #color-picker {
                 padding: 10px 12px;
                 gap: 8px;
-                bottom: 10px;
+                bottom: 10px; /* Closer to the bottom edge */
             }
 
             .color {
                 width: 30px;
                 height: 30px;
+                border-width: 2px; /* Thinner border for selected color */
+            }
+            .color.selected {
+                box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 8px var(--primary-red); /* Smaller shadow */
             }
 
             #minimap {
-                width: 150px;
-                height: 150px;
-                top: 15px;
-                right: 15px;
+                width: 130px; /* Smaller minimap */
+                height: 130px;
+                top: calc(var(--header-height-mobile) + 10px); /* Position below mobile header */
+                right: 10px; /* Closer to right edge */
+                border-width: 1px; /* Thinner border */
+                border-radius: 8px; /* Slightly less rounded */
+                box-shadow: 0 2px 8px var(--shadow-light); /* Lighter shadow */
+            }
+            #minimap .viewport-rect {
+                border-width: 1px; /* Thinner border for viewport rect */
             }
 
             .popup-content {
                 padding: 25px 30px;
                 gap: 20px;
+                border-radius: 12px; /* Slightly less rounded */
             }
 
             .popup-content h2 {
@@ -474,26 +509,90 @@
                 padding: 12px 25px;
                 font-size: 1rem;
             }
+            
+            #name-input-popup input[type="text"] {
+                width: 90%; /* Wider input for better touch targeting */
+                font-size: 1rem;
+                padding: 10px 12px;
+            }
 
             #leaderboard {
                 bottom: 10px;
                 left: 10px;
-                max-width: 160px; /* Further reduced for mobile */
-                padding: 6px 10px; /* Further reduced padding */
-                font-size: 0.75rem; /* Further reduced font size */
+                max-width: 150px; /* Even smaller max-width */
+                padding: 5px 8px; /* Reduced padding */
+                font-size: 0.7rem; /* Smallest font size */
+                border-radius: 4px; /* More compact rounding */
             }
             #leaderboard h3 {
-                font-size: 0.85rem;
-                margin-bottom: 6px;
+                font-size: 0.8rem;
+                margin-bottom: 5px;
                 padding-bottom: 3px;
             }
             #leaderboard li {
-                padding: 3px 0;
+                padding: 2px 0;
             }
-            #leaderboard #total-pixels-display { /* Changed ID here */
-                margin-top: 6px;
-                padding-top: 6px;
-                font-size: 0.8em;
+            #leaderboard li strong, #leaderboard li span.user-pixels {
+                font-size: 0.9em; /* Adjust relative to parent */
+            }
+            #leaderboard #total-pixels-display {
+                margin-top: 5px;
+                padding-top: 5px;
+                font-size: 0.75em;
+            }
+        }
+
+        /* Further refinement for very small screens (e.g., iPhone SE) */
+        @media (max-width: 400px) {
+            header h1 {
+                font-size: 1.2rem;
+            }
+            header h1 .logo {
+                font-size: 1.5rem;
+            }
+            .controls-info {
+                font-size: 0.7rem;
+            }
+            #cooldown {
+                font-size: 0.85rem;
+            }
+            body {
+                --header-height-mobile: 110px; /* Adjust for even smaller header */
+            }
+            #container {
+                top: var(--header-height-mobile);
+                height: calc(100vh - var(--header-height-mobile));
+            }
+            #color-picker {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+            .color {
+                width: 26px;
+                height: 26px;
+            }
+            #minimap {
+                width: 110px;
+                height: 110px;
+                top: calc(var(--header-height-mobile) + 8px);
+                right: 8px;
+            }
+            .popup-content h2 {
+                font-size: 1.5rem;
+            }
+            .popup-content p {
+                font-size: 0.9rem;
+            }
+            .popup-content .emoji {
+                font-size: 2.5rem;
+            }
+            .popup-content button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            #leaderboard {
+                max-width: 130px;
+                font-size: 0.65rem;
             }
         }
     </style>
