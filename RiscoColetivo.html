@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Risco Coletivo</title>
+    <!-- Google Fonts para uma fonte mais agradável -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --header-height: 64px;
+            --primary-red: #ff3b3b;
+            --secondary-text: #555;
+            --border-color: #ddd;
+            --background-light: #f8f8f8;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --success-green: #00cc78;
+            --overlay-color: rgba(0, 0, 0, 0.6); /* Fundo mais escuro para modals */
+            --modal-bg: #fff;
+            --modal-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--background-light);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            overflow: hidden;
+            color: #111;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 25px;
+            box-shadow: 0 3px 6px var(--shadow-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            height: var(--header-height);
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #222;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        header h1 .logo {
+            font-size: 2rem;
+            line-height: 1;
+            color: var(--primary-red);
+            animation: bounce 0.8s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-3px);
+            }
+        }
+
+        .controls-info {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            font-size: 0.88rem;
+            color: var(--secondary-text);
+        }
+
+        .controls-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .controls-info i {
+            font-size: 1.1em;
+            color: #777;
+        }
+
+        #cooldown {
+            font-size: 1rem;
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 6px 14px;
+            min-width: 130px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            color: #444;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        #cooldown.ready {
+            background: #e6ffe6;
+            border-color: var(--success-green);
+            color: #00756f;
+        }
+
+        #cooldown .bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: var(--primary-red);
+            width: 0%;
+            transition: width 1s linear;
+            border-radius: 8px 0 0 8px;
+            z-index: -1;
+        }
+
+        #container {
+            position: absolute;
+            top: var(--header-height);
+            left: 0;
+            width: 100vw;
+            height: calc(100vh - var(--header-height));
+            overflow: hidden;
+            cursor: grab;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+        }
+
+        #canvas {
+            display: block;
+            image-rendering: pixelated;
+            background: #fff;
+            cursor: crosshair;
+            user-select: none;
+        }
+
+        #color-picker {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 15px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 6px 15px var(--shadow-medium);
+            z-index: 1000;
+        }
+
+        .color {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        .color:hover {
+            transform: scale(1.15);
+            border-color: #aaa;
+        }
+
+        .color.selected {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8), 0 0 12px var(--primary-red);
+            transform: scale(1.15);
+        }
+
+        #minimap {
+            position: fixed;
+            right: 20px;
+            top: calc(var(--header-height) + 15px);
+            width: 200px;
+            height: 200px;
+            border: 2px solid var(--border-color);
+            background: #fff;
+            box-shadow: 0 4px 15px var(--shadow-light);
+            border-radius: 12px;
+            z-index: 1000;
+            image-rendering: pixelated;
+            user-select: none;
+            cursor: grab;
+        }
+
+        #minimap .viewport-rect {
+            border: 2px solid var(--primary-red);
+            box-shadow: 0 0 5px rgba(255, 59, 59, 0.5);
+        }
+
+        /* --- Estilos do Overlay e Pop-ups (geral) --- */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup-content {
+            background: var(--modal-bg);
+            border-radius: 16px;
+            padding: 30px 40px;
+            box-shadow: var(--modal-shadow);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            text-align: center;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.4s ease-out;
+            max-width: 90%;
+            box-sizing: border-box;
+        }
+
+        .popup-overlay.show .popup-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .popup-content h2 {
+            font-size: 2.2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .popup-content p {
+            font-size: 1.15rem;
+            color: #444;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .popup-content .emoji {
+            font-size: 3.5rem;
+            animation: pulse 1.5s infinite;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+
+        .popup-content button {
+            background: var(--success-green);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 204, 120, 0.3);
+        }
+
+        .popup-content button:hover {
+            background: #00b368;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 204, 120, 0.4);
+        }
+
+        .popup-content button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 204, 120, 0.2);
+        }
+
+        /* Cooldown specific */
+        #notification-popup h2 {
+            color: var(--success-green);
+        }
+
+        /* Name Input Specific */
+        #name-input-popup h2 {
+            color: #2450a4; /* Uma cor diferente para este pop-up */
+        }
+        #name-input-popup input[type="text"] {
+            width: 80%;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #name-input-popup input[type="text"]:focus {
+            border-color: #3690ea;
+            box-shadow: 0 0 0 3px rgba(54, 144, 234, 0.2);
+        }
+        #name-input-popup button {
+            background: #3690ea; /* Azul para o botão de nome */
+            box-shadow: 0 4px 10px rgba(54, 144, 234, 0.3);
+        }
+        #name-input-popup button:hover {
+            background: #2450a4;
+            box-shadow: 0 6px 15px rgba(54, 144, 234, 0.4);
+        }
+        #name-input-popup button:active {
+            background: #3690ea;
+            box-shadow: 0 2px 5px rgba(54, 144, 234, 0.2);
+        }
+
+        /* --- Leaderboard Styles (Minimalist) --- */
+        #leaderboard {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px; /* Slightly less rounded for a sharper, cleaner look */
+            padding: 8px 12px; /* Reduced padding for a more compact feel */
+            box-shadow: none; /* Explicitly no shadow for minimalism */
+            z-index: 999;
+            max-width: 220px; /* Reduced max-width */
+            font-size: 0.8rem; /* Smaller overall font size */
+            color: #333;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #leaderboard h3 {
+            margin-top: 0;
+            margin-bottom: 8px; /* Reduced margin */
+            font-size: 1rem; /* Smaller font for title */
+            color: #222;
+            border-bottom: 1px solid #eee; /* Light separator */
+            padding-bottom: 6px; /* Reduced padding */
+            text-align: center; /* Center the title */
+        }
+
+        #leaderboard ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #leaderboard li {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0; /* Reduced padding */
+            border-bottom: none; /* Ensure no borders between items */
+        }
+
+        #leaderboard li:last-child {
+            border-bottom: none;
+        }
+
+        #leaderboard li strong {
+            color: #000;
+            font-weight: 500; /* Slightly lighter font weight for names */
+        }
+
+        #leaderboard li span.user-pixels {
+            font-weight: 600; /* Slightly lighter font weight for pixels */
+            color: var(--primary-red);
+        }
+        
+        #leaderboard #total-pixels-display { /* Changed ID here */
+            margin-top: 12px; /* Adjusted margin */
+            padding-top: 10px; /* Adjusted padding */
+            border-top: 1px solid #eee; /* Light separator */
+            font-weight: 500; /* Lighter font weight */
+            color: #00756f;
+            text-align: center;
+            font-size: 0.85em; /* Smaller font for personal count */
+        }
+        #leaderboard #total-pixels-display span { /* Changed ID here */
+            color: var(--primary-red);
+            font-size: 1em; /* Adjusted relative to parent */
+            margin-left: 4px; /* Reduced margin */
+        }
+
+        /* Responsividade básica */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 10px 15px;
+                height: auto;
+                gap: 10px;
+            }
+
+            .controls-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                font-size: 0.8rem;
+            }
+
+            #cooldown {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            #container {
+                top: auto;
+                height: calc(100vh - var(--header-height-mobile, 130px));
+            }
+
+            #color-picker {
+                padding: 10px 12px;
+                gap: 8px;
+                bottom: 10px;
+            }
+
+            .color {
+                width: 30px;
+                height: 30px;
+            }
+
+            #minimap {
+                width: 150px;
+                height: 150px;
+                top: 15px;
+                right: 15px;
+            }
+
+            .popup-content {
+                padding: 25px 30px;
+                gap: 20px;
+            }
+
+            .popup-content h2 {
+                font-size: 1.8rem;
+            }
+
+            .popup-content p {
+                font-size: 1rem;
+            }
+
+            .popup-content .emoji {
+                font-size: 3rem;
+            }
+
+            .popup-content button {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+
+            #leaderboard {
+                bottom: 10px;
+                left: 10px;
+                max-width: 160px; /* Further reduced for mobile */
+                padding: 6px 10px; /* Further reduced padding */
+                font-size: 0.75rem; /* Further reduced font size */
+            }
+            #leaderboard h3 {
+                font-size: 0.85rem;
+                margin-bottom: 6px;
+                padding-bottom: 3px;
+            }
+            #leaderboard li {
+                padding: 3px 0;
+            }
+            #leaderboard #total-pixels-display { /* Changed ID here */
+                margin-top: 6px;
+                padding-top: 6px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+
+
+<link rel="icon" type="image/x-icon" href="farinha.png">
+
+
+
+
+<body>
+    <header>
+        <h1><span class="logo">🎨</span> Risco Coletivo 2025</h1>
+        <div class="controls-info">
+            <span id="instructions">
+                Clique esquerdo para pintar · Clique direito para arrastar · Scroll para zoom
+            </span>
+            <span id="coords">X: 0, Y: 0</span>
+            <span id="zoom-level">Zoom: 20x</span>
+        </div>
+        <div id="cooldown">
+            <div class="bar"></div>
+            <span id="cooldown-text">Pronto</span>
+        </div>
+    </header>
+    <div id="container">
+        <canvas id="canvas" width="2000" height="2000"></canvas>
+    </div>
+    <canvas id="minimap" width="200" height="200"></canvas>
+    <div id="color-picker"></div>
+
+    <!-- Elemento de áudio -->
+    <audio id="cooldownSound" src="pronto.mp3" preload="auto"></audio>
+
+    <!-- Overlay do Pop-up de Cooldown -->
+    <div id="popup-overlay" class="popup-overlay">
+        <div id="notification-popup" class="popup-content">
+            <span class="emoji">🎉</span>
+            <h2>Pronto para Pixels!</h2>
+            <p>O seu cooldown terminou. Pode colocar o seu próximo pixel!</p>
+            <button id="closePopup">Ótimo!</button>
+        </div>
+    </div>
+
+    <!-- Overlay do Pop-up de Pedir Nome (Novo) -->
+    <div id="name-overlay" class="popup-overlay">
+        <div id="name-input-popup" class="popup-content">
+            <span class="emoji">👋</span>
+            <h2>Bem-vindo ao Risco Coletivo</h2>
+            <p>Qual vai ser o teu nome de artista?</p>
+            <input type="text" id="userNameInput" placeholder="Leonardo da Depressão" maxlength="35">
+            <button id="saveNameButton">Entrar</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard (Novo) -->
+    <div id="leaderboard">
+        <h3>Classificação de Pixels</h3>
+        <ul id="leaderboard-list">
+            <!-- Itens do leaderboard serão inseridos aqui pelo JS -->
+        </ul>
+        <div id="total-pixels-display"> <!-- Changed ID here -->
+            Total de Pixels: <span id="total-pixels-count">0</span> <!-- Changed ID here and text -->
+        </div>
+    </div>
+
+    <!-- Firebase libs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Config do Firebase — substitua pelos seus dados
+        // Substitua os valores abaixo pelas suas credenciais reais do Firebase
+         const firebaseConfig = {
+  apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+  measurementId: "G-Z9YLSTGHST"
+};
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Referências aos elementos DOM
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const minimap = document.getElementById('minimap');
+        const minimapCtx = minimap.getContext('2d');
+        const cooldownDisplay = document.getElementById('cooldown');
+        const cooldownBar = cooldownDisplay.querySelector('.bar');
+        const cooldownText = document.getElementById('cooldown-text');
+        const colorPicker = document.getElementById('color-picker');
+        const coordsDisplay = document.getElementById('coords');
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+        const cooldownSound = document.getElementById('cooldownSound');
+
+        // Referências para o pop-up de Cooldown
+        const notificationPopupOverlay = document.getElementById('popup-overlay');
+        const closePopupButton = document.getElementById('closePopup');
+
+        // Referências para o pop-up de Nome
+        const nameOverlay = document.getElementById('name-overlay');
+        const userNameInput = document.getElementById('userNameInput');
+        const saveNameButton = document.getElementById('saveNameButton');
+
+        // Referências para o Leaderboard
+        const leaderboard = document.getElementById('leaderboard');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const totalPixelsDisplay = document.getElementById('total-pixels-display'); // Changed ID here
+        const totalPixelsCount = document.getElementById('total-pixels-count');     // Changed ID here
+
+        // Variáveis globais de estado
+        let zoom = 20; // Zoom inicial (pixel maior)
+        let offsetX = 0;
+        let offsetY = 0;
+        let dragging = false;
+        let dragStart = {};
+        let currentColor = '#ff0000'; // Cor inicial
+        let cooldown = false;
+        let cooldownEndTimestamp = 0;
+        const cooldownDuration = 120000; // 15 segundos de cooldown
+        const originalTitle = document.title; // Guarda o título original da página
+        const newPixelTitle = "Podes por um novo pixel!"; // O novo título para o pop-up de cooldown
+
+        let userName = localStorage.getItem('userName'); // Tenta carregar o nome do utilizador do localStorage
+        let userPixels = 0; // Contagem de pixels do utilizador atual (ainda usada para o seu próprio pixel count no Firebase)
+
+        // Cores iguais ao r/place oficial 2024
+        const colors = [
+            '#6d001a', '#be0039', '#ff4500', '#ffa800', '#ffd635', '#fff8b8',
+            '#00a368', '#00cc78', '#7eed56', '#00756f', '#009eaa', '#00fff8',
+            '#2450a4', '#3690ea', '#51e9f4', '#493ac1', '#6a5cff', '#94b3ff',
+            '#811e9f', '#b44ac0', '#e4abff', '#de107f', '#ff3881', '#ff99aa',
+            '#6d482f', '#9c6926', '#ffb470', '#000000', '#515252', '#898d90',
+            '#d4d7d9', '#ffffff'
+        ];
+
+        // --- Funções de UI e Desenho do Canvas ---
+
+        /**
+         * Constrói a paleta de cores na interface.
+         */
+        function buildColorPicker() {
+            colorPicker.innerHTML = ''; // Limpa antes de construir
+            colors.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'color';
+                div.style.backgroundColor = c;
+                if (c === currentColor) div.classList.add('selected');
+                div.onclick = () => {
+                    currentColor = c;
+                    document.querySelectorAll('.color').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                };
+                colorPicker.appendChild(div);
+            });
+        }
+
+        /**
+         * Desenha a grade de fundo no canvas principal.
+         */
+        function drawGrid() {
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reseta a transformação para desenhar a grade de fundo
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#eee';
+            ctx.lineWidth = 0.5;
+
+            // Desenha linhas a cada 10 pixels no canvas
+            for (let x = 0; x <= canvas.width; x += 10) {
+                ctx.beginPath();
+                ctx.moveTo(x + 0.5, 0);
+                ctx.lineTo(x + 0.5, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= canvas.height; y += 10) {
+                ctx.beginPath();
+                ctx.moveTo(0, y + 0.5);
+                ctx.lineTo(canvas.width, y + 0.5);
+                ctx.stroke();
+            }
+        }
+
+        /**
+         * Desenha um único pixel no canvas principal e no minimap.
+         * @param {number} x - Coordenada X do pixel.
+         * @param {number} y - Coordenada Y do pixel.
+         * @param {string} color - Cor do pixel (hex).
+         */
+        function drawPixel(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, 1, 1); // Desenha 1x1 na escala do canvas
+
+            minimapCtx.fillStyle = color;
+            // Calcula a posição e o tamanho do pixel no minimap
+            const minMapX = x * (minimap.width / canvas.width);
+            const minMapY = y * (minimap.height / canvas.height);
+            minimapCtx.fillRect(minMapX, minMapY, 1, 1);
+        }
+
+        /**
+         * Redesenha todo o canvas e o minimap com os dados do Firebase.
+         */
+        function drawAll() {
+            drawGrid(); // Redesenha a grade de fundo
+            // Aplica zoom e pan ao contexto do canvas principal
+            ctx.setTransform(zoom, 0, 0, zoom, -offsetX * zoom, -offsetY * zoom);
+
+            // Redesenha todos os pixels do Firebase
+            db.ref('pixels').once('value').then(snap => {
+                const data = snap.val();
+                if (!data) return;
+
+                // Limpa e redesenha a grade do minimap
+                minimapCtx.setTransform(1, 0, 0, 1, 0, 0);
+                minimapCtx.clearRect(0, 0, minimap.width, minimap.height);
+                minimapCtx.fillStyle = '#fff';
+                minimapCtx.fillRect(0, 0, minimap.width, minimap.height);
+                minimapCtx.strokeStyle = '#eee';
+                minimapCtx.lineWidth = 0.5;
+                for (let i = 0; i <= minimap.width; i += 10) {
+                    minimapCtx.beginPath(); minimapCtx.moveTo(i + 0.5, 0); minimapCtx.lineTo(i + 0.5, minimap.height); minimapCtx.stroke();
+                    minimapCtx.beginPath(); minimapCtx.moveTo(0, i + 0.5); minimapCtx.lineTo(minimap.width, i + 0.5); minimapCtx.stroke();
+                }
+
+                // Desenha todos os pixels no canvas principal e no minimap
+                Object.entries(data).forEach(([key, color]) => {
+                    const [x, y] = key.split('_').map(Number);
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y, 1, 1); // Redesenha no canvas principal
+
+                    minimapCtx.fillStyle = color;
+                    minimapCtx.fillRect(x * (minimap.width / canvas.width), y * (minimap.height / canvas.height), 1, 1);
+                });
+
+                drawMinimapViewRect(); // Desenha o retângulo de visualização no minimap
+            });
+
+            updateDisplayInfo(); // Atualiza os displays de coordenadas e zoom
+        }
+
+        /**
+         * Desenha o retângulo que representa a área visível do canvas no minimap.
+         */
+        function drawMinimapViewRect() {
+            minimapCtx.strokeStyle = '#ff3b3b';
+            minimapCtx.lineWidth = 2;
+
+            // Calcula as dimensões e posição do retângulo de visualização no minimap
+            const viewRectX = offsetX * (minimap.width / canvas.width);
+            const viewRectY = offsetY * (minimap.height / canvas.height);
+            const viewRectWidth = (canvas.width / zoom) * (minimap.width / canvas.width);
+            const viewRectHeight = (canvas.height / zoom) * (minimap.height / canvas.height);
+
+            minimapCtx.strokeRect(viewRectX, viewRectY, viewRectWidth, viewRectHeight);
+        }
+
+        let popupShown = false; // Flag para controlar se o pop-up de cooldown já foi mostrado nesta prontidão
+
+        /**
+         * Atualiza o display visual do cooldown e toca o som quando pronto.
+         */
+        function updateCooldown() {
+            const now = Date.now();
+            if (!cooldown || now >= cooldownEndTimestamp) {
+                // Se o cooldown acabou ou não estava ativo
+                if (cooldown && !popupShown) { // Se acabou de terminar e o pop-up ainda não foi mostrado
+                    cooldownSound.currentTime = 0;
+                    // Tenta tocar o som. O catch lida com erros de autoplay em navegadores.
+                    cooldownSound.play().catch(e => console.error("Erro ao tocar som: ", e));
+                    showCooldownPopup(); // Mostra o pop-up de cooldown
+                    popupShown = true; // Define a flag como verdadeira
+                }
+                cooldown = false;
+                cooldownText.textContent = 'PRONTO!';
+                cooldownDisplay.classList.add('ready'); // Adiciona classe para estilo "pronto"
+                cooldownBar.style.width = '0%';
+                return; // Não há necessidade de agendar outra chamada se o cooldown terminou
+            }
+            cooldownDisplay.classList.remove('ready'); // Remove classe se não estiver pronto
+            let remaining = cooldownEndTimestamp - now;
+            cooldownText.textContent = `Aguarde ${(remaining / 1000).toFixed(1)}s`;
+            const percent = 100 * remaining / cooldownDuration;
+            cooldownBar.style.width = `${percent}%`;
+
+            popupShown = false; // Redefine a flag se o cooldown ainda estiver ativo
+
+            // Usa setTimeout para garantir que a atualização continue mesmo em abas não focadas
+            setTimeout(updateCooldown, 100); // Verifica a cada 100ms
+        }
+
+        /**
+         * Atualiza os displays de coordenadas do rato e nível de zoom.
+         */
+        function updateDisplayInfo() {
+            zoomLevelDisplay.textContent = `Zoom: ${zoom.toFixed(1)}x`;
+            // As coordenadas são atualizadas no evento mousemove
+        }
+
+        // --- Funções dos Pop-ups ---
+
+        /**
+         * Mostra o pop-up de notificação de cooldown.
+         */
+        function showCooldownPopup() {
+            notificationPopupOverlay.classList.add('show');
+            document.title = newPixelTitle; // Altera o título da página
+        }
+
+        /**
+         * Esconde o pop-up de notificação de cooldown.
+         */
+        function hideCooldownPopup() {
+            notificationPopupOverlay.classList.remove('show');
+            document.title = originalTitle; // Volta ao título original
+        }
+
+        /**
+         * Mostra o pop-up para pedir o nome do utilizador.
+         */
+        function showNamePopup() {
+            nameOverlay.classList.add('show');
+            userNameInput.focus(); // Foca no campo de input
+        }
+
+        /**
+         * Esconde o pop-up de nome.
+         */
+        function hideNamePopup() {
+            nameOverlay.classList.remove('show');
+        }
+
+        // --- Lógica de Interação Principal ---
+
+        /**
+         * Envia um pixel para o Firebase e inicia o cooldown.
+         * @param {number} x - Coordenada X do pixel.
+         * @param {number} y - Coordenada Y do pixel.
+         * @param {string} color - Cor do pixel (hex).
+         */
+        function sendPixel(x, y, color) {
+            if (cooldown) {
+                console.log("Ainda em cooldown!");
+                // Poderia adicionar uma notificação visual aqui (toast)
+                return;
+            }
+            if (!userName) {
+                // Se o nome não estiver definido, pede antes de permitir pintar
+                showNamePopup();
+                return;
+            }
+
+            // Garante que o pixel esteja dentro dos limites do canvas
+            if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) {
+                console.warn("Tentativa de pintar fora dos limites do canvas.");
+                return;
+            }
+
+            const pixelKey = `${x}_${y}`;
+            
+            // Atualiza o pixel no canvas (apenas a cor)
+            db.ref('pixels/' + pixelKey).set(color)
+                .then(() => {
+                    // Incrementa o contador de pixels do utilizador na secção 'users'
+                    db.ref('users/' + userName).transaction(currentPixels => {
+                        return (currentPixels || 0) + 1;
+                    }).then(() => {
+                         // Atualiza a contagem local imediatamente
+                        userPixels++;
+                        // Não atualizamos yourPixelsCount aqui, pois agora mostra o total global
+                        // updateLeaderboard() será chamado para atualizar o total e a lista
+                        updateLeaderboard(); 
+                    }).catch(error => {
+                        console.error("Erro ao atualizar contador de pixels do utilizador:", error);
+                    });
+                })
+                .catch(error => {
+                    console.error("Erro ao escrever pixel no Firebase:", error);
+                });
+
+            // Inicia o cooldown
+            cooldown = true;
+            cooldownEndTimestamp = Date.now() + cooldownDuration;
+            updateCooldown();
+            localStorage.setItem('cooldownEnd', cooldownEndTimestamp.toString());
+        }
+
+        // --- Funções do Leaderboard ---
+
+        /**
+         * Atualiza o leaderboard em tempo real, buscando os top 3 utilizadores
+         * e a contagem total de pixels no quadro.
+         */
+        function updateLeaderboard() {
+            // Escuta por mudanças na secção 'users', pegando os 3 com mais pixels
+            db.ref('users').orderByValue().limitToLast(3).on('value', snap => {
+                const users = [];
+                snap.forEach(childSnap => {
+                    users.push({ name: childSnap.key, pixels: childSnap.val() });
+                });
+                users.sort((a, b) => b.pixels - a.pixels); // Ordena do maior para o menor
+
+                leaderboardList.innerHTML = ''; // Limpa a lista existente
+                users.forEach((user, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${index + 1}. ${user.name}</strong> <span class="user-pixels">${user.pixels}</span>`;
+                    leaderboardList.appendChild(li);
+                });
+            });
+
+            // Obtém a contagem total de pixels no quadro
+            db.ref('pixels').once('value').then(snap => {
+                const totalCount = snap.exists() ? Object.keys(snap.val()).length : 0;
+                totalPixelsCount.textContent = totalCount;
+            }).catch(error => {
+                console.error("Erro ao obter a contagem total de pixels:", error);
+                totalPixelsCount.textContent = "Erro";
+            });
+        }
+
+
+        // --- Event Listeners ---
+
+        // Eventos para arrastar e pintar no canvas principal
+        canvas.addEventListener('mousedown', e => {
+            e.preventDefault();
+            if (e.button === 2) { // Botão direito = pan
+                dragging = true;
+                dragStart.x = e.clientX;
+                dragStart.y = e.clientY;
+                dragStart.offsetX = offsetX;
+                dragStart.offsetY = offsetY;
+                canvas.style.cursor = 'grabbing';
+            } else if (e.button === 0) { // Botão esquerdo = pintar
+                const rect = canvas.getBoundingClientRect();
+                // Calcula as coordenadas do pixel no canvas base
+                const x = Math.floor((e.clientX - rect.left) / zoom + offsetX);
+                const y = Math.floor((e.clientY - rect.top) / zoom + offsetY);
+                sendPixel(x, y, currentColor);
+            }
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            // Calcula e mostra as coordenadas do rato na tela principal
+            const currentCanvasX = Math.floor((e.clientX - rect.left) / zoom + offsetX);
+            const currentCanvasY = Math.floor((e.clientY - rect.top) / zoom + offsetY);
+            coordsDisplay.textContent = `X: ${currentCanvasX}, Y: ${currentCanvasY}`;
+
+            if (dragging) {
+                offsetX = dragStart.offsetX - (e.clientX - dragStart.x) / zoom;
+                offsetY = dragStart.offsetY - (e.clientY - dragStart.y) / zoom;
+
+                // Limita o pan para não sair do canvas
+                offsetX = Math.max(0, Math.min(offsetX, canvas.width - (canvas.width / zoom)));
+                offsetY = Math.max(0, Math.min(offsetY, canvas.height - (canvas.height / zoom)));
+
+                drawAll(); // Redesenha a tela com nova posição
+            }
+        });
+
+        window.addEventListener('mouseup', e => {
+            if (dragging) {
+                dragging = false;
+                canvas.style.cursor = 'crosshair';
+                drawMinimapViewRect(); // Atualiza a posição do retângulo no minimap após arrastar
+            }
+        });
+
+        // Zoom com mouse wheel no canvas
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            // Ponto no canvas onde o mouse está ANTES do zoom
+            const mouseX_canvas = (e.clientX - rect.left) / zoom + offsetX;
+            const mouseY_canvas = (e.clientY - rect.top) / zoom + offsetY;
+
+            const zoomFactor = e.deltaY > 0 ? 0.85 : 1.15; // 0.85 para diminuir (zoom out), 1.15 para aumentar (zoom in)
+            let newZoom = zoom * zoomFactor;
+
+            // Limita o zoom
+            if (newZoom < 1) newZoom = 1; // Mínimo zoom (1:1 pixel)
+            if (newZoom > 60) newZoom = 60; // Máximo zoom (pixel grande)
+
+            // Ajusta o offset para "seguir" o mouse durante o zoom
+            offsetX = mouseX_canvas - (e.clientX - rect.left) / newZoom;
+            offsetY = mouseY_canvas - (e.clientY - rect.top) / newZoom;
+
+            // Limita o pan após o zoom
+            offsetX = Math.max(0, Math.min(offsetX, canvas.width - (canvas.width / newZoom)));
+            offsetY = Math.max(0, Math.min(offsetY, canvas.height - (canvas.height / newZoom)));
+
+            zoom = newZoom;
+            drawAll(); // Redesenha com o novo zoom e pan
+        }, { passive: false });
+
+        // Navegação pelo Minimap (arrastar o minimap para mover o canvas)
+        let minimapDragging = false;
+        let minimapDragStart = {};
+
+        minimap.addEventListener('mousedown', e => {
+            if (e.button === 0) { // Apenas clique esquerdo no minimap
+                minimapDragging = true;
+                minimapDragStart.x = e.clientX;
+                minimapDragStart.y = e.clientY;
+                minimapDragStart.offsetX = offsetX;
+                minimapDragStart.offsetY = offsetY;
+                minimap.style.cursor = 'grabbing';
+
+                // Calcula a nova posição no canvas principal com base no clique no minimap
+                const minimapRect = minimap.getBoundingClientRect();
+                const clickX_minimap = e.clientX - minimapRect.left;
+                const clickY_minimap = e.clientY - minimapRect.top;
+
+                // Converte coordenadas do minimap para coordenadas do canvas principal
+                const targetCanvasX = (clickX_minimap / minimap.width) * canvas.width;
+                const targetCanvasY = (clickY_minimap / minimap.height) * canvas.height;
+
+                // Centraliza a visualização principal no ponto clicado no minimap
+                offsetX = targetCanvasX - (canvas.width / zoom) / 2;
+                offsetY = targetCanvasY - (canvas.height / zoom) / 2;
+
+                // Limita o pan para não sair do canvas
+                offsetX = Math.max(0, Math.min(offsetX, canvas.width - (canvas.width / zoom)));
+                offsetY = Math.max(0, Math.min(offsetY, canvas.height - (canvas.height / zoom)));
+
+                drawAll();
+            }
+        });
+
+        minimap.addEventListener('mousemove', e => {
+            if (minimapDragging) {
+                const deltaX = (e.clientX - minimapDragStart.x) / (minimap.width / canvas.width);
+                const deltaY = (e.clientY - minimapDragStart.y) / (minimap.height / canvas.height);
+
+                offsetX = minimapDragStart.offsetX - deltaX;
+                offsetX = Math.max(0, Math.min(offsetX, canvas.width - (canvas.width / zoom)));
+                offsetY = Math.max(0, Math.min(offsetY, canvas.height - (canvas.height / zoom)));
+
+                drawAll();
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (minimapDragging) {
+                minimapDragging = false;
+                minimap.style.cursor = 'grab';
+                drawMinimapViewRect();
+            }
+        });
+
+        // Event listeners para os pop-ups
+        closePopupButton.addEventListener('click', hideCooldownPopup);
+        notificationPopupOverlay.addEventListener('click', (e) => {
+            if (e.target === notificationPopupOverlay) { // Só fecha se clicou diretamente no overlay, não no popup
+                hideCooldownPopup();
+            }
+        });
+
+        // Event listeners para o pop-up de nome
+        saveNameButton.addEventListener('click', () => {
+            const name = userNameInput.value.trim();
+            if (name) {
+                userName = name;
+                localStorage.setItem('userName', userName); // Salva o nome no armazenamento local
+                hideNamePopup();
+                updateLeaderboard(); // Atualiza o leaderboard com o nome do novo utilizador
+            } else {
+                // Em vez de alert, pode-se adicionar uma mensagem de erro na UI
+                alert("Por favor, insere o teu nome!"); 
+            }
+        });
+
+        userNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                saveNameButton.click(); // Permite "Enter" para submeter o nome
+            }
+        });
+
+        // --- Sincronização com Firebase em Tempo Real ---
+
+        // Listener para novos pixels adicionados ao Firebase
+        db.ref('pixels').on('child_added', snap => {
+            const [x, y] = snap.key.split('_').map(Number);
+            const color = snap.val(); // Assumindo que o valor é a cor diretamente
+
+            ctx.setTransform(zoom, 0, 0, zoom, -offsetX * zoom, -offsetY * zoom);
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, 1, 1);
+
+            // Redesenha o minimap completamente para garantir a atualização
+            drawAll();
+        });
+
+        // Listener para pixels alterados no Firebase
+        db.ref('pixels').on('child_changed', snap => {
+            const [x, y] = snap.key.split('_').map(Number);
+            const color = snap.val(); // Assumindo que o valor é a cor diretamente
+
+            ctx.setTransform(zoom, 0, 0, zoom, -offsetX * zoom, -offsetY * zoom);
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, 1, 1);
+
+            // Redesenha o minimap completamente para garantir a atualização
+            drawAll();
+        });
+
+        // --- Inicialização da Aplicação ---
+
+        // Evita o menu de contexto do navegador para o botão direito no canvas e minimap
+        canvas.addEventListener('contextmenu', e => e.preventDefault());
+        minimap.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Constrói a paleta de cores
+        buildColorPicker();
+        // Desenha o estado inicial do canvas e minimap
+        drawAll();
+        // Carrega e atualiza o leaderboard na inicialização
+        updateLeaderboard(); 
+
+        // Verifica se é a primeira vez do utilizador (se o nome já foi salvo)
+        if (!userName) {
+            showNamePopup(); // Se não tem nome, pede o nome
+        } else {
+            // Se já tem nome, carrega a contagem de pixels do utilizador do Firebase
+            db.ref('users/' + userName).once('value').then(snap => {
+                userPixels = snap.val() || 0;
+                // Não atualizamos yourPixelsCount aqui, pois agora mostra o total global
+            });
+        }
+
+        // Verifica o cooldown ao carregar a página
+        let storedCooldown = localStorage.getItem('cooldownEnd');
+        if (storedCooldown) {
+            cooldownEndTimestamp = parseInt(storedCooldown, 10);
+            if (Date.now() < cooldownEndTimestamp) {
+                cooldown = true;
+                updateCooldown();
+            }
+        }
+    </script>
+</body>
+
+</html>
