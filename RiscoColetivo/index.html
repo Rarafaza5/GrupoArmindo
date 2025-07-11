@@ -19,6 +19,8 @@
             --overlay-color: rgba(0, 0, 0, 0.6); /* Fundo mais escuro para modals */
             --modal-bg: #fff;
             --modal-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+            --color-red: #FF0000; /* Cor vermelha da imagem */
+            --color-white: #FFFFFF; /* Cor branca para contraste */
         }
 
         * {
@@ -40,7 +42,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            background: #fff;
+            background: linear-gradient(to right, var(--color-red) 50%, var(--color-white) 50%); /* Adiciona as cores à barra */
             border-bottom: 1px solid var(--border-color);
             padding: 10px 25px;
             box-shadow: 0 3px 6px var(--shadow-light);
@@ -419,6 +421,7 @@
                 padding: 10px 15px;
                 height: auto; /* Allow header height to adapt */
                 gap: 10px;
+                background: linear-gradient(to right, var(--color-red) 50%, var(--color-white) 50%); /* Keeps the gradient on mobile */
             }
 
             header h1 {
