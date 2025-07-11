@@ -5,7 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Risco Coletivo</title>
-    <!-- Google Fonts para uma fonte mais agradável -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -527,10 +526,8 @@
     <canvas id="minimap" width="200" height="200"></canvas>
     <div id="color-picker"></div>
 
-    <!-- Elemento de áudio -->
     <audio id="cooldownSound" src="pronto.mp3" preload="auto"></audio>
 
-    <!-- Overlay do Pop-up de Cooldown -->
     <div id="popup-overlay" class="popup-overlay">
         <div id="notification-popup" class="popup-content">
             <span class="emoji">🎉</span>
@@ -540,7 +537,6 @@
         </div>
     </div>
 
-    <!-- Overlay do Pop-up de Pedir Nome (Novo) -->
     <div id="name-overlay" class="popup-overlay">
         <div id="name-input-popup" class="popup-content">
             <span class="emoji">👋</span>
@@ -551,18 +547,13 @@
         </div>
     </div>
 
-    <!-- Leaderboard (Novo) -->
     <div id="leaderboard">
         <h3>Classificação de Pixels</h3>
         <ul id="leaderboard-list">
-            <!-- Itens do leaderboard serão inseridos aqui pelo JS -->
-        </ul>
-        <div id="total-pixels-display"> <!-- Changed ID here -->
-            Total de Pixels: <span id="total-pixels-count">0</span> <!-- Changed ID here and text -->
-        </div>
+            </ul>
+        <div id="total-pixels-display"> Total de Pixels: <span id="total-pixels-count">0</span> </div>
     </div>
 
-    <!-- Firebase libs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
@@ -770,9 +761,6 @@
             if (!cooldown || now >= cooldownEndTimestamp) {
                 // Se o cooldown acabou ou não estava ativo
                 if (cooldown && !popupShown) { // Se acabou de terminar e o pop-up ainda não foi mostrado
-                    cooldownSound.currentTime = 0;
-                    // Tenta tocar o som. O catch lida com erros de autoplay em navegadores.
-                    cooldownSound.play().catch(e => console.error("Erro ao tocar som: ", e));
                     showCooldownPopup(); // Mostra o pop-up de cooldown
                     popupShown = true; // Define a flag como verdadeira
                 }
@@ -1055,10 +1043,18 @@
         });
 
         // Event listeners para os pop-ups
-        closePopupButton.addEventListener('click', hideCooldownPopup);
+        closePopupButton.addEventListener('click', () => {
+            hideCooldownPopup();
+            // Play the sound here, as it's directly tied to a user click
+            cooldownSound.currentTime = 0;
+            cooldownSound.play().catch(e => console.error("Erro ao tocar som: ", e));
+        });
         notificationPopupOverlay.addEventListener('click', (e) => {
             if (e.target === notificationPopupOverlay) { // Só fecha se clicou diretamente no overlay, não no popup
                 hideCooldownPopup();
+                // Play the sound here, as it's directly tied to a user click on the overlay
+                cooldownSound.currentTime = 0;
+                cooldownSound.play().catch(e => console.error("Erro ao tocar som: ", e));
             }
         });
 
