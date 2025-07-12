@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inquérito Anual do Grupo Armindo 2025</title>
+  <style>
+    /* Basic reset and body styling */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      /* Lighter background with a subtle gradient for more depth */
+      background: linear-gradient(135deg, #f0f2f5 0%, #e6e9ed 100%);
+      font-family: 'Inter', sans-serif; /* Keep Inter font */
+      overflow: hidden; /* Prevent scrolling on the main page */
+      display: flex; /* Use flexbox for centering content */
+      justify-content: center;
+      align-items: center;
+      /* Add a subtle background pattern for more visual interest */
+      background-image: radial-gradient(#d0d0d0 1px, transparent 1px);
+      background-size: 25px 25px; /* Slightly larger pattern */
+    }
+
+    /* Consent screen overlay styling */
+    #consent {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8); /* Slightly darker overlay for better contrast */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999; /* Ensure it's on top */
+      animation: fadeIn 0.6s ease-out; /* Smooth fade-in effect */
+      backdrop-filter: blur(8px); /* More pronounced blur effect for the background */
+    }
+
+    /* Consent box (the modal itself) styling */
+    #consent-box {
+      background: white;
+      color: #212529; /* Darker text for readability */
+      padding: 35px; /* Further decreased padding for a more compact look */
+      border-radius: 20px; /* Slightly less rounded for compactness */
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5); /* Enhanced, deeper shadow for depth */
+      max-width: 580px; /* Further decreased max-width */
+      width: 90%; /* Responsive width for smaller screens */
+      text-align: center;
+      box-sizing: border-box; /* Include padding in width calculation */
+      animation: slideInBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; /* Bouncier slide-in animation */
+      display: flex; /* Use flexbox for content inside the box */
+      flex-direction: column;
+      align-items: center;
+      position: relative; /* Needed for potential future elements */
+      border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle light border */
+    }
+
+    #consent-box h1 {
+      font-size: 2.4rem; /* Further adjusted heading size */
+      margin-bottom: 25px; /* Further adjusted margin */
+      color: #1a202c; /* Darker heading color */
+      font-weight: 900; /* Extra bold heading */
+      line-height: 1.1;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* More noticeable text shadow */
+    }
+
+    #consent-box p {
+      font-size: 1.05rem; /* Further adjusted paragraph font size */
+      margin-bottom: 30px; /* Further adjusted margin */
+      line-height: 1.7; /* Adjusted line spacing for readability */
+      color: #4a5568; /* Softer text color */
+      max-width: 500px; /* Further adjusted paragraph max-width */
+    }
+
+    /* Button container for better layout */
+    #consent-buttons {
+        display: flex;
+        flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        justify-content: center;
+        gap: 15px; /* Adjusted space between buttons */
+        width: 100%; /* Ensure container takes full width */
+    }
+
+    /* Button styling for consent screen */
+    #consent button {
+      flex-grow: 1; /* Allow buttons to grow and fill space */
+      min-width: 190px; /* Further adjusted minimum width for buttons */
+      padding: 18px 35px; /* Further adjusted padding for larger touch targets */
+      font-size: 1rem; /* Further adjusted font size for buttons */
+      border: none;
+      border-radius: 15px; /* Consistent rounded corners */
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother transitions for all properties */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); /* Adjusted prominent button shadow */
+      font-weight: 800; /* Bolder button text */
+      letter-spacing: 0.8px; /* Adjusted letter spacing for better appearance */
+      text-transform: uppercase; /* Uppercase text for buttons */
+    }
+
+    #start {
+      /* Gradient from Grupo Armindo site */
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      position: relative; /* For pseudo-element glow */
+      overflow: hidden; /* Hide overflow for glow effect */
+    }
+
+    #start:hover {
+      transform: translateY(-7px) scale(1.02); /* Adjusted lift and slight scale effect */
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(135deg, #5a0ecc, #2065e0); /* Slightly darker gradient on hover */
+    }
+
+    /* Add a subtle glow effect on hover for the start button */
+    #start::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        transition: width 0.7s ease, height 0.7s ease, opacity 0.7s ease;
+        z-index: 0;
+    }
+
+    #start:hover::before {
+        width: 280%; /* Adjusted glow size */
+        height: 280%; /* Adjusted glow size */
+        opacity: 1;
+    }
+
+
+    #close {
+      background: #e9ecef; /* Lighter grey for close button */
+      color: #495057; /* Darker text for contrast */
+      border: 1px solid #ced4da; /* Subtle border */
+    }
+
+    #close:hover {
+      background: #dee2e6; /* Darker grey on hover */
+      transform: translateY(-5px) scale(1.01); /* Adjusted lift effect */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Iframe container styling */
+    #frame-container {
+      display: none; /* Hidden by default */
+      width: 100%;
+      height: 100%;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none; /* No border for the iframe */
+    }
+
+    /* Exit fullscreen button styling */
+    #exitFullscreen {
+      position: fixed;
+      bottom: 25px; /* Adjusted position */
+      left: 25px; /* Adjusted position */
+      padding: 12px 25px; /* Adjusted padding */
+      background: #dc3545; /* Red color for exit button (Bootstrap danger red) */
+      color: white;
+      font-size: 1rem; /* Adjusted font size */
+      border: none;
+      border-radius: 10px; /* Consistent rounded corners */
+      z-index: 10000; /* Ensure it's on top of everything */
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* More prominent shadow */
+      transition: all 0.3s ease; /* Smooth transitions */
+      display: none; /* Hidden by default */
+      font-weight: 700; /* Bolder text */
+      letter-spacing: 0.4px;
+    }
+
+    #exitFullscreen:hover {
+      background: #c82333; /* Darker red on hover */
+      transform: translateY(-4px) scale(1.01); /* Slight lift effect */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Confirmation Modal Styling */
+    #confirmationModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8); /* Darker background for modal */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10001; /* Above exit button */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+        backdrop-filter: blur(6px); /* More blur for confirmation modal background */
+    }
+
+    #confirmationModal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #confirmationBox {
+        background: white;
+        color: #212529;
+        padding: 35px; /* Adjusted padding */
+        border-radius: 12px; /* Adjusted rounded corners */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Deeper shadow */
+        max-width: 450px; /* Adjusted max-width */
+        width: 90%;
+        text-align: center;
+        box-sizing: border-box;
+        transform: translateY(-25px); /* More pronounced slide */
+        transition: transform 0.4s ease;
+    }
+
+    #confirmationModal.show #confirmationBox {
+        transform: translateY(0);
+    }
+
+    #confirmationBox h2 {
+        font-size: 1.7rem; /* Adjusted heading size */
+        margin-bottom: 18px; /* Adjusted margin */
+        color: #1a202c;
+        font-weight: 800;
+    }
+
+    #confirmationBox p {
+        font-size: 1.05rem; /* Adjusted text size */
+        margin-bottom: 25px; /* Adjusted margin */
+        line-height: 1.6;
+        color: #4a5568;
+    }
+
+    #confirmationBox button {
+        margin: 10px; /* Adjusted margin */
+        padding: 10px 25px; /* Adjusted padding */
+        font-size: 0.95rem; /* Adjusted font size */
+        border: none;
+        border-radius: 8px; /* More rounded corners */
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 700;
+    }
+
+    #confirmYes {
+        background: #dc3545; /* Red for confirmation */
+        color: white;
+    }
+
+    #confirmYes:hover {
+        background: #c82333;
+        transform: translateY(-2px) scale(1.005);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    #confirmNo {
+        background: #e9ecef; /* Light grey for cancel */
+        color: #495057;
+        border: 1px solid #ced4da;
+    }
+
+    #confirmNo:hover {
+        background: #dee2e6;
+        transform: translateY(-2px) scale(1.005);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+    }
+
+
+    /* Keyframe animation for fade-in effect */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Keyframe animation for bouncier slide-in effect for the consent box */
+    @keyframes slideInBounce {
+        from {
+            opacity: 0;
+            transform: translateY(-80px); /* Adjusted slide from top */
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Media queries for better responsiveness on smaller screens */
+    @media (max-width: 768px) {
+        #consent-box {
+            padding: 30px 20px; /* Adjusted padding for mobile */
+            border-radius: 18px;
+            max-width: 95%; /* Even wider on smaller screens */
+        }
+
+        #consent-box h1 {
+            font-size: 2rem; /* Adjusted font size for mobile */
+            margin-bottom: 20px;
+        }
+
+        #consent-box p {
+            font-size: 0.95rem; /* Adjusted font size for mobile */
+            margin-bottom: 25px;
+        }
+
+        #consent-buttons {
+            flex-direction: column; /* Stack buttons vertically on small screens */
+            gap: 12px; /* Reduced gap for mobile */
+        }
+
+        #consent button {
+            width: 100%; /* Full width buttons on small screens */
+            min-width: unset; /* Remove min-width constraint */
+            margin: 0; /* Remove margin as gap handles spacing */
+            padding: 16px 20px; /* Adjusted padding for mobile */
+            font-size: 1rem; /* Adjusted font size for mobile */
+            border-radius: 12px;
+        }
+
+        #exitFullscreen {
+            bottom: 15px; /* Adjusted position for mobile */
+            left: 50%; /* Center the button on small screens */
+            transform: translateX(-50%);
+            padding: 10px 20px; /* Adjusted padding for mobile */
+            font-size: 0.9rem; /* Adjusted font size for mobile */
+            border-radius: 8px;
+        }
+
+        #confirmationBox {
+            padding: 25px 18px; /* Adjusted padding for mobile */
+            border-radius: 12px;
+        }
+
+        #confirmationBox h2 {
+            font-size: 1.4rem; /* Adjusted font size for mobile */
+        }
+
+        #confirmationBox p {
+            font-size: 0.9rem; /* Adjusted font size for mobile */
+        }
+
+        #confirmationBox button {
+            width: 100%;
+            margin: 6px 0;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+        }
+    }
+  </style>
+  <!-- Google Fonts - Inter for a clean, modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="consent">
+  <div id="consent-box"> <!-- New div for the consent modal content -->
+    <h1>Inquérito Anual do Grupo Armindo 2025</h1>
+    <p>Ao continuar este inquérito, declaro que fui informado(a) sobre os seus objetivos e autorizo, de forma voluntária, a recolha e o tratamento dos dados aqui fornecidos, os quais serão livremente utilizados para fins estatísticos e de análise no âmbito da otimização e desenvolvimento dos eventos do Grupo Armindo, entre outros.<br><br>A tua participação é totalmente voluntária e pode ser interrompida a qualquer momento clicando em "Encerrar".</p>
+    <div id="consent-buttons">
+      <button id="start" onclick="startSurvey()">Começar agora</button>
+      <button id="close" onclick="window.location.href='https://google.com'">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="frame-container">
+  <!-- Iframe for the survey form -->
+  <iframe src="https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAMAAEcqfWBUMEZCUE1TWDZBNE45MUg0RkxES0pJUzg0OS4u&embed=true" allowfullscreen></iframe>
+  <!-- Button to exit fullscreen and redirect -->
+  <button id="exitFullscreen" onclick="showConfirmationModal()">Encerrar Inquérito</button>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal">
+    <div id="confirmationBox">
+        <h2>Tem certeza que deseja encerrar?</h2>
+        
+        <div>
+            <button id="confirmYes" onclick="exitFullscreenAndRedirect()">Sim, Encerrar</button>
+            <button id="confirmNo" onclick="hideConfirmationModal()">Não, Continuar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+  const exitButton = document.getElementById("exitFullscreen");
+  const frameContainer = document.getElementById("frame-container");
+  const confirmationModal = document.getElementById("confirmationModal");
+
+  /**
+   * Starts the survey by hiding the consent screen, showing the iframe,
+   * and attempting to go fullscreen.
+   */
+  function startSurvey() {
+    document.getElementById('consent').style.display = 'none';
+    frameContainer.style.display = 'block';
+    exitButton.style.display = 'block';
+
+    // Request fullscreen for the frame container
+    if (frameContainer.requestFullscreen) {
+      frameContainer.requestFullscreen().catch((e) => {
+        console.error("Fullscreen request failed:", e);
+        // Optionally, handle cases where fullscreen is not allowed or fails
+        // e.g., display a message to the user
+      });
+    }
+  }
+
+  /**
+   * Shows the confirmation modal.
+   * This function now exits fullscreen before showing the modal.
+   */
+  function showConfirmationModal() {
+      // Attempt to exit fullscreen first
+      if (document.exitFullscreen) {
+          document.exitFullscreen().then(() => {
+              confirmationModal.classList.add('show'); // Show modal after exiting fullscreen
+          }).catch((e) => {
+              console.error("Fullscreen exit failed before showing modal:", e);
+              confirmationModal.classList.add('show'); // Show modal even if exit fails
+          });
+      } else {
+          // Fallback if no fullscreen API is supported, just show the modal
+          confirmationModal.classList.add('show');
+      }
+  }
+
+  /**
+   * Hides the confirmation modal.
+   * If the user chooses to continue, it attempts to re-enter fullscreen.
+   */
+  function hideConfirmationModal() {
+      confirmationModal.classList.remove('show'); // Hide modal
+
+      // Attempt to re-enter fullscreen
+      if (frameContainer.requestFullscreen) {
+          frameContainer.requestFullscreen().catch((e) => {
+              console.error("Fullscreen re-entry failed:", e);
+          });
+      }
+  }
+
+  /**
+   * Exits fullscreen mode and then redirects the user to a specified URL.
+   * This function is called when the user confirms "Sim, Encerrar".
+   */
+  function exitFullscreenAndRedirect() {
+    // Hide the modal first
+    hideConfirmationModal(); // This will also attempt to re-enter fullscreen, but the redirect will override it.
+
+    // Redirect
+    window.location.href = 'https://grupoarmindo.site';
+
+    // Hide the frame and button immediately for a cleaner transition
+    frameContainer.style.display = 'none';
+    exitButton.style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
