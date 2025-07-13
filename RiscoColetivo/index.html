@@ -978,26 +978,6 @@
                             console.error("Erro ao tocar som: ", e);
                         }
                     });
-
-                    // --- NEW: Request and Show Browser Notification ---
-                    if (Notification.permission === "granted") {
-                        new Notification("Risco Coletivo", {
-                            body: "O teu cooldown terminou! Podes colocar um novo pixel. 🎉",
-                            icon: "farinha.png" // Make sure you have this icon file in your root directory
-                        });
-                    } else if (Notification.permission !== "denied") {
-                        // If permission is not granted or denied, request it
-                        Notification.requestPermission().then(permission => {
-                            if (permission === "granted") {
-                                new Notification("Risco Coletivo", {
-                                    body: "O teu cooldown terminou! Podes colocar um novo pixel. 🎉",
-                                    icon: "farinha.png"
-                                });
-                            }
-                        });
-                    }
-                    // --- END NEW ---
-
                 }
                 cooldown = false;
                 cooldownText.textContent = 'PRONTO!';
@@ -1114,6 +1094,7 @@
         }
 
         // --- Funções do Leaderboard ---
+
         /**
          * Atualiza o leaderboard em tempo real, buscando os top 3 utilizadores
          * e a contagem total de pixels no quadro.
@@ -1299,13 +1280,6 @@
                 localStorage.setItem('userName', userName); // Salva o nome no armazenamento local
                 hideNamePopup();
                 updateLeaderboard(); // Atualiza o leaderboard com o nome do novo utilizador
-
-                // --- NEW: Request Notification Permission after user interaction ---
-                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-                    Notification.requestPermission();
-                }
-                // --- END NEW ---
-
             } else {
                 // Em vez de alert, pode-se adicionar uma mensagem de erro na UI
                 alert("Por favor, insere o teu nome!");
