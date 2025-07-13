@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Risco Coletivo</title>
+    <!-- Google Fonts para uma fonte mais agradável -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,12 +17,9 @@
             --shadow-light: rgba(0, 0, 0, 0.08);
             --shadow-medium: rgba(0, 0, 0, 0.15);
             --success-green: #00cc78;
-            --overlay-color: rgba(0, 0, 0, 0.6);
-            /* Fundo mais escuro para modals */
+            --overlay-color: rgba(0, 0, 0, 0.6); /* Fundo mais escuro para modals */
             --modal-bg: #fff;
             --modal-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
-            /* As variáveis --color-red e --color-white não são mais usadas aqui diretamente no header */
-            /* Elas permanecem se forem referenciadas em outros lugares, mas para o banner não são necessárias. */
         }
 
         * {
@@ -44,7 +42,6 @@
             left: 0;
             width: 100%;
             background: #fff;
-            /* Fundo branco para a barra do site, conforme solicitado */
             border-bottom: 1px solid var(--border-color);
             padding: 10px 25px;
             box-shadow: 0 3px 6px var(--shadow-light);
@@ -278,17 +275,9 @@
         }
 
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.12);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+            100% { transform: scale(1); }
         }
 
         .popup-content button {
@@ -322,10 +311,8 @@
 
         /* Name Input Specific */
         #name-input-popup h2 {
-            color: #2450a4;
-            /* Uma cor diferente para este pop-up */
+            color: #2450a4; /* Uma cor diferente para este pop-up */
         }
-
         #name-input-popup input[type="text"] {
             width: 80%;
             padding: 12px 15px;
@@ -336,23 +323,18 @@
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-
         #name-input-popup input[type="text"]:focus {
             border-color: #3690ea;
             box-shadow: 0 0 0 3px rgba(54, 144, 234, 0.2);
         }
-
         #name-input-popup button {
-            background: #3690ea;
-            /* Azul para o botão de nome */
+            background: #3690ea; /* Azul para o botão de nome */
             box-shadow: 0 4px 10px rgba(54, 144, 234, 0.3);
         }
-
         #name-input-popup button:hover {
             background: #2450a4;
             box-shadow: 0 6px 15px rgba(54, 144, 234, 0.4);
         }
-
         #name-input-popup button:active {
             background: #3690ea;
             box-shadow: 0 2px 5px rgba(54, 144, 234, 0.2);
@@ -365,34 +347,24 @@
             left: 20px;
             background: #fff;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            /* Slightly less rounded for a sharper, cleaner look */
-            padding: 8px 12px;
-            /* Reduced padding for a more compact feel */
-            box-shadow: none;
-            /* Explicitly no shadow for minimalism */
+            border-radius: 6px; /* Slightly less rounded for a sharper, cleaner look */
+            padding: 8px 12px; /* Reduced padding for a more compact feel */
+            box-shadow: none; /* Explicitly no shadow for minimalism */
             z-index: 999;
-            max-width: 220px;
-            /* Reduced max-width */
-            font-size: 0.8rem;
-            /* Smaller overall font size */
+            max-width: 220px; /* Reduced max-width */
+            font-size: 0.8rem; /* Smaller overall font size */
             color: #333;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         #leaderboard h3 {
             margin-top: 0;
-            margin-bottom: 8px;
-            /* Reduced margin */
-            font-size: 1rem;
-            /* Smaller font for title */
+            margin-bottom: 8px; /* Reduced margin */
+            font-size: 1rem; /* Smaller font for title */
             color: #222;
-            border-bottom: 1px solid #eee;
-            /* Light separator */
-            padding-bottom: 6px;
-            /* Reduced padding */
-            text-align: center;
-            /* Center the title */
+            border-bottom: 1px solid #eee; /* Light separator */
+            padding-bottom: 6px; /* Reduced padding */
+            text-align: center; /* Center the title */
         }
 
         #leaderboard ul {
@@ -404,10 +376,8 @@
         #leaderboard li {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
-            /* Reduced padding */
-            border-bottom: none;
-            /* Ensure no borders between items */
+            padding: 4px 0; /* Reduced padding */
+            border-bottom: none; /* Ensure no borders between items */
         }
 
         #leaderboard li:last-child {
@@ -416,151 +386,77 @@
 
         #leaderboard li strong {
             color: #000;
-            font-weight: 500;
-            /* Slightly lighter font weight for names */
+            font-weight: 500; /* Slightly lighter font weight for names */
         }
 
         #leaderboard li span.user-pixels {
-            font-weight: 600;
-            /* Slightly lighter font weight for pixels */
+            font-weight: 600; /* Slightly lighter font weight for pixels */
             color: var(--primary-red);
         }
-
-        #leaderboard #total-pixels-display {
-            /* Changed ID here */
-            margin-top: 12px;
-            /* Adjusted margin */
-            padding-top: 10px;
-            /* Adjusted padding */
-            border-top: 1px solid #eee;
-            /* Light separator */
-            font-weight: 500;
-            /* Lighter font weight */
+        
+        #leaderboard #total-pixels-display { /* Changed ID here */
+            margin-top: 12px; /* Adjusted margin */
+            padding-top: 10px; /* Adjusted padding */
+            border-top: 1px solid #eee; /* Light separator */
+            font-weight: 500; /* Lighter font weight */
             color: #00756f;
             text-align: center;
-            font-size: 0.85em;
-            /* Smaller font for personal count */
+            font-size: 0.85em; /* Smaller font for personal count */
         }
-
-        #leaderboard #total-pixels-display span {
-            /* Changed ID here */
+        #leaderboard #total-pixels-display span { /* Changed ID here */
             color: var(--primary-red);
-            font-size: 1em;
-            /* Adjusted relative to parent */
-            margin-left: 4px;
-            /* Reduced margin */
+            font-size: 1em; /* Adjusted relative to parent */
+            margin-left: 4px; /* Reduced margin */
         }
 
-        /* ------------------------------------------- */
-        /* RESPONSIVE STYLES FOR MOBILE DEVICES */
-        /* ------------------------------------------- */
-
+        /* Responsividade básica */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
                 align-items: flex-start;
                 padding: 10px 15px;
                 height: auto;
-                /* Allow header height to adapt */
                 gap: 10px;
-                background: #fff;
-                /* Keeps the white background on mobile */
-            }
-
-            header h1 {
-                font-size: 1.4rem;
-                /* Slightly smaller title */
-                margin-bottom: 5px;
-                /* Space between title and controls */
-            }
-
-            header h1 .logo {
-                font-size: 1.8rem;
             }
 
             .controls-info {
                 flex-direction: column;
-                /* Stack controls vertically */
                 align-items: flex-start;
-                gap: 5px;
-                /* Smaller gap between info items */
-                font-size: 0.78rem;
-                /* Smaller font for info */
-                width: 100%;
-                /* Take full width */
-            }
-
-            #instructions {
-                display: none;
-                /* Hide lengthy instructions on mobile to save space */
+                gap: 8px;
+                font-size: 0.8rem;
             }
 
             #cooldown {
                 width: 100%;
-                /* Full width cooldown bar */
                 margin-top: 10px;
-                /* Space from controls */
-                font-size: 0.9rem;
-                padding: 8px 10px;
-            }
-
-            /* Define a new header height variable for mobile */
-            body {
-                --header-height-mobile: 130px;
-                /* Adjust based on collapsed header height */
             }
 
             #container {
-                top: var(--header-height-mobile);
-                /* Adjust canvas position below mobile header */
-                height: calc(100vh - var(--header-height-mobile));
+                top: auto;
+                height: calc(100vh - var(--header-height-mobile, 130px));
             }
 
             #color-picker {
                 padding: 10px 12px;
                 gap: 8px;
                 bottom: 10px;
-                /* Closer to the bottom edge */
             }
 
             .color {
                 width: 30px;
                 height: 30px;
-                border-width: 2px;
-                /* Thinner border for selected color */
-            }
-
-            .color.selected {
-                box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 8px var(--primary-red);
-                /* Smaller shadow */
             }
 
             #minimap {
-                width: 130px;
-                /* Smaller minimap */
-                height: 130px;
-                top: calc(var(--header-height-mobile) + 10px);
-                /* Position below mobile header */
-                right: 10px;
-                /* Closer to right edge */
-                border-width: 1px;
-                /* Thinner border */
-                border-radius: 8px;
-                /* Slightly less rounded */
-                box-shadow: 0 2px 8px var(--shadow-light);
-                /* Lighter shadow */
-            }
-
-            #minimap .viewport-rect {
-                border-width: 1px;
-                /* Thinner border for viewport rect */
+                width: 150px;
+                height: 150px;
+                top: 15px;
+                right: 15px;
             }
 
             .popup-content {
                 padding: 25px 30px;
                 gap: 20px;
-                border-radius: 12px;
-                /* Slightly less rounded */
             }
 
             .popup-content h2 {
@@ -580,114 +476,25 @@
                 font-size: 1rem;
             }
 
-            #name-input-popup input[type="text"] {
-                width: 90%;
-                /* Wider input for better touch targeting */
-                font-size: 1rem;
-                padding: 10px 12px;
-            }
-
             #leaderboard {
                 bottom: 10px;
                 left: 10px;
-                max-width: 150px;
-                /* Even smaller max-width */
-                padding: 5px 8px;
-                /* Reduced padding */
-                font-size: 0.7rem;
-                /* Smallest font size */
-                border-radius: 4px;
-                /* More compact rounding */
+                max-width: 160px; /* Further reduced for mobile */
+                padding: 6px 10px; /* Further reduced padding */
+                font-size: 0.75rem; /* Further reduced font size */
             }
-
             #leaderboard h3 {
-                font-size: 0.8rem;
-                margin-bottom: 5px;
+                font-size: 0.85rem;
+                margin-bottom: 6px;
                 padding-bottom: 3px;
             }
-
             #leaderboard li {
-                padding: 2px 0;
+                padding: 3px 0;
             }
-
-            #leaderboard li strong,
-            #leaderboard li span.user-pixels {
-                font-size: 0.9em;
-                /* Adjust relative to parent */
-            }
-
-            #leaderboard #total-pixels-display {
-                margin-top: 5px;
-                padding-top: 5px;
-                font-size: 0.75em;
-            }
-        }
-
-        /* Further refinement for very small screens (e.g., iPhone SE) */
-        @media (max-width: 400px) {
-            header h1 {
-                font-size: 1.2rem;
-            }
-
-            header h1 .logo {
-                font-size: 1.5rem;
-            }
-
-            .controls-info {
-                font-size: 0.7rem;
-            }
-
-            #cooldown {
-                font-size: 0.85rem;
-            }
-
-            body {
-                --header-height-mobile: 110px;
-                /* Adjust for even smaller header */
-            }
-
-            #container {
-                top: var(--header-height-mobile);
-                height: calc(100vh - var(--header-height-mobile));
-            }
-
-            #color-picker {
-                padding: 8px 10px;
-                gap: 6px;
-            }
-
-            .color {
-                width: 26px;
-                height: 26px;
-            }
-
-            #minimap {
-                width: 110px;
-                height: 110px;
-                top: calc(var(--header-height-mobile) + 8px);
-                right: 8px;
-            }
-
-            .popup-content h2 {
-                font-size: 1.5rem;
-            }
-
-            .popup-content p {
-                font-size: 0.9rem;
-            }
-
-            .popup-content .emoji {
-                font-size: 2.5rem;
-            }
-
-            .popup-content button {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-
-            #leaderboard {
-                max-width: 130px;
-                font-size: 0.65rem;
+            #leaderboard #total-pixels-display { /* Changed ID here */
+                margin-top: 6px;
+                padding-top: 6px;
+                font-size: 0.8em;
             }
         }
     </style>
@@ -720,8 +527,10 @@
     <canvas id="minimap" width="200" height="200"></canvas>
     <div id="color-picker"></div>
 
+    <!-- Elemento de áudio -->
     <audio id="cooldownSound" src="pronto.mp3" preload="auto"></audio>
 
+    <!-- Overlay do Pop-up de Cooldown -->
     <div id="popup-overlay" class="popup-overlay">
         <div id="notification-popup" class="popup-content">
             <span class="emoji">🎉</span>
@@ -731,6 +540,7 @@
         </div>
     </div>
 
+    <!-- Overlay do Pop-up de Pedir Nome (Novo) -->
     <div id="name-overlay" class="popup-overlay">
         <div id="name-input-popup" class="popup-content">
             <span class="emoji">👋</span>
@@ -741,31 +551,34 @@
         </div>
     </div>
 
+    <!-- Leaderboard (Novo) -->
     <div id="leaderboard">
         <h3>Classificação de Pixels</h3>
         <ul id="leaderboard-list">
-            </ul>
-        <div id="total-pixels-display">
-            Total de Pixels: <span id="total-pixels-count">0</span>
-            </div>
+            <!-- Itens do leaderboard serão inseridos aqui pelo JS -->
+        </ul>
+        <div id="total-pixels-display"> <!-- Changed ID here -->
+            Total de Pixels: <span id="total-pixels-count">0</span> <!-- Changed ID here and text -->
+        </div>
     </div>
 
+    <!-- Firebase libs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
         // Config do Firebase — substitua pelos seus dados
         // Substitua os valores abaixo pelas suas credenciais reais do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
-            authDomain: "aawards.firebaseapp.com",
-            databaseURL: "https://aawards-default-rtdb.firebaseio.com",
-            projectId: "aawards",
-            storageBucket: "aawards.firebasestorage.app",
-            messagingSenderId: "839334918366",
-            appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
-            measurementId: "G-Z9YLSTGHST"
-        };
+         const firebaseConfig = {
+  apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+  measurementId: "G-Z9YLSTGHST"
+};
 
         // Inicializa o Firebase
         firebase.initializeApp(firebaseConfig);
@@ -797,7 +610,7 @@
         const leaderboard = document.getElementById('leaderboard');
         const leaderboardList = document.getElementById('leaderboard-list');
         const totalPixelsDisplay = document.getElementById('total-pixels-display'); // Changed ID here
-        const totalPixelsCount = document.getElementById('total-pixels-count'); // Changed ID here
+        const totalPixelsCount = document.getElementById('total-pixels-count');     // Changed ID here
 
         // Variáveis globais de estado
         let zoom = 20; // Zoom inicial (pixel maior)
@@ -805,24 +618,24 @@
         let offsetY = 0;
         let dragging = false;
         let dragStart = {};
-        let currentColor = '#ff4500'; // Cor inicial (mantendo a sugestão do r/place)
+        let currentColor = '#ff0000'; // Cor inicial
         let cooldown = false;
         let cooldownEndTimestamp = 0;
-        const cooldownDuration = 90000; // 15 segundos de cooldown
+        const cooldownDuration = 120000; // 15 segundos de cooldown
         const originalTitle = document.title; // Guarda o título original da página
         const newPixelTitle = "Podes por um novo pixel!"; // O novo título para o pop-up de cooldown
 
         let userName = localStorage.getItem('userName'); // Tenta carregar o nome do utilizador do localStorage
         let userPixels = 0; // Contagem de pixels do utilizador atual (ainda usada para o seu próprio pixel count no Firebase)
 
-        // Cores iguais ao r/place oficial 2024 (já incluem vermelho e branco)
+        // Cores iguais ao r/place oficial 2024
         const colors = [
             '#6d001a', '#be0039', '#ff4500', '#ffa800', '#ffd635', '#fff8b8',
             '#00a368', '#00cc78', '#7eed56', '#00756f', '#009eaa', '#00fff8',
             '#2450a4', '#3690ea', '#51e9f4', '#493ac1', '#6a5cff', '#94b3ff',
             '#811e9f', '#b44ac0', '#e4abff', '#de107f', '#ff3881', '#ff99aa',
             '#6d482f', '#9c6926', '#ffb470', '#000000', '#515252', '#898d90',
-            '#d4d7d9', '#ffffff','#ff0404','#d864a4' // O branco (#ffffff) e vários tons de vermelho/laranja já estão aqui
+            '#d4d7d9', '#ffffff'
         ];
 
         // --- Funções de UI e Desenho do Canvas ---
@@ -911,14 +724,8 @@
                 minimapCtx.strokeStyle = '#eee';
                 minimapCtx.lineWidth = 0.5;
                 for (let i = 0; i <= minimap.width; i += 10) {
-                    minimapCtx.beginPath();
-                    minimapCtx.moveTo(i + 0.5, 0);
-                    minimapCtx.lineTo(i + 0.5, minimap.height);
-                    minimapCtx.stroke();
-                    minimapCtx.beginPath();
-                    minimapCtx.moveTo(0, i + 0.5);
-                    minimapCtx.lineTo(minimap.width, i + 0.5);
-                    minimapCtx.stroke();
+                    minimapCtx.beginPath(); minimapCtx.moveTo(i + 0.5, 0); minimapCtx.lineTo(i + 0.5, minimap.height); minimapCtx.stroke();
+                    minimapCtx.beginPath(); minimapCtx.moveTo(0, i + 0.5); minimapCtx.lineTo(minimap.width, i + 0.5); minimapCtx.stroke();
                 }
 
                 // Desenha todos os pixels no canvas principal e no minimap
@@ -963,21 +770,11 @@
             if (!cooldown || now >= cooldownEndTimestamp) {
                 // Se o cooldown acabou ou não estava ativo
                 if (cooldown && !popupShown) { // Se acabou de terminar e o pop-up ainda não foi mostrado
+                    cooldownSound.currentTime = 0;
+                    // Tenta tocar o som. O catch lida com erros de autoplay em navegadores.
+                    cooldownSound.play().catch(e => console.error("Erro ao tocar som: ", e));
                     showCooldownPopup(); // Mostra o pop-up de cooldown
                     popupShown = true; // Define a flag como verdadeira
-
-                    // Tenta tocar o som. Se falhar por autoplay policy, o catch() lidará com isso.
-                    cooldownSound.currentTime = 0; // Reinicia o som para ter certeza que toca do início
-                    cooldownSound.play().catch(e => {
-                        // NotAllowedError significa que o navegador bloqueou o autoplay
-                        if (e.name === 'NotAllowedError') {
-                            console.warn("Autoplay bloqueado. Por favor, interaja com a página para ativar o som.");
-                            // Opcional: Adicionar uma mensagem visual para o utilizador
-                            // Por exemplo, um pequeno ícone de "mute" ou "clique para ativar som"
-                        } else {
-                            console.error("Erro ao tocar som: ", e);
-                        }
-                    });
                 }
                 cooldown = false;
                 cooldownText.textContent = 'PRONTO!';
@@ -1065,7 +862,7 @@
             }
 
             const pixelKey = `${x}_${y}`;
-
+            
             // Atualiza o pixel no canvas (apenas a cor)
             db.ref('pixels/' + pixelKey).set(color)
                 .then(() => {
@@ -1073,11 +870,11 @@
                     db.ref('users/' + userName).transaction(currentPixels => {
                         return (currentPixels || 0) + 1;
                     }).then(() => {
-                        // Atualiza a contagem local imediatamente
+                         // Atualiza a contagem local imediatamente
                         userPixels++;
                         // Não atualizamos yourPixelsCount aqui, pois agora mostra o total global
                         // updateLeaderboard() será chamado para atualizar o total e a lista
-                        updateLeaderboard();
+                        updateLeaderboard(); 
                     }).catch(error => {
                         console.error("Erro ao atualizar contador de pixels do utilizador:", error);
                     });
@@ -1104,10 +901,7 @@
             db.ref('users').orderByValue().limitToLast(3).on('value', snap => {
                 const users = [];
                 snap.forEach(childSnap => {
-                    users.push({
-                        name: childSnap.key,
-                        pixels: childSnap.val()
-                    });
+                    users.push({ name: childSnap.key, pixels: childSnap.val() });
                 });
                 users.sort((a, b) => b.pixels - a.pixels); // Ordena do maior para o menor
 
@@ -1203,9 +997,7 @@
 
             zoom = newZoom;
             drawAll(); // Redesenha com o novo zoom e pan
-        }, {
-            passive: false
-        });
+        }, { passive: false });
 
         // Navegação pelo Minimap (arrastar o minimap para mover o canvas)
         let minimapDragging = false;
@@ -1263,9 +1055,7 @@
         });
 
         // Event listeners para os pop-ups
-        closePopupButton.addEventListener('click', () => {
-            hideCooldownPopup();
-        });
+        closePopupButton.addEventListener('click', hideCooldownPopup);
         notificationPopupOverlay.addEventListener('click', (e) => {
             if (e.target === notificationPopupOverlay) { // Só fecha se clicou diretamente no overlay, não no popup
                 hideCooldownPopup();
@@ -1282,7 +1072,7 @@
                 updateLeaderboard(); // Atualiza o leaderboard com o nome do novo utilizador
             } else {
                 // Em vez de alert, pode-se adicionar uma mensagem de erro na UI
-                alert("Por favor, insere o teu nome!");
+                alert("Por favor, insere o teu nome!"); 
             }
         });
 
@@ -1331,7 +1121,7 @@
         // Desenha o estado inicial do canvas e minimap
         drawAll();
         // Carrega e atualiza o leaderboard na inicialização
-        updateLeaderboard();
+        updateLeaderboard(); 
 
         // Verifica se é a primeira vez do utilizador (se o nome já foi salvo)
         if (!userName) {
