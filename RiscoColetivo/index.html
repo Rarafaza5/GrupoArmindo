@@ -1094,6 +1094,92 @@
         }
 
         // --- Funções do Leaderboard ---
+let popupShown = false; // Flag para controlar se o pop-up de cooldown já foi mostrado nesta prontidão
+
+    /**
+     * Atualiza o display visual do cooldown e toca o som quando pronto.
+     */
+    function updateCooldown() {
+        const now = Date.now();
+        if (!cooldown || now >= cooldownEndTimestamp) {
+            // Se o cooldown acabou ou não estava ativo
+            if (cooldown && !popupShown) { // Se acabou de terminar e o pop-up ainda não foi mostrado
+                showCooldownPopup(); // Mostra o pop-up de cooldown
+                popupShown = true; // Define a flag como verdadeira
+
+                // Tenta tocar o som. Se falhar por autoplay policy, o catch() lidará com isso.
+                cooldownSound.currentTime = 0; // Reinicia o som para ter certeza que toca do início
+                cooldownSound.play().catch(e => {
+                    // NotAllowedError significa que o navegador bloqueou o autoplay
+                    if (e.name === 'NotAllowedError') {
+                        console.warn("Autoplay bloqueado. Por favor, interaja com a página para ativar o som.");
+                        // Opcional: Adicionar uma mensagem visual para o utilizador
+                        // Por exemplo, um pequeno ícone de "mute" ou "clique para ativar som"
+                    } else {
+                        console.error("Erro ao tocar som: ", e);
+                    }
+                });
+
+                // --- NEW: Request and Show Browser Notification ---
+                if (Notification.permission === "granted") {
+                    new Notification("Risco Coletivo", {
+                        body: "O teu cooldown terminou! Podes colocar um novo pixel. 🎉",
+                        icon: "farinha.png" // Make sure you have this icon file in your root directory
+                    });
+                } else if (Notification.permission !== "denied") {
+                    // If permission is not granted or denied, request it
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification("Risco Coletivo", {
+                                body: "O teu cooldown terminou! Podes colocar um novo pixel. 🎉",
+                                icon: "farinha.png"
+                            });
+                        }
+                    });
+                }
+                // --- END NEW ---
+
+            }
+            cooldown = false;
+            cooldownText.textContent = 'PRONTO!';
+            cooldownDisplay.classList.add('ready'); // Adiciona classe para estilo "pronto"
+            cooldownBar.style.width = '0%';
+            return; // Não há necessidade de agendar outra chamada se o cooldown terminou
+        }
+        cooldownDisplay.classList.remove('ready'); // Remove classe se não estiver pronto
+        let remaining = cooldownEndTimestamp - now;
+        cooldownText.textContent = `Aguarde ${(remaining / 1000).toFixed(1)}s`;
+        const percent = 100 * remaining / cooldownDuration;
+        cooldownBar.style.width = `${percent}%`;
+
+        popupShown = false; // Redefine a flag se o cooldown ainda estiver ativo
+
+        // Usa setTimeout para garantir que a atualização continue mesmo em abas não focadas
+        setTimeout(updateCooldown, 100); // Verifica a cada 100ms
+    }
+
+    // ... (existing code)
+
+    // Event listeners para o pop-up de nome
+    saveNameButton.addEventListener('click', () => {
+        const name = userNameInput.value.trim();
+        if (name) {
+            userName = name;
+            localStorage.setItem('userName', userName); // Salva o nome no armazenamento local
+            hideNamePopup();
+            updateLeaderboard(); // Atualiza o leaderboard com o nome do novo utilizador
+
+            // --- NEW: Request Notification Permission after user interaction ---
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+            // --- END NEW ---
+
+        } else {
+            // Em vez de alert, pode-se adicionar uma mensagem de erro na UI
+            alert("Por favor, insere o teu nome!");
+        }
+    });
 
         /**
          * Atualiza o leaderboard em tempo real, buscando os top 3 utilizadores
