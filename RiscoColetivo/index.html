@@ -1094,12 +1094,7 @@
         }
 
         // --- Funções do Leaderboard ---
-let popupShown = false; // Flag para controlar se o pop-up de cooldown já foi mostrado nesta prontidão
-
-    /**
-     * Atualiza o display visual do cooldown e toca o som quando pronto.
-     */
-    function updateCooldown() {
+ function updateCooldown() {
         const now = Date.now();
         if (!cooldown || now >= cooldownEndTimestamp) {
             // Se o cooldown acabou ou não estava ativo
@@ -1138,6 +1133,48 @@ let popupShown = false; // Flag para controlar se o pop-up de cooldown já foi m
                     });
                 }
                 // --- END NEW ---
+
+            }
+            cooldown = false;
+            cooldownText.textContent = 'PRONTO!';
+            cooldownDisplay.classList.add('ready'); // Adiciona classe para estilo "pronto"
+            cooldownBar.style.width = '0%';
+            return; // Não há necessidade de agendar outra chamada se o cooldown terminou
+        }
+        cooldownDisplay.classList.remove('ready'); // Remove classe se não estiver pronto
+        let remaining = cooldownEndTimestamp - now;
+        cooldownText.textContent = `Aguarde ${(remaining / 1000).toFixed(1)}s`;
+        const percent = 100 * remaining / cooldownDuration;
+        cooldownBar.style.width = `${percent}%`;
+
+        popupShown = false; // Redefine a flag se o cooldown ainda estiver ativo
+
+        // Usa setTimeout para garantir que a atualização continue mesmo em abas não focadas
+        setTimeout(updateCooldown, 100); // Verifica a cada 100ms
+    }
+
+    // ... (existing code)
+
+    // Event listeners para o pop-up de nome
+    saveNameButton.addEventListener('click', () => {
+        const name = userNameInput.value.trim();
+        if (name) {
+            userName = name;
+            localStorage.setItem('userName', userName); // Salva o nome no armazenamento local
+            hideNamePopup();
+            updateLeaderboard(); // Atualiza o leaderboard com o nome do novo utilizador
+
+            // --- NEW: Request Notification Permission after user interaction ---
+            if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+            // --- END NEW ---
+
+        } else {
+            // Em vez de alert, pode-se adicionar uma mensagem de erro na UI
+            alert("Por favor, insere o teu nome!");
+        }
+    });
 
             }
             cooldown = false;
