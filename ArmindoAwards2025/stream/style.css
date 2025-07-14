@@ -1,0 +1,857 @@
+/* Variáveis de Cores */
+:root {
+    --color-dark-bg: #1A1A2E; /* Fundo escuro principal */
+    --color-medium-dark-bg: #272C41; /* Fundo de cards/seções */
+    --color-light-dark-bg: #3F4761; /* Fundo de elementos específicos, como itens de lista */
+    --color-gold-primary: #FFD700; /* Dourado principal para destaques */
+    --color-gold-light: #FFEB3B; /* Dourado mais claro para hover/ativos */
+    --color-gold-shadow: rgba(255, 215, 0, 0.4); /* Sombra para o dourado */
+    --color-text-light: #E0E0E0; /* Texto claro principal */
+    --color-text-muted: #A0A0A0; /* Texto secundário/apagado */
+    --color-border-dark: #4B526B; /* Cor de bordas escuras */
+    --color-error: #FF6B6B; /* Cor para erros/alertas vermelhos */
+    --color-info: #6EC6FF; /* Cor para informações azuis */
+    --color-warning: #FFC107; /* Cor para avisos amarelos */
+    --color-success: #8BC34A; /* Cor para sucesso verde */
+
+    /* Fontes */
+    --font-heading: 'Cinzel', serif;
+    --font-body: 'Montserrat', sans-serif;
+    --font-accent: 'Playfair Display', serif; /* Para elementos que se destacam */
+}
+
+/* Reset Básico e Estilos Globais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-light);
+    line-height: 1.6;
+    overflow-x: hidden; /* Evita scroll horizontal */
+}
+
+a {
+    color: var(--color-gold-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--color-gold-light);
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: inherit;
+    font-family: inherit;
+}
+
+/* --- Cabeçalho do Evento --- */
+.event-header {
+    background: linear-gradient(135deg, var(--color-medium-dark-bg) 0%, #171A29 100%);
+    color: var(--color-text-light);
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    border-bottom: 2px solid var(--color-gold-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.header-content {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 0 15px var(--color-gold-primary));
+    margin-bottom: 15px;
+}
+
+.event-header h1 {
+    font-family: var(--font-heading);
+    font-size: 3.5em;
+    color: var(--color-gold-primary);
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px var(--color-gold-shadow);
+    letter-spacing: 2px;
+}
+
+.event-header p {
+    font-family: var(--font-accent);
+    font-size: 1.3em;
+    color: var(--color-text-muted);
+    font-weight: 300;
+}
+
+/* --- Layout Principal (Flexbox/Grid) --- */
+.main-content {
+    display: flex;
+    flex-wrap: wrap; /* Permite que as seções se quebrem em linhas */
+    gap: 30px; /* Espaçamento entre as seções */
+    padding: 30px;
+    max-width: 1600px; /* Largura máxima do conteúdo */
+    margin: 0 auto; /* Centraliza */
+}
+
+.player-section {
+    flex: 3; /* O player ocupa 3 partes do espaço disponível */
+    min-width: 600px; /* Largura mínima para o player */
+    position: relative;
+    display: flex; /* Para organizar o vídeo e os botões */
+    flex-direction: column;
+    gap: 20px; /* Espaço entre o vídeo e os botões */
+}
+
+.info-chat-section {
+    flex: 1; /* A seção de info/chat ocupa 1 parte */
+    min-width: 350px; /* Largura mínima para a barra lateral */
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* --- Conteúdo Principal (Vídeo e Overlays) --- */
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* Proporção 16:9 (altura/largura * 100%) */
+    background-color: #000;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--color-border-dark);
+}
+
+#video-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000; /* Fundo preto antes do player carregar */
+}
+
+#video-player iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Mensagem de Live Offline */
+.live-offline-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 26, 46, 0.95); /* Cor de fundo escura, semi-transparente */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 100; /* Acima do player */
+    font-family: var(--font-body);
+    padding: 20px;
+    color: var(--color-text-light);
+    border-radius: 15px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.live-offline-message.hidden {
+    opacity: 0;
+    pointer-events: none; /* Impede interação quando oculto */
+}
+
+.live-offline-message .fas {
+    font-size: 4em;
+    color: var(--color-gold-primary);
+    margin-bottom: 20px;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+.live-offline-message h2 {
+    font-family: var(--font-heading);
+    font-size: 2.5em;
+    color: var(--color-gold-light);
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.live-offline-message p {
+    font-size: 1.2em;
+    color: var(--color-text-muted);
+    margin-bottom: 30px;
+}
+
+.live-offline-message .social-links a {
+    font-size: 2em;
+    margin: 0 10px;
+    color: var(--color-text-muted);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.live-offline-message .social-links a:hover {
+    color: var(--color-gold-primary);
+    transform: translateY(-3px);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* Overlay de Notificações */
+.notification-overlay {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(45, 45, 70, 0.95); /* Fundo semi-transparente */
+    color: var(--color-text-light);
+    padding: 15px 25px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-border-dark);
+    z-index: 50; /* Acima do player, abaixo da mensagem offline */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+    max-width: 90%;
+}
+
+.notification-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.notification-overlay .notification-type-icon {
+    font-size: 1.8em;
+    min-width: 30px;
+    text-align: center;
+}
+
+.notification-overlay.info .notification-type-icon::before { content: "\f05a"; font-family: "Font Awesome 5 Free"; font-weight: 900; color: var(--color-info); }
+.notification-overlay.warning .notification-type-icon::before { content: "\f071"; font-family: "Font Awesome 5 Free"; font-weight: 900; color: var(--color-warning); }
+.notification-overlay.success .notification-type-icon::before { content: "\f058"; font-family: "Font Awesome 5 Free"; font-weight: 900; color: var(--color-success); }
+.notification-overlay.breaking .notification-type-icon::before { content: "\f0a1"; font-family: "Font Awesome 5 Free"; font-weight: 900; color: var(--color-error); } /* Megafone */
+
+.notification-overlay #notification-text {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+/* Overlay de Textos Dinâmicos do Player */
+.player-overlay-texts {
+    position: absolute;
+    bottom: 0; /* Alinha na parte inferior do vídeo */
+    left: 0;
+    width: 100%;
+    padding: 10px 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.player-text-item {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--color-gold-light); /* Cor padrão se não especificada */
+    white-space: nowrap; /* Evita quebra de linha */
+    overflow: hidden; /* Esconde o que excede */
+    text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
+    max-width: 80%; /* Limita a largura */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    cursor: default; /* Padrão, muda para pointer se for link */
+}
+
+/* Estilo para links dentro dos textos do player */
+.player-text-item .player-text-link {
+    color: var(--color-gold-light); /* Cor do link */
+    text-decoration: none; /* Remove sublinhado padrão */
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+    cursor: pointer;
+}
+
+.player-text-item .player-text-link:hover {
+    color: var(--color-gold-primary); /* Cor no hover */
+    text-decoration: underline; /* Sublinhado no hover */
+}
+
+/* --- Reações (MOVIDAS PARA FORA DA TELA) --- */
+.reactions-container-offscreen {
+    position: absolute;
+    top: -9999px; /* Move para fora da viewport */
+    left: -9999px; /* Move para fora da viewport */
+    visibility: hidden; /* Garante que não é visível */
+    pointer-events: none; /* Impede qualquer interação */
+    opacity: 0; /* Totalmente transparente */
+}
+
+/* Os estilos para .reaction-button e .floating-reaction são mantidos
+   caso queira reativá-los facilmente, mas não terão efeito visual na tela */
+.reaction-button {
+    background-color: rgba(45, 45, 70, 0.7);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 50px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.reaction-button i {
+    font-size: 1.2em;
+}
+
+/* Cores específicas para ícones de reação (ainda serão aplicadas, mas não visíveis) */
+.reaction-button[data-reaction="like"] i { color: #007bff; }
+.reaction-button[data-reaction="heart"] i { color: #dc3545; }
+.reaction-button[data-reaction="laugh"] i { color: #ffc107; }
+.reaction-button[data-reaction="sad"] i { color: #6c757d; }
+.reaction-button[data-reaction="clap"] i { color: #28a745; }
+
+/* Efeito de "Explosão" de Reações (Floating Reactions) - também invisível */
+#reaction-burst-container {
+    position: absolute;
+    bottom: -9999px; /* Move para fora da viewport */
+    left: -9999px; /* Move para fora da viewport */
+    pointer-events: none;
+    overflow: hidden;
+    z-index: -1; /* Garante que está atrás de tudo */
+}
+
+.floating-reaction {
+    position: absolute;
+    font-size: 2em;
+    opacity: 0;
+    /* A animação ainda existirá, mas não será visível */
+    animation: floatUpAndFade 3s ease-out forwards;
+}
+
+@keyframes floatUpAndFade {
+    0% {
+        transform: translate(0, 0) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(var(--rand-x) * 1px), -200px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* --- Agenda e Chat Containers --- */
+.agenda-container,
+.chat-container {
+    background-color: var(--color-medium-dark-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--color-border-dark);
+    display: flex;
+    flex-direction: column;
+}
+
+.agenda-container h2,
+.chat-container h2 {
+    font-family: var(--font-heading);
+    font-size: 1.8em;
+    color: var(--color-gold-primary);
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--color-gold-shadow);
+}
+
+.agenda-container h2 .fas,
+.chat-container h2 .fas {
+    margin-right: 10px;
+    color: var(--color-gold-light);
+}
+
+/* --- Agenda --- */
+.agenda-item {
+    background-color: var(--color-light-dark-bg);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border: 1px solid var(--color-border-dark);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.3s ease;
+}
+
+.agenda-item:last-child {
+    margin-bottom: 0;
+}
+
+.agenda-item:hover {
+    background-color: #31364a;
+}
+
+/* Destaque para o item da agenda atual */
+.agenda-item.current {
+    background: linear-gradient(90deg, var(--color-gold-primary) 0%, rgba(255, 215, 0, 0.2) 100%);
+    color: var(--color-dark-bg);
+    border-color: var(--color-gold-light);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    transform: scale(1.02);
+    position: relative;
+    z-index: 10; /* Garante que fique acima de outros itens */
+    animation: pulseCurrentAgenda 2s infinite alternate;
+}
+
+@keyframes pulseCurrentAgenda {
+    0% { transform: scale(1.02); box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+    100% { transform: scale(1.03); box-shadow: 0 0 30px rgba(255, 215, 0, 1); }
+}
+
+.agenda-item.current strong,
+.agenda-item.current p {
+    color: var(--color-dark-bg); /* Garante bom contraste */
+}
+.agenda-item.current strong {
+    font-size: 1.2em; /* Aumenta um pouco para destaque */
+}
+
+.agenda-item p {
+    font-size: 0.9em;
+    color: var(--color-text-muted);
+}
+
+.loading-message {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+    padding: 20px 0;
+}
+
+/* --- Chat --- */
+.chat-container {
+    flex-grow: 1; /* Permite que o chat ocupe o espaço restante */
+}
+
+.chat-messages {
+    flex-grow: 1;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 10px;
+    padding: 15px;
+    background-color: var(--color-dark-bg);
+    overflow-y: auto; /* Scroll para mensagens */
+    max-height: 400px; /* Altura máxima do chat box */
+    display: flex;
+    flex-direction: column-reverse; /* Novas mensagens no final */
+    scroll-behavior: smooth;
+    margin-bottom: 15px;
+}
+
+.chat-message {
+    background-color: var(--color-medium-dark-bg);
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    word-wrap: break-word; /* Quebra palavras longas */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    /* Adição para alinhar mensagens: */
+    display: flex;
+    flex-direction: column; /* Conteúdo da mensagem em coluna */
+    max-width: 90%; /* Limita a largura da bolha de mensagem */
+}
+
+/* Estilo para mensagens do próprio usuário */
+.chat-message.self {
+    background-color: var(--color-light-dark-bg); /* Um tom ligeiramente diferente */
+    align-self: flex-end; /* Alinha a bolha de mensagem à direita */
+    border-bottom-right-radius: 2px; /* Ajuste no canto inferior-direito */
+}
+
+/* Estilo para mensagens de outros usuários */
+.chat-message.other {
+    align-self: flex-start; /* Alinha a bolha de mensagem à esquerda */
+    border-bottom-left-radius: 2px; /* Ajuste no canto inferior-esquerdo */
+}
+
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaço entre o avatar/cor do usuário e o nome */
+    margin-bottom: 5px; /* Espaço entre o header e o texto da mensagem */
+}
+
+/* Opcional: Estilo para um avatar placeholder */
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2); /* Um fundo neutro para o avatar */
+    color: var(--color-text-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+
+.message-user {
+    font-weight: bold;
+    margin-right: 8px;
+    /* A cor é aplicada via JS para ser aleatória */
+}
+
+.message-time {
+    font-size: 0.8em;
+    color: var(--color-text-muted);
+}
+
+.message-text {
+    /* margin-top: 5px;  Removido porque o gap do message-header resolve */
+    font-size: 0.95em;
+    color: var(--color-text-light);
+}
+
+.chat-input-area {
+    display: flex; /* Garante que é um flex container por padrão */
+    gap: 10px; /* Espaçamento entre os itens */
+    margin-top: auto; /* Empurra para o fundo do chat container */
+    flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha se não houver espaço */
+    align-items: center; /* Alinha os itens verticalmente no centro */
+}
+
+.chat-input-area input[type="text"] {
+    padding: 12px;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 8px;
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-light);
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chat-input-area input[type="text"]:focus {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 0 3px var(--color-gold-shadow);
+}
+
+#chat-username {
+    flex: 0.4; /* Menor largura para o nome */
+    min-width: 100px; /* Largura mínima para o nome */
+}
+
+#chat-message-input {
+    flex: 1; /* Maior largura para a mensagem */
+    min-width: 150px; /* Largura mínima para o input da mensagem */
+}
+
+#send-chat-message {
+    background-color: var(--color-gold-primary);
+    color: var(--color-dark-bg);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#send-chat-message:hover {
+    background-color: var(--color-gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Indicador de Digitação (novo) */
+.typing-indicator {
+    font-size: 0.85em;
+    color: var(--color-text-muted);
+    margin-top: 5px;
+    margin-left: 5px; /* Alinha com o início dos inputs */
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    height: 1.2em; /* Para evitar saltos no layout quando aparece */
+    visibility: hidden;
+}
+
+.typing-indicator.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* --- Rodapé --- */
+.event-footer {
+    background: linear-gradient(135deg, #171A29 0%, var(--color-medium-dark-bg) 100%);
+    color: var(--color-text-muted);
+    padding: 25px 20px;
+    text-align: center;
+    font-size: 0.9em;
+    border-top: 2px solid var(--color-border-dark);
+    margin-top: 40px;
+}
+
+.event-footer .social-links {
+    margin-top: 15px;
+}
+
+.event-footer .social-links a {
+    color: var(--color-text-muted);
+    font-size: 1.5em;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.event-footer .social-links a:hover {
+    color: var(--color-gold-primary);
+}
+
+/* --- Responsividade Aprimorada --- */
+
+/* Telas muito grandes (desktops e TVs) */
+@media (min-width: 1601px) {
+    .main-content {
+        padding: 40px; /* Mais padding para telas maiores */
+        gap: 40px;
+    }
+    .event-header h1 {
+        font-size: 4em;
+    }
+}
+
+/* Telas médias a grandes (Tablets em paisagem, laptops) */
+@media (max-width: 1200px) {
+    .main-content {
+        flex-direction: column; /* Pilha as seções (player e info/chat) */
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .player-section,
+    .info-chat-section {
+        min-width: unset; /* Remove largura mínima */
+        flex: auto; /* Deixa o browser decidir a largura */
+        width: 100%; /* Ocupa a largura total disponível */
+    }
+
+    .event-header {
+        padding: 30px 15px;
+    }
+    .event-header h1 {
+        font-size: 3em;
+    }
+    .event-header p {
+        font-size: 1.2em;
+    }
+}
+
+/* Telas pequenas a médias (Tablets em retrato, smartphones grandes) */
+@media (max-width: 768px) {
+    .event-header h1 {
+        font-size: 2.5em;
+    }
+    .event-header p {
+        font-size: 1.1em;
+    }
+    .event-header .header-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .main-content {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .agenda-container,
+    .chat-container {
+        padding: 20px;
+    }
+
+    .agenda-container h2,
+    .chat-container h2 {
+        font-size: 1.6em; /* Um pouco menor para telas menores */
+    }
+
+    .notification-overlay {
+        padding: 10px 15px;
+        top: 10px;
+        max-width: 95%;
+    }
+    .notification-overlay #notification-text {
+        font-size: 0.95em;
+    }
+    .notification-overlay .notification-type-icon {
+        font-size: 1.5em;
+    }
+
+    .player-text-item {
+        font-size: 0.95em;
+        padding: 6px 12px;
+        max-width: 95%; /* Aumenta a largura máxima para preencher mais */
+    }
+
+    .chat-messages {
+        max-height: 350px; /* Ajusta a altura do chat em mobile */
+        min-height: 200px; /* Garante uma altura mínima */
+    }
+
+    .chat-message {
+        max-width: 100%; /* Em mobile, ocupa toda a largura disponível */
+    }
+
+    .chat-input-area {
+        flex-direction: column; /* Empilha inputs e botão */
+        gap: 8px;
+    }
+
+    #chat-username,
+    #chat-message-input,
+    #send-chat-message {
+        width: 100%; /* Ocupa toda a largura */
+        flex: none; /* Desativa flex-grow para manter a largura 100% */
+        min-width: unset; /* Remove o min-width para não forçar largura em mobile */
+    }
+
+    #send-chat-message {
+        justify-content: center; /* Centraliza o texto do botão */
+        padding: 10px 15px; /* Reduz o padding do botão */
+        font-size: 0.95em; /* Reduz o tamanho da fonte */
+    }
+
+    .live-offline-message h2 {
+        font-size: 1.8em;
+    }
+    .live-offline-message p {
+        font-size: 1em;
+    }
+    .live-offline-message .fas {
+        font-size: 3em;
+    }
+    .live-offline-message .social-links a {
+        font-size: 1.5em;
+    }
+}
+
+/* Telas muito pequenas (smartphones pequenos) */
+@media (max-width: 480px) {
+    .event-header {
+        padding: 20px 10px;
+    }
+    .event-header h1 {
+        font-size: 2em;
+        letter-spacing: 1px;
+    }
+    .event-header p {
+        font-size: 1em;
+    }
+    .header-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .main-content {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .agenda-container,
+    .chat-container {
+        padding: 15px;
+    }
+
+    .agenda-container h2,
+    .chat-container h2 {
+        font-size: 1.4em;
+        margin-bottom: 15px;
+    }
+
+    .agenda-item {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+    .agenda-item strong {
+        font-size: 1em;
+    }
+    .agenda-item p {
+        font-size: 0.85em;
+    }
+
+    .chat-messages {
+        padding: 10px;
+        max-height: 250px;
+    }
+    .chat-message {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .message-time {
+        font-size: 0.75em;
+    }
+    .message-text {
+        font-size: 0.9em;
+    }
+
+    .chat-input-area input[type="text"],
+    #send-chat-message {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+
+    .live-offline-message h2 {
+        font-size: 1.5em;
+    }
+    .live-offline-message p {
+        font-size: 0.9em;
+    }
+    .live-offline-message .fas {
+        font-size: 2.5em;
+    }
+    .live-offline-message .social-links a {
+        font-size: 1.3em;
+    }
+
+    .event-footer {
+        padding: 15px 10px;
+        font-size: 0.8em;
+    }
+    .event-footer .social-links a {
+        font-size: 1.3em;
+        margin: 0 8px;
+    }
+}
