@@ -1,0 +1,919 @@
+/* --- Variáveis CSS para Cores e Fontes (Melhor Manutenção) --- */
+:root {
+    --color-dark-bg: #0a0e14; /* Fundo mais escuro */
+    --color-medium-dark-bg: #151a21; /* Fundo de containers */
+    --color-light-dark-bg: #21262d; /* Fundo de elementos internos */
+    --color-text-light: #e0e6ec; /* Texto principal claro */
+    --color-text-muted: #959da6; /* Texto secundário */
+    --color-gold-primary: #FFD700; /* Dourado principal (Ouro) */
+    --color-gold-light: #FFEA00; /* Dourado mais claro para hover */
+    --color-gold-shadow: rgba(255, 215, 0, 0.6); /* Sombra dourada */
+    --color-border-dark: #30363d; /* Borda escura */
+
+    /* Cores para notificações (consistente com bootstrap) */
+    --color-info: #0d6efd;
+    --color-warning: #ffc107;
+    --color-success: #198754;
+    --color-breaking: #dc3545; /* Vermelho para notícias urgentes */
+
+    --font-heading: 'Cinzel', serif; /* Fonte para títulos (elegante) */
+    --font-body: 'Montserrat', sans-serif; /* Fonte para o corpo (moderna e legível) */
+    --font-accent: 'Playfair Display', serif; /* Fonte de destaque (sofisticada) */
+}
+
+/* --- Reset Básico e Estilos Globais --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    line-height: 1.6;
+    overflow-x: hidden; /* Evita scroll horizontal indesejado */
+    position: relative; /* Necessário para o fundo animado */
+}
+
+/* --- Fundo Animado Sutil (Toque Premium) --- */
+.background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top left, rgba(255, 215, 0, 0.05), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(255, 215, 0, 0.05), transparent 30%);
+    z-index: -1; /* Fica atrás de todo o conteúdo */
+    animation: backgroundPulse 15s infinite alternate ease-in-out;
+}
+
+@keyframes backgroundPulse {
+    0% { background-size: 150% 150%; opacity: 0.8; }
+    100% { background-size: 170% 170%; opacity: 1; }
+}
+
+/* --- Componentes Reutilizáveis (Cards, Títulos) --- */
+.card {
+    background-color: var(--color-medium-dark-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--color-border-dark);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Efeito de "levantar" */
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 20px var(--color-gold-shadow);
+}
+
+h1, h2 {
+    font-family: var(--font-heading);
+    color: var(--color-gold-primary);
+    text-align: center;
+    text-shadow: 0 0 12px var(--color-gold-shadow);
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Espaçamento entre ícone e texto */
+}
+
+h2 .fas {
+    color: var(--color-text-light); /* Cor dos ícones nos títulos */
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+/* --- Header do Evento --- */
+.event-header {
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 40px;
+    background: linear-gradient(to right, var(--color-medium-dark-bg), var(--color-light-dark-bg), var(--color-medium-dark-bg));
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    border: 2px solid var(--color-gold-primary);
+    padding: 25px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.event-header h1 {
+    font-size: 3.5em;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    line-height: 1.2;
+}
+
+.event-header p {
+    font-family: var(--font-accent);
+    font-size: 1.4em;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+.header-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 8px var(--color-gold-shadow));
+}
+
+/* --- Layout Principal (Vídeo + Sidebar) --- */
+.main-content-wrapper {
+    display: flex;
+    flex-direction: row; /* Layout padrão: vídeo à esquerda, sidebar à direita */
+    width: 98vw; /* Largura para preencher bem a tela */
+    max-width: 1600px; /* Limite máximo para telas grandes */
+    gap: 30px; /* Espaçamento entre as seções */
+    margin-bottom: 40px;
+}
+
+.video-section {
+    flex: 3; /* Ocupa 3 partes do espaço */
+    min-width: 60%; /* Mínimo de 60% da largura */
+    position: relative; /* Para notificaçoes sobre o player */
+}
+
+.sidebar-section {
+    flex: 1; /* Ocupa 1 parte do espaço */
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    min-width: 300px; /* Mínimo de 300px de largura */
+}
+
+/* --- Player Container (Aparência do Iframe) --- */
+.player-container {
+    position: relative;
+    padding-bottom: 56.25%; /* Proporção de aspecto 16:9 (altura/largura) */
+    height: 0; /* Necessário para padding-bottom funcionar como altura */
+    overflow: hidden; /* Garante que nada saia do container */
+    background-color: #000;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
+    border: 2px solid var(--color-gold-primary); /* Borda dourada de destaque */
+}
+
+#youtube-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- Notificações ao Vivo (Sobre o Player) --- */
+.live-notifications-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza horizontalmente */
+    width: 90%;
+    max-width: 600px;
+    z-index: 10; /* Acima do player */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* Permite cliques em elementos abaixo, exceto o botão de fechar */
+}
+
+.live-notification {
+    background-color: rgba(33, 38, 45, 0.95); /* Fundo semitransparente escuro */
+    color: var(--color-text-light);
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-left: 5px solid; /* Borda colorida para tipo de notificação */
+    animation: slideInFromTop 0.5s ease-out forwards; /* Animação de entrada */
+    pointer-events: all; /* Habilita cliques para o botão de fechar */
+}
+
+.live-notification.fade-out {
+    animation: fadeOutToTop 0.5s ease-out forwards; /* Animação de saída */
+}
+
+@keyframes slideInFromTop {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeOutToTop {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-100%); opacity: 0; }
+}
+
+/* Cores específicas para tipos de notificação */
+.live-notification.notification-info { border-left-color: var(--color-info); }
+.live-notification.notification-warning { border-left-color: var(--color-warning); }
+.live-notification.notification-success { border-left-color: var(--color-success); }
+.live-notification.notification-breaking {
+    border-left-color: var(--color-breaking);
+    animation: slideInFromTop 0.5s ease-out forwards, pulseBorder 1.5s infinite alternate; /* Adiciona animação de pulso */
+}
+
+@keyframes pulseBorder {
+    0% { border-left-color: var(--color-breaking); }
+    100% { border-left-color: var(--color-gold-primary); }
+}
+
+.live-notification .fas {
+    font-size: 1.3em;
+    color: var(--color-gold-primary); /* Ícone dourado */
+}
+
+.close-notification-btn {
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 1.5em;
+    margin-left: auto; /* Empurra o botão para a direita */
+    padding: 0 5px;
+    border-radius: 5px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.close-notification-btn:hover {
+    color: var(--color-text-light);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Controles Personalizados do Player (Mais Intuitivo) --- */
+.custom-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* Gradiente para mesclar com o vídeo */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
+    padding: 20px 25px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5;
+    opacity: 0; /* Esconde por padrão */
+    transition: opacity 0.3s ease; /* Animação de aparecimento */
+}
+
+.player-container:hover .custom-controls {
+    opacity: 1; /* Mostra ao passar o mouse sobre o player */
+}
+
+.control-btn {
+    background: none;
+    color: var(--color-text-light);
+    font-size: 1.5em;
+    padding: 10px;
+    border-radius: 50%; /* Botões circulares */
+    transition: color 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
+}
+
+.control-btn:hover {
+    color: var(--color-gold-primary); /* Ícone dourado no hover */
+    background-color: rgba(255, 215, 0, 0.1); /* Fundo sutil dourado */
+    transform: scale(1.1); /* Efeito de "pop" */
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1; /* Ocupa o espaço entre os botões */
+    margin: 0 20px;
+}
+
+.volume-control i {
+    font-size: 1.2em;
+    color: var(--color-text-muted);
+}
+
+.volume-slider {
+    -webkit-appearance: none; /* Remove estilo padrão do navegador */
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-border-dark); /* Trilha do slider */
+    outline: none;
+    opacity: 0.9;
+    transition: opacity .2s;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-gold-primary); /* Ponto do slider */
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--color-gold-shadow);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-gold-primary);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--color-gold-shadow);
+}
+
+/* --- Chat Box --- */
+.chat-box {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 350px; /* Altura mínima para o chat */
+}
+
+.messages-display {
+    flex-grow: 1;
+    overflow-y: auto; /* Rolagem quando o conteúdo exceder */
+    margin-bottom: 20px;
+    padding-right: 10px;
+    scroll-behavior: smooth; /* Rolagem suave ao adicionar mensagens */
+}
+
+/* Estilos da scrollbar personalizada para um visual mais limpo */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--color-light-dark-bg);
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-gold-primary);
+    border-radius: 10px;
+    border: 2px solid var(--color-light-dark-bg); /* Pequena borda para o thumb */
+}
+
+.chat-message {
+    background-color: var(--color-light-dark-bg);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 10px;
+    word-wrap: break-word; /* Garante que palavras longas quebrem */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-out; /* Animação de entrada da mensagem */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-user {
+    font-weight: 600;
+    margin-right: 10px;
+    font-size: 0.95em;
+    /* As cores serão aplicadas via JS para diferenciar usuários */
+}
+
+.message-time {
+    font-size: 0.75em;
+    color: var(--color-text-muted);
+}
+
+.message-text {
+    margin-top: 8px;
+    color: var(--color-text-light);
+    font-size: 0.9em;
+}
+
+.chat-input-area {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar linha para inputs */
+    gap: 10px;
+}
+
+.chat-input {
+    flex: 1 1 48%; /* Permite 2 inputs por linha em telas maiores */
+    padding: 12px 15px;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 8px;
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-light);
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chat-input.username-input {
+    flex-basis: 100%; /* Nome do usuário ocupa a linha toda */
+}
+
+.chat-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.chat-input:focus {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 0 3px var(--color-gold-shadow);
+}
+
+.send-button {
+    padding: 12px 18px;
+    background-color: var(--color-gold-primary);
+    color: var(--color-dark-bg);
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    text-transform: uppercase;
+    flex-grow: 1; /* Ocupa espaço restante na linha */
+}
+
+.send-button:hover {
+    background-color: var(--color-gold-light);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Reactions Box --- */
+.reactions-box {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.reaction-buttons-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.reaction-button {
+    background-color: var(--color-light-dark-bg);
+    color: var(--color-text-light);
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    font-size: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-border-dark);
+    position: relative;
+}
+
+.reaction-button:hover {
+    transform: scale(1.18); /* Efeito de zoom */
+    background-color: #383f47;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 15px var(--color-gold-shadow);
+}
+
+.reaction-count {
+    font-size: 0.7em;
+    color: var(--color-gold-primary);
+    margin-top: 4px;
+    font-weight: bold;
+}
+
+/* Animação para reações flutuantes (feedback visual) */
+@keyframes floatUpFadeOut {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+}
+
+.floating-reaction {
+    position: absolute;
+    font-size: 40px;
+    opacity: 0;
+    animation: floatUpFadeOut 1.8s forwards ease-out;
+    pointer-events: none; /* Para não bloquear cliques */
+    z-index: 100;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+/* --- Agenda Box --- */
+.agenda-box {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.agenda-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 15px;
+}
+
+.agenda-item {
+    background-color: var(--color-dark-bg);
+    border-left: 4px solid var(--color-border-dark);
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.agenda-item.active-segment {
+    background-color: var(--color-gold-primary);
+    color: var(--color-dark-bg);
+    border-left-color: var(--color-gold-light);
+    box-shadow: 0 0 15px var(--color-gold-shadow);
+    transform: scale(1.02); /* Leve zoom no item ativo */
+}
+
+.agenda-item.active-segment span,
+.agenda-item.active-segment p {
+    color: var(--color-dark-bg); /* Garante texto escuro no item ativo */
+}
+
+.agenda-item span {
+    font-weight: bold;
+    color: var(--color-text-light);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.agenda-item p {
+    font-size: 0.85em;
+    color: var(--color-text-muted);
+}
+
+.active-segment .animated-play {
+    color: var(--color-dark-bg);
+    margin-right: 8px;
+    animation: pulsePlay 1.5s infinite; /* Ícone de play pulsando */
+}
+
+@keyframes pulsePlay {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.countdown {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--color-gold-light);
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border-dark);
+}
+
+#countdown-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+}
+
+/* --- Footer --- */
+.event-footer {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    background-color: var(--color-medium-dark-bg);
+    border-top: 1px solid var(--color-border-dark);
+    border-radius: 15px 15px 0 0; /* Bordas arredondadas no topo */
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+}
+
+.event-footer p {
+    color: var(--color-text-muted);
+    font-size: 0.9em;
+}
+
+/* --- Estilos para o Player Overlay Texts (Placares/Títulos sobre o Vídeo) --- */
+.player-overlay-texts-container {
+    position: absolute;
+    bottom: 80px; /* Acima dos controles do player */
+    left: 0;
+    width: 100%;
+    z-index: 9; /* Abaixo dos controles, acima do player */
+    pointer-events: none; /* Não interfere com cliques no player */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza horizontalmente */
+    padding: 0 20px;
+}
+
+.player-text-item {
+    background: rgba(10, 14, 20, 0.7); /* Fundo semi-transparente */
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 8px;
+    padding: 10px 20px;
+    margin-bottom: 10px; /* Espaço entre os textos */
+    font-family: var(--font-accent);
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    color: var(--color-gold-primary); /* Cor padrão do texto */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    animation: fadeInSlideUp 0.5s ease-out forwards;
+    white-space: nowrap; /* Evita quebra de linha */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adiciona '...' se o texto for muito longo */
+    max-width: 80%; /* Limita a largura */
+    transition: all 0.3s ease;
+}
+
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animação para remover (opcional, para transições mais suaves) */
+.player-text-item.fade-out-down {
+    animation: fadeOutSlideDown 0.5s ease-in forwards;
+}
+
+@keyframes fadeOutSlideDown {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(20px); }
+}
+
+
+/* --- Estilos Específicos para o Admin (se aplicável) --- */
+/* Estes estilos podem ser movidos para um `admin.css` se o painel for separado */
+.admin-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.admin-card {
+    background-color: var(--color-medium-dark-bg);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--color-border-dark);
+}
+
+.admin-card h2 {
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    color: var(--color-gold-primary);
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-text-light);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="time"],
+.form-group textarea,
+.form-group select,
+.form-group input[type="color"] { /* Adicionado input type color */
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 8px;
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-light);
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.form-group input[type="color"]:focus {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 0 3px var(--color-gold-shadow);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.action-button {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background-color: var(--color-gold-primary);
+    color: var(--color-dark-bg);
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: var(--color-gold-light);
+    transform: translateY(-2px);
+}
+
+.list-item {
+    background-color: var(--color-light-dark-bg);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--color-border-dark);
+}
+
+.list-item-content {
+    flex-grow: 1;
+    color: var(--color-text-light);
+    font-size: 0.95em;
+}
+.list-item-content strong {
+     color: var(--color-gold-light);
+}
+
+.list-item button {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 1.2em;
+    margin-left: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.list-item button:hover {
+    color: var(--color-gold-primary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.status-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+.status-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.status-toggle label {
+    margin-bottom: 0; /* Override default label margin */
+}
+
+
+/* --- Media Queries para Responsividade (Garante Boa Aparência em Todos os Dispositivos) --- */
+@media (max-width: 1200px) {
+    .main-content-wrapper {
+        flex-direction: column; /* Em telas menores, o vídeo fica em cima da sidebar */
+        gap: 20px;
+    }
+
+    .video-section {
+        min-width: unset; /* Remove largura mínima */
+        width: 100%;
+    }
+
+    .sidebar-section {
+        flex-direction: row; /* Chat e reações lado a lado na sidebar */
+        min-width: unset;
+        width: 100%;
+        gap: 20px;
+    }
+
+    .chat-box, .reactions-box, .agenda-box {
+        flex: 1; /* Dividem o espaço igualmente */
+    }
+
+    .live-notifications-container {
+        width: 95%; /* Mais largo em telas menores */
+    }
+
+    .admin-container {
+        grid-template-columns: 1fr; /* Uma coluna em telas menores */
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
+    .event-header {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .event-header h1 {
+        font-size: 2.5em;
+    }
+
+    .event-header p {
+        font-size: 1.1em;
+    }
+
+    .header-icon {
+        width: 45px;
+        height: 45px;
+    }
+
+    .sidebar-section {
+        flex-direction: column; /* Empilha chat e reações novamente em telas menores */
+        gap: 20px;
+    }
+
+    .chat-box h2, .reactions-box h2, .agenda-box h2, .admin-card h2 {
+        font-size: 1.6em;
+    }
+
+    .reaction-button {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+
+    .custom-controls {
+        padding: 15px 20px 10px;
+    }
+    .control-btn {
+        font-size: 1.3em;
+    }
+    .volume-control i {
+        font-size: 1em;
+    }
+
+    .chat-input {
+        flex-basis: 100%; /* Inputs do chat em uma coluna */
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .event-header h1 {
+        font-size: 2em;
+    }
+    .event-header p {
+        font-size: 1em;
+    }
+
+    .chat-input-area {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .send-button {
+        width: 100%;
+    }
+
+    .reaction-buttons-group {
+        gap: 10px;
+    }
+    .reaction-button {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+    .reaction-count {
+        font-size: 0.65em;
+    }
+}

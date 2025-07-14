@@ -1,0 +1,333 @@
+/* --- Estilos Específicos para o Admin --- */
+
+/* Adaptação do cabeçalho */
+.admin-header {
+    margin-bottom: 30px;
+    padding: 20px 30px;
+}
+.admin-header h1 {
+    font-size: 2.8em;
+}
+.admin-header p {
+    font-size: 1.2em;
+}
+
+.admin-container {
+    max-width: 1200px; /* Aumenta a largura máxima para comportar mais cards */
+    margin: 0 auto 40px auto; /* Centraliza e adiciona margem inferior */
+    display: grid;
+    /* Grid responsivo: 2 colunas em telas grandes, 1 em pequenas */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px; /* Espaçamento entre os cards */
+    padding: 0 20px; /* Padding nas laterais */
+}
+
+.admin-card {
+    background-color: var(--color-medium-dark-bg);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--color-border-dark);
+    display: flex; /* Para flex-direction column */
+    flex-direction: column;
+}
+
+/* Formulário e Grupos de Campos */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-text-light);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="url"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 8px;
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-light);
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="url"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 0 3px var(--color-gold-shadow);
+}
+
+.form-group textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+}
+
+/* Botões de Ação */
+.action-button {
+    background-color: var(--color-gold-primary);
+    color: var(--color-dark-bg);
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 10px;
+    width: fit-content; /* Ajusta ao conteúdo */
+    align-self: flex-start; /* Alinha à esquerda no flex container */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-button:hover {
+    background-color: var(--color-gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Lista de Itens (Agenda, Player Texts) */
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    max-height: 300px; /* Altura máxima para listas roláveis */
+    overflow-y: auto;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 10px;
+    background-color: var(--color-dark-bg);
+    padding: 10px;
+}
+
+.item-list li {
+    background-color: var(--color-light-dark-bg);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid transparent; /* Para transição */
+}
+
+.item-list li:last-child {
+    margin-bottom: 0;
+}
+
+.item-list li span {
+    flex-grow: 1; /* Permite que o texto ocupe espaço */
+    margin-right: 10px;
+    color: var(--color-text-light);
+}
+
+.item-list .remove-btn {
+    background-color: var(--color-error);
+    color: white;
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.item-list .remove-btn:hover {
+    background-color: #d13a3a;
+    transform: scale(1.05);
+}
+
+/* Toggle de Status (Live Online/Offline) */
+.status-toggle {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espaço entre o checkbox e o label */
+    margin-top: 20px;
+}
+
+.status-toggle input[type="checkbox"] {
+    position: relative;
+    width: 60px; /* Largura total do toggle */
+    height: 34px; /* Altura total do toggle */
+    -webkit-appearance: none; /* Esconde o checkbox padrão */
+    appearance: none;
+    background: var(--color-border-dark); /* Cor de fundo quando desativado */
+    border-radius: 34px; /* Formato pill */
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0; /* Não permite que encolha */
+}
+
+.status-toggle input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 30px; /* Diâmetro do círculo */
+    height: 30px;
+    border-radius: 50%;
+    background: #f1f1f1;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.status-toggle input[type="checkbox"]:checked {
+    background: var(--color-success); /* Cor quando ativado */
+}
+
+.status-toggle input[type="checkbox"]:checked::before {
+    transform: translateX(26px); /* Move o círculo para a direita */
+    background: var(--color-gold-light);
+}
+
+.status-toggle label {
+    margin-bottom: 0; /* Remove a margem extra do label */
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--color-text-light);
+}
+
+
+/* NOVO: Estilos para o Chat de Moderação */
+.admin-chat-card {
+    grid-column: 1 / -1; /* Ocupa todas as colunas disponíveis */
+    max-height: 600px; /* Altura máxima para o card de chat */
+}
+
+.admin-chat-messages {
+    flex-grow: 1;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 10px;
+    padding: 15px;
+    background-color: var(--color-dark-bg);
+    overflow-y: auto; /* Scroll para mensagens */
+    max-height: 450px; /* Altura máxima do chat box no admin */
+    min-height: 200px; /* Altura mínima para o chat box */
+    display: flex;
+    flex-direction: column-reverse; /* Novas mensagens no final */
+    scroll-behavior: smooth;
+    margin-top: 15px; /* Espaço após o título */
+}
+
+.admin-chat-message {
+    background-color: var(--color-light-dark-bg); /* Fundo um pouco mais claro */
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between; /* Para alinhar o texto e o botão */
+    align-items: center; /* Centraliza verticalmente o conteúdo */
+    gap: 10px; /* Espaço entre o texto da mensagem e o botão */
+}
+
+.admin-chat-message:last-child {
+    margin-bottom: 0;
+}
+
+.admin-message-content {
+    flex-grow: 1; /* Permite que o conteúdo da mensagem ocupe o espaço */
+}
+
+.admin-message-user {
+    font-weight: bold;
+    margin-right: 8px;
+    color: var(--color-gold-light); /* Destaque para o nome do usuário */
+}
+
+.admin-message-time {
+    font-size: 0.8em;
+    color: var(--color-text-muted);
+}
+
+.admin-message-text {
+    margin-top: 5px;
+    font-size: 0.95em;
+    color: var(--color-text-light);
+}
+
+.admin-message-remove-btn {
+    background-color: var(--color-error);
+    color: white;
+    border-radius: 5px;
+    padding: 5px 9px;
+    font-size: 0.8em;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    flex-shrink: 0; /* Não permite que o botão encolha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-message-remove-btn:hover {
+    background-color: #d13a3a;
+    transform: scale(1.05);
+}
+
+
+/* Media Queries para responsividade */
+@media (max-width: 768px) {
+    .admin-header h1 {
+        font-size: 2.2em;
+    }
+    .admin-header p {
+        font-size: 1em;
+    }
+    .admin-container {
+        grid-template-columns: 1fr; /* Uma coluna em telas menores */
+        padding: 0 15px;
+    }
+    .admin-card {
+        padding: 20px;
+    }
+    .action-button {
+        width: 100%; /* Botões de ação ocupam toda a largura */
+        justify-content: center;
+    }
+    .item-list {
+        max-height: 250px; /* Ajuste para listas roláveis em mobile */
+    }
+    .admin-chat-messages {
+        max-height: 300px; /* Ajuste para o chat em mobile */
+    }
+}
+
+/* Media Query para telas muito pequenas */
+@media (max-width: 480px) {
+    .admin-header h1 {
+        font-size: 1.8em;
+    }
+    .admin-header p {
+        font-size: 0.9em;
+    }
+    .admin-card {
+        padding: 15px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select,
+    .action-button {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+    .admin-chat-message {
+        flex-direction: column; /* Empilha o texto e o botão em telas muito pequenas */
+        align-items: flex-start;
+        padding: 8px 10px;
+    }
+    .admin-message-remove-btn {
+        width: 100%;
+        margin-top: 5px;
+        padding: 8px;
+    }
+}   

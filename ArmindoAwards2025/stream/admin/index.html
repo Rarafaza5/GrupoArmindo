@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Óscares Eleitorais</title>
+
+    <link rel="icon" href="https://img.icons8.com/color/48/000000/trophy.png" type="image/png">
+
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="admin.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="event-header admin-header">
+        <div class="header-content">
+            <img src="https://img.icons8.com/ios-filled/50/FFD700/trophy.png" alt="Troféu" class="header-icon">
+            <h1>Painel de Administração</h1>
+            <p>Controle os "Óscares Eleitorais" em tempo real.</p>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <div class="admin-card">
+            <h2><i class="fas fa-bell"></i> Gerenciar Notificações</h2>
+            <div class="form-group">
+                <label for="notification-message">Mensagem:</label>
+                <input type="text" id="notification-message" placeholder="Mensagem de notificação">
+            </div>
+            <div class="form-group">
+                <label for="notification-type">Tipo:</label>
+                <select id="notification-type">
+                    <option value="info">Info</option>
+                    <option value="warning">Aviso</option>
+                    <option value="success">Sucesso</option>
+                    <option value="breaking">Urgente</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="notification-duration">Duração (segundos):</label>
+                <input type="number" id="notification-duration" value="5" min="1">
+            </div>
+            <button id="send-notification-btn" class="action-button">Enviar Notificação</button>
+        </div>
+
+        <div class="admin-card">
+            <h2><i class="fas fa-calendar-alt"></i> Gerenciar Agenda</h2>
+            <div class="form-group">
+                <label for="agenda-title">Título:</label>
+                <input type="text" id="agenda-title" placeholder="Título do item da agenda">
+            </div>
+            <div class="form-group">
+                <label for="agenda-description">Descrição:</label>
+                <textarea id="agenda-description" rows="3" placeholder="Detalhes do item da agenda"></textarea>
+            </div>
+            <button id="add-agenda-btn" class="action-button">Adicionar Item</button>
+
+            <h3>Itens Atuais:</h3>
+            <ul id="agenda-list" class="item-list">
+                <li class="loading-message">Carregando agenda...</li>
+            </ul>
+        </div>
+
+        <div class="admin-card">
+            <h2><i class="fas fa-closed-captioning"></i> Gerenciar Textos do Player</h2>
+            <div class="form-group">
+                <label for="player-text-content">Conteúdo do Texto:</label>
+                <input type="text" id="player-text-content" placeholder="Texto curto para exibir no player">
+            </div>
+            <div class="form-group">
+                <label for="player-text-link">Link (Opcional):</label>
+                <input type="url" id="player-text-link" placeholder="URL para o texto (ex: youtube.com/seucanal)">
+            </div>
+            <button id="add-player-text-btn" class="action-button">Adicionar Texto</button>
+
+            <h3>Textos Atuais:</h3>
+            <ul id="player-text-list" class="item-list">
+                <li class="loading-message">Carregando textos...</li>
+            </ul>
+        </div>
+
+        <div class="admin-card">
+            <h2><i class="fas fa-ban"></i> Palavras Proibidas do Chat</h2>
+            <div class="form-group">
+                <label for="forbidden-words">Lista (separadas por vírgula):</label>
+                <textarea id="forbidden-words" rows="4" placeholder="palavra1,palavra2,palavra3"></textarea>
+            </div>
+            <button id="save-forbidden-words-btn" class="action-button">Salvar Palavras Proibidas</button>
+            <hr style="border-color: var(--color-border-dark); margin: 20px 0;">
+            <p style="color: var(--color-text-muted); font-size: 0.9em;">
+                As mensagens que contiverem estas palavras serão substituídas por "***".
+            </p>
+        </div>
+
+        <div class="admin-card">
+            <h2><i class="fas fa-broadcast-tower"></i> Estado da Live</h2>
+            <div class="form-group status-toggle">
+                <input type="checkbox" id="live-status-toggle">
+                <label for="live-status-toggle">Live Online</label>
+            </div>
+            <p style="margin-top: 15px; color: var(--color-text-muted);">
+                * Este controlo pode ser usado para exibir uma mensagem de "Live Offline" na página principal quando desativado, se implementar essa lógica.
+            </p>
+        </div>
+
+        <div class="admin-card admin-chat-card">
+            <h2><i class="fas fa-comments"></i> Chat ao Vivo (Moderação)</h2>
+            <div id="admin-chat-messages" class="admin-chat-messages">
+                <p class="loading-message">Carregando mensagens do chat...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="event-footer">
+       <p>© 2025 Armindo Awards e seu Sistema de Transmissão — Todos os direitos são reservados ao Grupo Armindo.<br>Este sistema utiliza tecnologias do Youtube e aplicam-se os seus <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos e Condições</a> e <a href="https://policies.google.com/privacy?hl=pt-PT" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a>.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
