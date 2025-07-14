@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armindo Awards 2025</title>
+
+    <link rel="icon" href="https://img.icons8.com/color/48/000000/trophy.png" type="image/png">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="event-header">
+        <div class="header-content">
+            
+            <h1>Armindo Awards</h1>
+            <p>2.ª Edição | 2025</p>
+          
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="player-section">
+            <div class="video-container">
+                <div id="live-offline-message" class="live-offline-message hidden">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <h2>Fora do Ar</h2><h3>A Grande Final dos Armindo Awards ainda não começou.</h3>
+                    <p>20 de Janeiro | 20:00</p>
+                   
+                </div>
+
+                <div id="video-player">
+                    </div>
+
+                <div id="notification-overlay" class="notification-overlay hidden">
+                    <span class="notification-type-icon"></span>
+                    <p id="notification-text"></p>
+                </div>
+
+                <div id="player-overlay-texts" class="player-overlay-texts">
+                    </div>
+
+                <div class="reactions-container-offscreen">
+                    <button class="reaction-button" data-reaction="like" aria-label="Gostar">
+                        <i class="far fa-thumbs-up"></i> <span id="like-count">0</span>
+                    </button>
+                    <button class="reaction-button" data-reaction="heart" aria-label="Adorar">
+                        <i class="far fa-heart"></i> <span id="heart-count">0</span>
+                    </button>
+                    <button class="reaction-button" data-reaction="laugh" aria-label="Rir">
+                        <i class="far fa-laugh-squint"></i> <span id="laugh-count">0</span>
+                    </button>
+                    <button class="reaction-button" data-reaction="sad" aria-label="Triste">
+                        <i class="far fa-sad-tear"></i> <span id="sad-count">0</span>
+                    </button>
+                    <button class="reaction-button" data-reaction="clap" aria-label="Aplaudir">
+                        <i class="far fa-hand-clap"></i> <span id="clap-count">0</span>
+                    </button>
+                    <div id="reaction-burst-container"></div>
+                </div>
+            </div>
+            </section>
+
+        <section class="info-chat-section">
+            <div class="agenda-container">
+                <h2><i class="fas fa-calendar-alt"></i> Próximos Segmentos</h2>
+                <div id="agenda-list">
+                    <p class="loading-message">Carregando agenda...</p>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <h2><i class="fas fa-comments"></i> Chat ao Vivo</h2>
+                <div id="chat-messages" class="chat-messages">
+                    <p class="loading-message">Conectando ao chat...</p>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-username" placeholder="Seu Nome" maxlength="20">
+                    <input type="text" id="chat-message-input" placeholder="Digite sua mensagem..." maxlength="200">
+                    <button id="send-chat-message"><i class="fas fa-paper-plane"></i> Enviar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="event-footer">
+       <p>© 2025 Armindo Awards e seu Sistema de Transmissão — Todos os direitos são reservados ao Grupo Armindo.<br>Este sistema utiliza tecnologias do Youtube e aplicam-se os seus <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos e Condições</a> e <a href="https://policies.google.com/privacy?hl=pt-PT" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a>.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
