@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carta Aberta - Grupo Armindo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      color: white;
+      background: transparent;
+      position: relative;
+    }
+
+    /* Fundo animado com as cores #084cac, #5c5ccc e #b86ce4 */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(-45deg, #084cac, #3131d6, #3348bb, #5c5ccc, #084cac);
+      background-size: 600% 600%;
+      animation: gradientBG 20s ease infinite;
+      z-index: -1;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      text-align: center;
+      padding: 60px 20px 30px;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    header img {
+      max-width: 280px;
+      height: auto;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+    }
+
+    .section {
+      text-align: center;
+      padding: 40px 20px;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 1s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .typewriter {
+      font-size: 1.3rem;
+      max-width: 900px;
+      margin: 0 auto;
+      white-space: pre-wrap;
+      display: inline-block;
+      overflow: hidden;
+      animation: typing 4s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+
+    .carta-img {
+      margin-top: 30px;
+      max-width: 90%;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transition: transform 0.6s ease;
+    }
+
+    .carta-img:hover {
+      transform: scale(1.02);
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink-caret {
+      0%, 100% { border-color: transparent; }
+      50% { border-color: white; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGO -->
+  <header>
+     </header>
+
+  <!-- INTRO COM TYPING -->
+  <section class="section visible" id="intro">
+    <div class="typewriter" id="typewriter"></div>
+  </section>
+
+  <!-- IMAGEM DA CARTA -->
+  
+
+  <script>
+  const text = `Sua Santidade, o Messias, Xavier Silva,
+
+Nós, em representação dos Jocaístas, por meio desta carta aberta, solicitamos formalmente a inclusão da Digníssima Melissa Figueiredo no Culto do Grande Joca. Tal inclusão foi expressamente aprovada pelos membros da Assembleia Geral do Jocaísmo, no dia 04 de fevereiro de 2025.
+
+Numa hipotética recusa desta solicitação, procederemos a uma nova votação para saber se os membros da Assembleia Geral do Jocaísmo mantêm a vontade de integrar Melissa Figueiredo no ‘Culto’.
+
+Na ausência de uma resolução pacífica para esta questão, adotaremos as medidas que se julgarem necessárias e adequadas para a salvaguarda dos nossos interesses.
+
+
+Com os melhores cumprimentos a Sua Santidade, o Messias,
+
+Rafael Diogo e Jorge Figueira`;
+
+  const typewriter = document.getElementById('typewriter');
+  let i = 0;
+
+  function getDelay(char) {
+    if (char === '.' || char === '\n') return 60;     // pausa maior em ponto/final de linha
+    if (char === ',' || char === ';' || char === ':') return 30; // pausa média em vírgulas etc
+    return 10 + Math.random() * 30;  // delay aleatório entre 30 e 100ms para naturalidade
+  }
+
+  function typeWriterEffect() {
+    if (i < text.length) {
+      typewriter.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typeWriterEffect, getDelay(text.charAt(i - 1)));
+    } else {
+      // Quando terminar, deixa cursor piscando só no fim
+      
+      // Opcional: você pode fazer o cursor piscar só no fim usando CSS, já que o span fica cheio.
+    }
+  }
+
+  window.onload = () => {
+    typeWriterEffect();
+  };
+</script>
+
+</body>
+</html>
