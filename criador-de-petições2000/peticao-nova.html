@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+
+<!-- Firebase (Compat) -->
+<!-- Substitua a versão se desejar; a compat (namespace firebase) simplifica em HTML puro -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+
+<script>
+// === CONFIGURE O SEU FIREBASE AQUI ===
+// 1) No console do Firebase, crie um app Web e copie a config abaixo
+const firebaseConfig = {
+  apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+  measurementId: "G-Z9YLSTGHST"
+};
+
+
+// Inicializa Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+
+// Referência da coleção de petições
+const petitionsCol = db.collection('petitions');
+
+
+const form = document.getElementById('petitionForm');
+const msg = document.getElementById('message');
+
+
+function showMsg(text, ok = true){
+msg.textContent = text;
+msg.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+
+
+form.addEventListener('submit', async (e) => {
+e.preventDefault();
+const data = {
+title: form.title.value.trim(),
+body: form.body.value.trim(),
+author: form.author.value.trim() || null,
+email: form.email.value.trim() || null,
+category: form.category.value,
+target: form.target.value.trim() || null,
+status: 'ativa',
+signatures: 0,
+createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+};
+
+
+if(!data.title || !data.body){
+return showMsg('Preencha o título e a descrição.', false);
+}
+if(!document.getElementById('terms').checked){
+return showMsg('É necessário aceitar os termos.', false);
+}
+
+
+try {
+const docRef = await petitionsCol.add(data);
+showMsg('Petição publicada com sucesso!');
+form.reset();
+// Link rápido para ver listagem
+setTimeout(() => { window.location.href = 'peticoes.html#' + docRef.id; }, 900);
+} catch (err) {
+console.error(err);
+showMsg('Não foi possível publicar. Verifique a conexão e tente novamente.', false);
+}
+});
+</script>
+</body>
+</html>
