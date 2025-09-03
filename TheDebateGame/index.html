@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Debate Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --side-a: #3b82f6;
+            --side-b: #ef4444;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-dark: rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Tela de Login */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .login-form {
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn.secondary {
+            background: var(--glass);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 1rem;
+        }
+
+        /* Tela de Lobby */
+        .lobby-screen {
+            display: none;
+        }
+
+        .lobby-header {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .room-code {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+            border: 2px dashed var(--accent);
+        }
+
+        .lobby-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .team-lobby {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+        }
+
+        .team-lobby.side-a {
+            border-color: var(--side-a);
+        }
+
+        .team-lobby.side-b {
+            border-color: var(--side-b);
+        }
+
+        .team-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .players-count {
+            text-align: center;
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .join-team-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .join-team-btn.side-a {
+            background: var(--side-a);
+            color: white;
+        }
+
+        .join-team-btn.side-b {
+            background: var(--side-b);
+            color: white;
+        }
+
+        .join-team-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .players-list {
+            min-height: 200px;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .player-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .admin-controls {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        /* Tela de Jogo */
+        .game-screen {
+            display: none;
+        }
+
+        .game-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--glass);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .phase-indicator {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: 900;
+            text-align: center;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+
+        .round-info {
+            text-align: right;
+            font-size: 1.1rem;
+            color: #94a3b8;
+        }
+
+        .topic-display {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(45deg, var(--accent), #f97316);
+            border-radius: 12px;
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .game-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .team-panel {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .team-panel.side-a {
+            border-color: var(--side-a);
+        }
+
+        .team-panel.side-b {
+            border-color: var(--side-b);
+        }
+
+        .team-panel.active {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            transform: scale(1.02);
+        }
+
+        .team-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .team-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .team-score {
+            font-size: 1.5rem;
+            font-weight: 900;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: var(--glass);
+        }
+
+        .argument-display {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 100px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+            font-style: italic;
+            color: #e2e8f0;
+        }
+
+        .argument-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 0.5rem;
+        }
+
+        .voting-section {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+
+        .vote-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .vote-btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vote-btn.side-a {
+            background: var(--side-a);
+            color: white;
+        }
+
+        .vote-btn.side-b {
+            background: var(--side-b);
+            color: white;
+        }
+
+        .vote-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .chat-panel {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            max-height: 300px;
+        }
+
+        .chat-header {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 0.5rem;
+        }
+
+        .message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .message-meta {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+        }
+
+        .results-screen {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .winner-announcement {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, var(--accent), #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .final-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .final-score-card {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            background: var(--success);
+            color: white;
+            border-radius: 8px;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .lobby-content, .game-content, .chat-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .vote-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animações */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+    <link rel="icon" type="image/x-icon" href="farinhacon.png">
+</head>
+<body>
+    
+    <!-- Tela de Login -->
+    <div id="login-screen" class="login-screen container">
+        <h1 class="logo">🏛️ The Debate Game</h1>
+        
+        <div class="login-form">
+            <div class="form-group">
+                <label for="player-name">Seu Nome:</label>
+                <input type="text" id="player-name" placeholder="Digite seu nome" required maxlength="20">
+            </div>
+            
+            <div class="form-group">
+                <label for="room-code-input">Código da Sala:</label>
+                <input type="text" id="room-code-input" placeholder="Deixe vazio para criar nova sala" maxlength="10">
+            </div>
+            
+            <button class="btn" onclick="joinOrCreateRoom()">🚀 Entrar</button>
+            <button class="btn secondary" onclick="showInstructions()">❓ Como Jogar</button>
+        </div>
+        <br><br>
+        
+        <p style="font-size: 1.2rem; color: #94a3b8; margin-bottom: 2rem;">© <script>document.write(new Date().getFullYear())</script> Rafael Diogo | Todos os direitos reservados.</p>
+    </div>
+
+    <!-- Tela de Lobby -->
+    <div id="lobby-screen" class="lobby-screen container">
+        <div class="lobby-header">
+            <h2>🏛️ Sala de Debate</h2>
+            <div class="room-code" id="display-room-code">XXXX</div>
+            <p>Compartilhe este código com outros jogadores</p>
+            <button class="btn secondary" onclick="copyRoomCode()" style="margin-top: 1rem; width: auto; padding: 0.5rem 1rem;">📋 Copiar Código</button>
+        </div>
+
+        <div id="topic-setup" style="background: var(--glass); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="margin-bottom: 1rem;">📝 Configurar Debate</h3>
+            <div class="form-group">
+                <label for="debate-topic">Tópico do Debate:</label>
+                <input type="text" id="debate-topic" placeholder="Ex: A inteligência artificial deve ser regulamentada?" maxlength="200">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="side-a-name">Nome do Lado A:</label>
+                    <input type="text" id="side-a-name" placeholder="Ex: A Favor" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="side-b-name">Nome do Lado B:</label>
+                    <input type="text" id="side-b-name" placeholder="Ex: Contra" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="lobby-content">
+            <div class="team-lobby side-a" id="team-a-lobby">
+                <div class="team-header" id="team-a-header">Lado A</div>
+                <div class="players-count" id="team-a-count">0 jogadores</div>
+                <button class="join-team-btn side-a" onclick="joinTeam('a')">Juntar-se ao Lado A</button>
+                <div class="players-list" id="team-a-players"></div>
+            </div>
+
+            <div class="team-lobby side-b" id="team-b-lobby">
+                <div class="team-header" id="team-b-header">Lado B</div>
+                <div class="players-count" id="team-b-count">0 jogadores</div>
+                <button class="join-team-btn side-b" onclick="joinTeam('b')">Juntar-se ao Lado B</button>
+                <div class="players-list" id="team-b-players"></div>
+            </div>
+        </div>
+
+        <div class="admin-controls">
+            <button class="btn" onclick="startGame()" id="start-game-btn" disabled>🎮 Iniciar Debate</button>
+            <p style="margin-top: 0.5rem; color: #94a3b8; font-size: 0.9rem;">Mínimo 2 jogadores (1 por lado) necessários</p>
+        </div>
+    </div>
+
+    <!-- Tela de Jogo -->
+    <div id="game-screen" class="game-screen container">
+        <div class="game-header">
+            <div class="phase-indicator" id="phase-indicator">Carregando...</div>
+            <div class="timer" id="timer">--:--</div>
+            <div class="round-info">Round <span id="current-round">1</span> de <span id="total-rounds">3</span></div>
+        </div>
+
+        <div class="topic-display" id="topic-display">Carregando tópico...</div>
+
+        <div class="game-content">
+            <div class="team-panel side-a" id="team-a-panel">
+                <div class="team-panel-header">
+                    <div class="team-name" id="game-team-a-name">Lado A</div>
+                    <div class="team-score" id="game-team-a-score">0</div>
+                </div>
+                <div style="margin-bottom: 1rem; font-size: 0.9rem; color: #94a3b8;" id="team-a-players-game"></div>
+                <div class="argument-display" id="team-a-argument">Aguardando argumento...</div>
+                <textarea class="argument-input" id="team-a-input" placeholder="Digite seu argumento aqui..." disabled></textarea>
+                <button class="btn" id="team-a-submit" onclick="submitArgument('a')" disabled>Enviar Argumento</button>
+            </div>
+
+            <div class="team-panel side-b" id="team-b-panel">
+                <div class="team-panel-header">
+                    <div class="team-name" id="game-team-b-name">Lado B</div>
+                    <div class="team-score" id="game-team-b-score">0</div>
+                </div>
+                <div style="margin-bottom: 1rem; font-size: 0.9rem; color: #94a3b8;" id="team-b-players-game"></div>
+                <div class="argument-display" id="team-b-argument">Aguardando argumento...</div>
+                <textarea class="argument-input" id="team-b-input" placeholder="Digite seu argumento aqui..." disabled></textarea>
+                <button class="btn" id="team-b-submit" onclick="submitArgument('b')" disabled>Enviar Argumento</button>
+            </div>
+        </div>
+
+        <div class="voting-section" id="voting-section">
+            <h3>🗳️ Votação</h3>
+            <p>Escolha o argumento mais convincente:</p>
+            <div class="vote-buttons">
+                <button class="vote-btn side-a" id="vote-a-btn" onclick="vote('a')">
+                    <div id="vote-a-text">Votar no Lado A</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;" id="vote-a-count">0 votos</div>
+                </button>
+                <button class="vote-btn side-b" id="vote-b-btn" onclick="vote('b')">
+                    <div id="vote-b-text">Votar no Lado B</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;" id="vote-b-count">0 votos</div>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <div class="chat-panel">
+                <div class="chat-header">💬 Chat Público</div>
+                <div class="chat-messages" id="public-chat"></div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="public-chat-input" placeholder="Mensagem para todos..." maxlength="200">
+                    <button class="btn" onclick="sendPublicMessage()">Enviar</button>
+                </div>
+            </div>
+            
+            <div class="chat-panel">
+                <div class="chat-header" id="team-chat-header">👥 Chat da Equipe</div>
+                <div class="chat-messages" id="team-chat"></div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="team-chat-input" placeholder="Mensagem para a equipe..." maxlength="200">
+                    <button class="btn" onclick="sendTeamMessage()">Enviar</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+            <button class="btn secondary" onclick="leaveGame()">🚪 Sair da Sala</button>
+        </div>
+    </div>
+
+    <!-- Tela de Resultados -->
+    <div id="results-screen" class="results-screen container">
+        <div class="winner-announcement" id="winner-announcement">🏆 VITÓRIA!</div>
+        <div class="final-scores">
+            <div class="final-score-card">
+                <h3 id="final-team-a-name">Lado A</h3>
+                <div class="team-score" id="final-team-a-score">0</div>
+            </div>
+            <div class="final-score-card">
+                <h3 id="final-team-b-name">Lado B</h3>
+                <div class="team-score" id="final-team-b-score">0</div>
+            </div>
+        </div>
+        <button class="btn" onclick="returnToLobby()">🔄 Nova Partida</button>
+        <button class="btn secondary" onclick="location.reload()">🏠 Sair</button>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script type="module">
+        // Firebase v11 imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, collection, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Adicionado getDoc
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+            authDomain: "aawards.firebaseapp.com",
+            databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+            projectId: "aawards",
+            storageBucket: "aawards.firebasestorage.app",
+            messagingSenderId: "839334918366",
+            appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+            measurementId: "G-Z9YLSTGHST"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Game state
+        let currentUser = null;
+        let currentRoom = null;
+        let playerName = '';
+        let playerSide = null;
+        let isRoomAdmin = false;
+        let gameState = null;
+        let timerInterval = null;
+        let unsubscribeRoom = null;
+        let unsubscribeChat = null;
+
+        // Initialize auth
+        await signInAnonymously(auth);
+        currentUser = auth.currentUser;
+
+        // Utility functions
+        function generateRoomCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''} show`;
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+
+        function hideAllScreens() {
+            document.querySelectorAll('.login-screen, .lobby-screen, .game-screen, .results-screen').forEach(screen => {
+                screen.style.display = 'none';
+            });
+        }
+
+        function showScreen(screenId) {
+            hideAllScreens();
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        // Room management
+        async function joinOrCreateRoom() {
+            const nameInput = document.getElementById('player-name');
+            const codeInput = document.getElementById('room-code-input');
+            
+            playerName = nameInput.value.trim();
+            if (!playerName) {
+                showNotification('Por favor, digite seu nome', true);
+                return;
+            }
+
+            const roomCode = codeInput.value.trim().toUpperCase();
+            console.log('Tentando entrar/criar sala com nome:', playerName, 'e código:', roomCode);
+            
+            try {
+                if (roomCode) {
+                    console.log('Tentando entrar em sala existente:', roomCode);
+                    await joinExistingRoom(roomCode);
+                } else {
+                    console.log('Tentando criar nova sala.');
+                    await createNewRoom();
+                }
+            } catch (error) {
+                console.error('Erro ao entrar/criar sala:', error);
+                showNotification('Erro ao conectar. Tente novamente.', true);
+            }
+        }
+
+        async function createNewRoom() {
+            currentRoom = generateRoomCode();
+            isRoomAdmin = true;
+            
+            const roomData = {
+                code: currentRoom,
+                admin: currentUser.uid,
+                topic: '',
+                sideAName: 'Lado A',
+                sideBName: 'Lado B',
+                phase: 'lobby',
+                currentRound: 1,
+                totalRounds: 3,
+                scores: { a: 0, b: 0 },
+                players: {},
+                arguments: { a: '', b: '' },
+                votes: { a: 0, b: 0 },
+                votedPlayers: [],
+                timer: 0,
+                createdAt: serverTimestamp()
+            };
+
+            await setDoc(doc(db, 'debate-rooms', currentRoom), roomData);
+            await addPlayerToRoom();
+            showLobby();
+        }
+
+        async function joinExistingRoom(roomCode) {
+            currentRoom = roomCode;
+            isRoomAdmin = false;
+            
+            // Check if room exists
+            const roomRef = doc(db, 'debate-rooms', roomCode);
+            const roomSnap = await getDoc(roomRef); // Usando getDoc
+            
+            console.log('Verificando existência da sala:', roomCode);
+            console.log('Snapshot da sala existe?', roomSnap.exists());
+            
+            if (!roomSnap.exists()) {
+                showNotification('Sala não encontrada!', true);
+                throw new Error('Room not found'); // Lança um erro para ser capturado no try-catch
+            }
+
+            await addPlayerToRoom();
+            showLobby();
+        }
+
+        async function addPlayerToRoom() {
+            const playerData = {
+                name: playerName,
+                uid: currentUser.uid,
+                side: null,
+                joinedAt: serverTimestamp()
+            };
+
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                [`players.${currentUser.uid}`]: playerData
+            });
+        }
+
+        function showLobby() {
+            showScreen('lobby-screen');
+            document.getElementById('display-room-code').textContent = currentRoom;
+            
+            // Subscribe to room updates
+            unsubscribeRoom = onSnapshot(doc(db, 'debate-rooms', currentRoom), (doc) => {
+                if (doc.exists()) {
+                    gameState = doc.data();
+                    updateLobbyDisplay();
+                    
+                    if (gameState.phase === 'game') {
+                        showGame();
+                    } else if (gameState.phase === 'results') {
+                        showResults();
+                    }
+                }
+            });
+
+            // Subscribe to chat
+            subscribeToChat();
+        }
+
+        function updateLobbyDisplay() {
+            if (!gameState) return;
+
+            // Update topic setup (only admin can edit)
+            const topicInput = document.getElementById('debate-topic');
+            const sideAInput = document.getElementById('side-a-name');
+            const sideBInput = document.getElementById('side-b-name');
+            
+            if (isRoomAdmin) {
+                topicInput.value = gameState.topic || '';
+                sideAInput.value = gameState.sideAName || 'Lado A';
+                sideBInput.value = gameState.sideBName || 'Lado B';
+                
+                // Add event listeners for real-time updates
+                topicInput.onchange = () => updateRoomConfig();
+                sideAInput.onchange = () => updateRoomConfig();
+                sideBInput.onchange = () => updateRoomConfig();
+            } else {
+                topicInput.disabled = true;
+                sideAInput.disabled = true;
+                sideBInput.disabled = true;
+            }
+
+            // Update team headers
+            document.getElementById('team-a-header').textContent = gameState.sideAName || 'Lado A';
+            document.getElementById('team-b-header').textContent = gameState.sideBName || 'Lado B';
+
+            // Update player lists
+            const playersA = [];
+            const playersB = [];
+            let totalPlayers = 0;
+
+            Object.values(gameState.players || {}).forEach(player => {
+                totalPlayers++;
+                if (player.side === 'a') playersA.push(player);
+                else if (player.side === 'b') playersB.push(player);
+            });
+
+            updateTeamDisplay('a', playersA);
+            updateTeamDisplay('b', playersB);
+
+            // Update start button
+            const startBtn = document.getElementById('start-game-btn');
+            const canStart = playersA.length > 0 && playersB.length > 0 && gameState.topic?.trim();
+            
+            if (isRoomAdmin) {
+                startBtn.disabled = !canStart;
+                startBtn.textContent = canStart ? '🎮 Iniciar Debate' : 
+                    (!gameState.topic?.trim() ? '📝 Configure o tópico primeiro' : '⚠️ Precisa de jogadores nos dois lados');
+            } else {
+                startBtn.style.display = 'none';
+            }
+
+            // Update current player's side
+            const currentPlayer = gameState.players?.[currentUser.uid];
+            if (currentPlayer) {
+                playerSide = currentPlayer.side;
+                updateJoinButtons();
+            }
+        }
+
+        function updateTeamDisplay(side, players) {
+            const countEl = document.getElementById(`team-${side}-count`);
+            const listEl = document.getElementById(`team-${side}-players`);
+            
+            countEl.textContent = `${players.length} jogador${players.length !== 1 ? 'es' : ''}`;
+            
+            listEl.innerHTML = '';
+            players.forEach(player => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player-item';
+                playerDiv.innerHTML = `
+                    <div class="player-info">
+                        <div class="player-status"></div>
+                        <span>${player.name}</span>
+                        ${player.uid === gameState?.admin ? ' 👑' : ''}
+                        ${player.uid === currentUser.uid ? ' (Você)' : ''}
+                    </div>
+                `;
+                listEl.appendChild(playerDiv);
+            });
+        }
+
+        function updateJoinButtons() {
+            const joinABtn = document.querySelector('.join-team-btn.side-a');
+            const joinBBtn = document.querySelector('.join-team-btn.side-b');
+            
+            if (playerSide === 'a') {
+                joinABtn.textContent = '✓ No Lado A';
+                joinABtn.disabled = true;
+                joinBBtn.textContent = 'Mudar para Lado B';
+                joinBBtn.disabled = false;
+            } else if (playerSide === 'b') {
+                joinBBtn.textContent = '✓ No Lado B';
+                joinBBtn.disabled = true;
+                joinABtn.textContent = 'Mudar para Lado A';
+                joinABtn.disabled = false;
+            } else {
+                joinABtn.textContent = 'Juntar-se ao Lado A';
+                joinABtn.disabled = false;
+                joinBBtn.textContent = 'Juntar-se ao Lado B';
+                joinBBtn.disabled = false;
+            }
+        }
+
+        async function updateRoomConfig() {
+            if (!isRoomAdmin) return;
+            
+            const topic = document.getElementById('debate-topic').value.trim();
+            const sideAName = document.getElementById('side-a-name').value.trim();
+            const sideBName = document.getElementById('side-b-name').value.trim();
+            
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                topic: topic,
+                sideAName: sideAName || 'Lado A',
+                sideBName: sideBName || 'Lado B'
+            });
+        }
+
+        async function joinTeam(side) {
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                [`players.${currentUser.uid}.side`]: side
+            });
+            playerSide = side;
+            showNotification(`Juntou-se ao ${side === 'a' ? gameState.sideAName : gameState.sideBName}!`);
+        }
+
+        async function startGame() {
+            if (!isRoomAdmin) return;
+            
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                phase: 'game',
+                currentRound: 1,
+                timer: 30,
+                gamePhase: 'preparation',
+                arguments: { a: '', b: '' },
+                votes: { a: 0, b: 0 },
+                votedPlayers: []
+            });
+            
+            startGameTimer('preparation', 30);
+        }
+
+        function showGame() {
+            showScreen('game-screen');
+            
+            if (!gameState) return;
+            
+            // Update displays
+            document.getElementById('topic-display').textContent = gameState.topic;
+            document.getElementById('game-team-a-name').textContent = gameState.sideAName;
+            document.getElementById('game-team-b-name').textContent = gameState.sideBName;
+            document.getElementById('game-team-a-score').textContent = gameState.scores?.a || 0;
+            document.getElementById('game-team-b-score').textContent = gameState.scores?.b || 0;
+            document.getElementById('current-round').textContent = gameState.currentRound || 1;
+            document.getElementById('team-chat-header').textContent = `👥 Chat - ${playerSide === 'a' ? gameState.sideAName : gameState.sideBName}`;
+            
+            // Update team players in game
+            updateGameTeamPlayers();
+            
+            // Update phase
+            updateGamePhase();
+        }
+
+        function updateGameTeamPlayers() {
+            const playersA = Object.values(gameState.players || {}).filter(p => p.side === 'a');
+            const playersB = Object.values(gameState.players || {}).filter(p => p.side === 'b');
+            
+            document.getElementById('team-a-players-game').textContent = 
+                'Jogadores: ' + playersA.map(p => p.name).join(', ');
+            document.getElementById('team-b-players-game').textContent = 
+                'Jogadores: ' + playersB.map(p => p.name).join(', ');
+        }
+
+        function updateGamePhase() {
+            if (!gameState) return;
+            
+            const phase = gameState.gamePhase;
+            const phaseIndicator = document.getElementById('phase-indicator');
+            const votingSection = document.getElementById('voting-section');
+            const teamAPanel = document.getElementById('team-a-panel');
+            const teamBPanel = document.getElementById('team-b-panel');
+            
+            // Reset panel states
+            teamAPanel.classList.remove('active');
+            teamBPanel.classList.remove('active');
+            
+            if (phase === 'preparation') {
+                phaseIndicator.textContent = '🤔 Preparação - Organizem suas ideias!';
+                votingSection.style.display = 'none';
+                
+                // Disable inputs during preparation
+                document.getElementById('team-a-input').disabled = true;
+                document.getElementById('team-b-input').disabled = true;
+                document.getElementById('team-a-submit').disabled = true;
+                document.getElementById('team-b-submit').disabled = true;
+                
+                // Clear previous arguments
+                document.getElementById('team-a-argument').textContent = 'Preparando...';
+                document.getElementById('team-b-argument').textContent = 'Preparando...';
+                document.getElementById('team-a-input').value = '';
+                document.getElementById('team-b-input').value = '';
+                
+            } else if (phase === 'debate') {
+                phaseIndicator.textContent = '⚡ Debate - Apresentem seus argumentos!';
+                votingSection.style.display = 'none';
+                
+                // Enable inputs for respective teams
+                const isTeamA = playerSide === 'a';
+                const isTeamB = playerSide === 'b';
+                
+                document.getElementById('team-a-input').disabled = !isTeamA;
+                document.getElementById('team-b-input').disabled = !isTeamB;
+                document.getElementById('team-a-submit').disabled = !isTeamA;
+                document.getElementById('team-b-submit').disabled = !isTeamB;
+                
+                // Highlight player's team
+                if (isTeamA) teamAPanel.classList.add('active');
+                if (isTeamB) teamBPanel.classList.add('active');
+                
+            } else if (phase === 'voting') {
+                phaseIndicator.textContent = '🗳️ Votação - Escolham o melhor argumento!';
+                votingSection.style.display = 'block';
+                
+                // Disable argument inputs
+                document.getElementById('team-a-input').disabled = true;
+                document.getElementById('team-b-input').disabled = true;
+                document.getElementById('team-a-submit').disabled = true;
+                document.getElementById('team-b-submit').disabled = true;
+                
+                // Update arguments display
+                document.getElementById('team-a-argument').textContent = 
+                    gameState.arguments?.a || 'Nenhum argumento apresentado.';
+                document.getElementById('team-b-argument').textContent = 
+                    gameState.arguments?.b || 'Nenhum argumento apresentado.';
+                
+                updateVotingDisplay();
+            }
+            
+            // Update timer
+            if (gameState.timer > 0) {
+                updateTimerDisplay();
+            }
+        }
+
+        function updateVotingDisplay() {
+            const hasVoted = gameState.votedPlayers?.includes(currentUser.uid);
+            const voteABtn = document.getElementById('vote-a-btn');
+            const voteBBtn = document.getElementById('vote-b-btn');
+            
+            // Update vote counts
+            document.getElementById('vote-a-count').textContent = `${gameState.votes?.a || 0} votos`;
+            document.getElementById('vote-b-count').textContent = `${gameState.votes?.b || 0} votos`;
+            
+            // Update button text
+            document.getElementById('vote-a-text').textContent = `Votar em ${gameState.sideAName}`;
+            document.getElementById('vote-b-text').textContent = `Votar em ${gameState.sideBName}`;
+            
+            // Disable if already voted
+            voteABtn.disabled = hasVoted;
+            voteBBtn.disabled = hasVoted;
+            
+            if (hasVoted) {
+                voteABtn.style.opacity = '0.6';
+                voteBBtn.style.opacity = '0.6';
+            }
+        }
+
+        async function submitArgument(side) {
+            if (playerSide !== side) return;
+            
+            const input = document.getElementById(`team-${side}-input`);
+            const argument = input.value.trim();
+            
+            if (!argument) {
+                showNotification('Digite um argumento primeiro!', true);
+                return;
+            }
+            
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                [`arguments.${side}`]: argument
+            });
+            
+            document.getElementById(`team-${side}-submit`).disabled = true;
+            document.getElementById(`team-${side}-argument`).textContent = argument;
+            
+            showNotification('Argumento enviado!');
+        }
+
+        async function vote(side) {
+            const hasVoted = gameState.votedPlayers?.includes(currentUser.uid);
+            if (hasVoted) {
+                showNotification('Você já votou!', true);
+                return;
+            }
+            
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                [`votes.${side}`]: (gameState.votes?.[side] || 0) + 1,
+                votedPlayers: arrayUnion(currentUser.uid)
+            });
+            
+            showNotification(`Voto registrado em ${side === 'a' ? gameState.sideAName : gameState.sideBName}!`);
+        }
+
+        // Timer management
+        function startGameTimer(phase, seconds) {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(async () => {
+                const currentTimer = gameState?.timer || 0;
+                if (currentTimer <= 1) {
+                    clearInterval(timerInterval);
+                    await handleTimerEnd(phase);
+                } else {
+                    await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                        timer: currentTimer - 1
+                    });
+                }
+            }, 1000);
+        }
+
+        async function handleTimerEnd(phase) {
+            if (!isRoomAdmin) return;
+            
+            if (phase === 'preparation') {
+                await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                    gamePhase: 'debate',
+                    timer: 120 // 2 minutes for debate
+                });
+                startGameTimer('debate', 120);
+                
+            } else if (phase === 'debate') {
+                await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                    gamePhase: 'voting',
+                    timer: 30 // 30 seconds for voting
+                });
+                startGameTimer('voting', 30);
+                
+            } else if (phase === 'voting') {
+                await endRound();
+            }
+        }
+
+        async function endRound() {
+            if (!isRoomAdmin) return;
+            
+            // Determine round winner
+            const votesA = gameState.votes?.a || 0;
+            const votesB = gameState.votes?.b || 0;
+            const winner = votesA > votesB ? 'a' : (votesB > votesA ? 'b' : null);
+            
+            const newScores = { ...gameState.scores };
+            if (winner) {
+                newScores[winner] = (newScores[winner] || 0) + 1;
+            }
+            
+            const isGameOver = (gameState.currentRound >= 3) || 
+                              (newScores.a > 1) || (newScores.b > 1);
+            
+            if (isGameOver) {
+                await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                    phase: 'results',
+                    scores: newScores
+                });
+            } else {
+                // Next round
+                await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                    currentRound: gameState.currentRound + 1,
+                    gamePhase: 'preparation',
+                    timer: 30,
+                    arguments: { a: '', b: '' },
+                    votes: { a: 0, b: 0 },
+                    votedPlayers: [],
+                    scores: newScores
+                });
+                startGameTimer('preparation', 30);
+            }
+        }
+
+        function updateTimerDisplay() {
+            const timer = gameState?.timer || 0;
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            const timerEl = document.getElementById('timer');
+            
+            timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timer <= 10) {
+                timerEl.style.color = 'var(--danger)';
+                timerEl.classList.add('pulsing');
+            } else {
+                timerEl.style.color = 'var(--accent)';
+                timerEl.classList.remove('pulsing');
+            }
+        }
+
+        function showResults() {
+            showScreen('results-screen');
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            const scoreA = gameState.scores?.a || 0;
+            const scoreB = gameState.scores?.b || 0;
+            const winner = scoreA > scoreB ? 'a' : (scoreB > scoreA ? 'b' : 'tie');
+            
+            let winnerText = '🏆 EMPATE!';
+            if (winner === 'a') winnerText = `🏆 ${gameState.sideAName} VENCE!`;
+            else if (winner === 'b') winnerText = `🏆 ${gameState.sideBName} VENCE!`;
+            
+            document.getElementById('winner-announcement').textContent = winnerText;
+            document.getElementById('final-team-a-name').textContent = gameState.sideAName;
+            document.getElementById('final-team-b-name').textContent = gameState.sideBName;
+            document.getElementById('final-team-a-score').textContent = scoreA;
+            document.getElementById('final-team-b-score').textContent = scoreB;
+        }
+
+        async function returnToLobby() {
+            if (!isRoomAdmin) {
+                showNotification('Apenas o administrador pode reiniciar o jogo.', true);
+                return;
+            }
+            
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                phase: 'lobby',
+                currentRound: 1,
+                scores: { a: 0, b: 0 },
+                arguments: { a: '', b: '' },
+                votes: { a: 0, b: 0 },
+                votedPlayers: [],
+                timer: 0
+            });
+        }
+
+        // Chat functions
+        function subscribeToChat() {
+            // Public chat
+            const publicChatRef = collection(db, 'debate-rooms', currentRoom, 'public-chat');
+            const publicQuery = query(publicChatRef, orderBy('timestamp', 'asc'));
+            
+            unsubscribeChat = onSnapshot(publicQuery, (snapshot) => { // Atribuído a unsubscribeChat
+                const messages = [];
+                snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+                updateChatDisplay('public', messages);
+            });
+            
+            // Team chat (só subscreve se o playerSide for conhecido)
+            if (playerSide) {
+                const teamChatRef = collection(db, 'debate-rooms', currentRoom, `team-${playerSide}-chat`);
+                const teamQuery = query(teamChatRef, orderBy('timestamp', 'asc'));
+                
+                // Nota: Se o playerSide mudar, esta subscrição não será atualizada automaticamente.
+                // Para um chat de equipa dinâmico, pode ser necessário re-subscrever ou ter uma lógica mais complexa.
+                onSnapshot(teamQuery, (snapshot) => {
+                    const messages = [];
+                    snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+                    updateChatDisplay('team', messages);
+                });
+            }
+        }
+
+        function updateChatDisplay(type, messages) {
+            const chatContainer = document.getElementById(`${type === 'public' ? 'public' : 'team'}-chat`);
+            chatContainer.innerHTML = '';
+            
+            messages.slice(-20).forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                
+                const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : 'now';
+                messageDiv.innerHTML = `
+                    <div class="message-meta">${msg.playerName} • ${time}</div>
+                    <div>${msg.text}</div>
+                `;
+                chatContainer.appendChild(messageDiv);
+            });
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendPublicMessage() {
+            const input = document.getElementById('public-chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            await addDoc(collection(db, 'debate-rooms', currentRoom, 'public-chat'), {
+                playerName: playerName,
+                playerUid: currentUser.uid,
+                playerSide: playerSide,
+                text: text,
+                timestamp: serverTimestamp()
+            });
+            
+            input.value = '';
+        }
+
+        async function sendTeamMessage() {
+            const input = document.getElementById('team-chat-input');
+            const text = input.value.trim();
+            if (!text || !playerSide) return;
+            
+            await addDoc(collection(db, 'debate-rooms', currentRoom, `team-${playerSide}-chat`), {
+                playerName: playerName,
+                playerUid: currentUser.uid,
+                text: text,
+                timestamp: serverTimestamp()
+            });
+            
+            input.value = '';
+        }
+
+        // Utility functions
+        async function copyRoomCode() {
+            await navigator.clipboard.writeText(currentRoom);
+            showNotification('Código copiado!');
+        }
+
+        async function leaveGame() {
+            if (unsubscribeRoom) unsubscribeRoom();
+            if (unsubscribeChat) unsubscribeChat();
+            if (timerInterval) clearInterval(timerInterval);
+            
+            // Remove player from room
+            // Nota: deleteDoc() é para eliminar um documento, não um campo dentro de um documento.
+            // Para remover um campo, use FieldValue.delete() do Firebase, mas aqui estamos a remover o jogador
+            // do mapa 'players', o que é feito ao definir o valor como 'deleteDoc()'.
+            // No entanto, o uso correto para remover um campo é `firebase.firestore.FieldValue.delete()`.
+            // Para o seu caso, onde `players` é um mapa e você quer remover uma chave, o `updateDoc` com
+            // `deleteDoc()` como valor para a chave funciona como um atalho para remover o campo.
+            await updateDoc(doc(db, 'debate-rooms', currentRoom), {
+                [`players.${currentUser.uid}`]: deleteDoc() // Isso remove o campo do jogador do mapa 'players'
+            });
+            
+            location.reload();
+        }
+
+        function showInstructions() {
+            alert(`
+🏛️ COMO JOGAR ARENA DE DEBATES
+
+⚡ COMO FUNCIONA:
+1. Digite seu nome e entre em uma sala
+2. Escolha um lado do debate (A ou B)  
+3. O admin configura o tópico e inicia o jogo
+4. Participe de 3 rounds estruturados
+
+📋 FASES DE CADA ROUND:
+• PREPARAÇÃO (30s) - Organize suas ideias
+• DEBATE (2min) - Digite e envie seu argumento  
+• VOTAÇÃO (30s) - Todos votam no melhor argumento
+• RESULTADOS - Lado vencedor ganha 1 ponto
+
+🏆 VITÓRIA:
+• Melhor de 3 rounds
+• Primeiro a ganhar 2 rounds vence
+• Use os chats para coordenar estratégias
+            `);
+        }
+
+        // Event listeners
+        document.getElementById('public-chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendPublicMessage();
+        });
+
+        document.getElementById('team-chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendTeamMessage();
+        });
+
+        // Make functions global for onclick handlers
+        window.joinOrCreateRoom = joinOrCreateRoom;
+        window.showInstructions = showInstructions;
+        window.joinTeam = joinTeam;
+        window.startGame = startGame;
+        window.submitArgument = submitArgument;
+        window.vote = vote;
+        window.sendPublicMessage = sendPublicMessage;
+        window.sendTeamMessage = sendTeamMessage;
+        window.copyRoomCode = copyRoomCode;
+        window.leaveGame = leaveGame;
+        window.returnToLobby = returnToLobby;
+
+        // Initialize
+        showScreen('login-screen');
+        
+    </script>
+</body>
+</html>
