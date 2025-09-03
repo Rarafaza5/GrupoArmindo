@@ -1013,14 +1013,14 @@
             await updateDoc(doc(db, 'debate-rooms', currentRoom), {
                 phase: 'game',
                 currentRound: 1,
-                timer: 30,
+                timer: 300,
                 gamePhase: 'preparation',
                 arguments: { a: '', b: '' },
                 votes: { a: 0, b: 0 },
                 votedPlayers: []
             });
             
-            startGameTimer('preparation', 30);
+            startGameTimer('preparation', 300);
         }
 
         function showGame() {
@@ -1207,9 +1207,9 @@
             if (phase === 'preparation') {
                 await updateDoc(doc(db, 'debate-rooms', currentRoom), {
                     gamePhase: 'debate',
-                    timer: 120 // 2 minutes for debate
+                    timer: 300 // 5 minutes for debate
                 });
-                startGameTimer('debate', 120);
+                startGameTimer('debate', 300);
                 
             } else if (phase === 'debate') {
                 await updateDoc(doc(db, 'debate-rooms', currentRoom), {
@@ -1249,13 +1249,13 @@
                 await updateDoc(doc(db, 'debate-rooms', currentRoom), {
                     currentRound: gameState.currentRound + 1,
                     gamePhase: 'preparation',
-                    timer: 30,
+                    timer: 90,
                     arguments: { a: '', b: '' },
                     votes: { a: 0, b: 0 },
                     votedPlayers: [],
                     scores: newScores
                 });
-                startGameTimer('preparation', 30);
+                startGameTimer('preparation', 90);
             }
         }
 
@@ -1426,9 +1426,9 @@
 4. Participe de 3 rounds estruturados
 
 📋 FASES DE CADA ROUND:
-• PREPARAÇÃO (30s) - Organize suas ideias
-• DEBATE (2min) - Digite e envie seu argumento  
-• VOTAÇÃO (30s) - Todos votam no melhor argumento
+• PREPARAÇÃO (1m30s) - Organize suas ideias
+• DEBATE (5min) - Digite e envie seu argumento  
+• VOTAÇÃO (1mim) - Todos votam no melhor argumento
 • RESULTADOS - Lado vencedor ganha 1 ponto
 
 🏆 VITÓRIA:
