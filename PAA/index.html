@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Despesas | Grupo Armindo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e40af;
+            --secondary-color: #64748b;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+                     align-items: center;
+            justify-content: center;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-white {
+            height: 120px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            gap: 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: var(--surface-color);
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-control:hover {
+            border-color: var(--secondary-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--surface-color) 0%, #f8fafc 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .stat-card:nth-child(1)::before { background: var(--primary-color); }
+        .stat-card:nth-child(2)::before { background: var(--accent-color); }
+        .stat-card:nth-child(3)::before { background: var(--warning-color); }
+        .stat-card:nth-child(4)::before { background: var(--danger-color); }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: rgba(30, 58, 138, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-color);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            justify-content: center;
+            line-height: 1.5;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface-color);
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--primary-color);
+        }
+
+        .loading-spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .amount.positive {
+            color: var(--accent-color);
+        }
+
+        .amount.negative {
+            color: var(--danger-color);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toolbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-offline {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.875rem;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar-right {
+                margin-left: 0;
+                justify-content: center;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+            width: 250px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .data-table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .data-table-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="Grupo_armindo_logo_colorida_fundo_trasparente.png" 
+                     alt="Grupo Armindo" class="logo-white">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        
+        <!-- Status & Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <div class="status-indicator" id="connectionStatus">
+                    <i class="fas fa-circle"></i>
+                    <span>Conectando...</span>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <div class="search-box">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Pesquisar despesas...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="export-buttons">
+                    <button class="btn btn-secondary" onclick="exportToCSV()">
+                        <i class="fas fa-download"></i>
+                        CSV
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportToPDF()">
+                        <i class="fas fa-file-pdf"></i>
+                        PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+<h1>Sistema de Gestão Financeira do Grupo Armindo</h1>
+        <!-- Filtros -->
+        <div class="card">
+            <div class="card-header">
+                <h2>
+                    <i class="fas fa-filter"></i>
+                    Filtros e Análise
+                </h2>
+            </div>
+            <div class="card-content">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label for="yearFilter">
+                            <i class="fas fa-calendar-alt"></i>
+                            Período Fiscal
+                        </label>
+                        <select id="yearFilter" class="form-control">
+                            <option value="">Todos os exercícios</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="activityFilter">
+                            <i class="fas fa-briefcase"></i>
+                            Atividade
+                        </label>
+                        <select id="activityFilter" class="form-control">
+                            <option value="">Todas as Atividades</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectFilter">
+                            <i class="fas fa-project-diagram"></i>
+                            Projeto
+                        </label>
+                        <select id="projectFilter" class="form-control">
+                            <option value="">Todos os projetos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amountRange">
+                            <i class="fas fa-euro-sign"></i>
+                            Filtro por Valor (€)
+                        </label>
+                        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.5rem; align-items: center;">
+                            <input type="number" id="minAmount" class="form-control" placeholder="Min">
+                            <span>-</span>
+                            <input type="number" id="maxAmount" class="form-control" placeholder="Max">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Total Atual</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="totalAnual">€0,00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Despesas do Mês</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="totalMensal">€0,00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Registos Este Mês</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="despesasMes">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Valor Médio</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="mediaDespesa">€0,00</div>
+            </div>
+        </div>
+
+        <!-- Formulário -->
+        <div class="card">
+            <div class="card-header">
+                <h2>
+                    <i class="fas fa-plus-circle"></i>
+                    Registo de Nova Despesa
+                </h2>
+            </div>
+            <div class="card-content">
+                <form id="expenseForm" onsubmit="addExpense(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newDate">
+                                <i class="fas fa-calendar"></i>
+                                Data da Despesa *
+                            </label>
+                            <input type="date" id="newDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newActivity">
+                                <i class="fas fa-tag"></i>
+                                Atividade *
+                            </label>
+                            <input type="text" id="newActivity" class="form-control" 
+                                   placeholder="ex: Recursos Humanos, Marketing, Operações..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newProject">
+                                <i class="fas fa-folder"></i>
+                                Projeto *
+                            </label>
+                            <input type="text" id="newProject" class="form-control" 
+                                   placeholder="ex: Projeto Expansão, Modernização IT..." required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newAmount">
+                                <i class="fas fa-euro-sign"></i>
+                                Valor da Despesa (€) *
+                            </label>
+                            <input type="number" id="newAmount" class="form-control" 
+                                   step="0.01" min="0" placeholder="0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newDescription">
+                                <i class="fas fa-align-left"></i>
+                                Descrição/Observações
+                            </label>
+                            <input type="text" id="newDescription" class="form-control" 
+                                   placeholder="Descrição detalhada da despesa...">
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()" style="margin-right: 1rem;">
+                            <i class="fas fa-eraser"></i>
+                            Limpar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Registar Despesa
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabela de Dados -->
+        <div class="card">
+            <div class="data-table-header">
+                <h2>
+                    <i class="fas fa-table"></i>
+                    Registo de Despesas
+                    <span class="badge" id="recordCount">0</span>
+                </h2>
+                <div class="table-actions">
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Atualizar
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <i class="fas fa-calendar-alt"></i>
+                                Data
+                            </th>
+                            <th>
+                                <i class="fas fa-briefcase"></i>
+                                Atividade
+                            </th>
+                            <th>
+                                <i class="fas fa-project-diagram"></i>
+                                Projeto
+                            </th>
+                            <th>
+                                <i class="fas fa-euro-sign"></i>
+                                Valor
+                            </th>
+                            <th>
+                                <i class="fas fa-align-left"></i>
+                                Descrição
+                            </th>
+                            <th style="text-align: center;">
+                                <i class="fas fa-cog"></i>
+                                Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesTableBody">
+                        <tr>
+                            <td colspan="6" class="loading-state">
+                                <div class="loading-spinner"></div>
+                                <div>Estabelecendo ligação ao sistema...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+
+    <script>
+        // Configuração Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+  measurementId: "G-Z9YLSTGHST"
+        };
+
+        // Estado da aplicação
+        class ExpenseManager {
+            constructor() {
+                this.db = null;
+                this.expenses = [];
+                this.filteredExpenses = [];
+                this.isConnected = false;
+                this.searchTerm = '';
+                this.init();
+            }
+
+            async init() {
+                try {
+                    firebase.initializeApp(firebaseConfig);
+                    this.db = firebase.firestore();
+                    this.isConnected = true;
+                    this.updateConnectionStatus(true);
+                    await this.loadExpenses();
+                } catch (error) {
+                    console.error("Erro Firebase:", error);
+                    this.showMockData();
+                    this.updateConnectionStatus(false);
+                }
+
+                this.setupEventListeners();
+                this.setDefaultDate();
+            }
+
+            updateConnectionStatus(connected) {
+                const statusEl = document.getElementById('connectionStatus');
+                if (connected) {
+                    statusEl.className = 'status-indicator status-connected';
+                    statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Sistema Online</span>';
+                } else {
+                    statusEl.className = 'status-indicator status-offline';
+                    statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Modo Demonstração</span>';
+                }
+            }
+
+            async loadExpenses() {
+                if (!this.db) return;
+
+                try {
+                    this.db.collection('expenses')
+                        .orderBy('date', 'desc')
+                        .onSnapshot((snapshot) => {
+                            this.expenses = [];
+                            snapshot.forEach((doc) => {
+                                this.expenses.push({
+                                    id: doc.id,
+                                    ...doc.data()
+                                });
+                            });
+                            
+                            this.updateFilters();
+                            this.applyFilters();
+                        }, (error) => {
+                            console.error("Erro ao carregar:", error);
+                            this.showNotification('Erro ao carregar dados', 'error');
+                        });
+                } catch (error) {
+                    console.error("Erro de conexão:", error);
+                    this.showMockData();
+                }
+            }
+
+            showMockData() {
+                this.expenses = [
+                    {
+                        id: 'demo_001',
+                        date: '2024-09-20',
+                        activity: 'Recursos Humanos',
+                        project: 'Recrutamento Q3 2024',
+                        amount: 4500.00,
+                        description: 'Processo seletivo para posições técnicas senior'
+                    },
+                    {
+                        id: 'demo_002',
+                        date: '2024-09-18',
+                        activity: 'Marketing Digital',
+                        project: 'Campanha Brand Awareness',
+                        amount: 12750.50,
+                        description: 'Investimento em publicidade digital multiplataforma'
+                    },
+                    {
+                        id: 'demo_003',
+                        date: '2024-09-15',
+                        activity: 'Tecnologia da Informação',
+                        project: 'Modernização Infraestrutura',
+                        amount: 18900.00,
+                        description: 'Aquisição de servidores e licenças enterprise'
+                    },
+                    {
+                        id: 'demo_004',
+                        date: '2024-09-12',
+                        activity: 'Operações Logísticas',
+                        project: 'Expansão Centro Norte',
+                        amount: 25600.75,
+                        description: 'Equipamentos logísticos e setup operacional'
+                    },
+                    {
+                        id: 'demo_005',
+                        date: '2024-08-28',
+                        activity: 'Consultoria Externa',
+                        project: 'Auditoria Processos',
+                        amount: 8350.00,
+                        description: 'Consultoria especializada em otimização de processos'
+                    },
+                    {
+                        id: 'demo_006',
+                        date: '2024-08-22',
+                        activity: 'Formação e Desenvolvimento',
+                        project: 'Capacitação Liderança',
+                        amount: 6200.25,
+                        description: 'Programa de desenvolvimento executivo'
+                    }
+                ];
+
+                this.updateFilters();
+                this.applyFilters();
+            }
+
+            async addExpense(expenseData) {
+                if (this.db && this.isConnected) {
+                    try {
+                        const docRef = await this.db.collection('expenses').add({
+                            ...expenseData,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        this.showNotification('Despesa registada com sucesso!', 'success');
+                        return docRef.id;
+                    } catch (error) {
+                        console.error("Erro ao adicionar:", error);
+                        this.showNotification('Erro ao registar despesa', 'error');
+                        throw error;
+                    }
+                } else {
+                    // Modo demonstração
+                    const newExpense = {
+                        id: 'demo_' + Date.now(),
+                        ...expenseData
+                    };
+                    this.expenses.unshift(newExpense);
+                    this.updateFilters();
+                    this.applyFilters();
+                    this.showNotification('Despesa adicionada (modo demonstração)', 'warning');
+                    return newExpense.id;
+                }
+            }
+
+            async deleteExpense(id) {
+                if (!confirm('Confirma a eliminação desta despesa?\n\nEsta ação não pode ser desfeita.')) {
+                    return;
+                }
+
+                if (this.db && this.isConnected && !id.includes('demo_')) {
+                    try {
+                        await this.db.collection('expenses').doc(id).delete();
+                        this.showNotification('Despesa eliminada com sucesso', 'success');
+                    } catch (error) {
+                        console.error("Erro ao eliminar:", error);
+                        this.showNotification('Erro ao eliminar despesa', 'error');
+                    }
+                } else {
+                    // Modo demonstração
+                    this.expenses = this.expenses.filter(exp => exp.id !== id);
+                    this.updateFilters();
+                    this.applyFilters();
+                    this.showNotification('Despesa removida (modo demonstração)', 'warning');
+                }
+            }
+
+            updateFilters() {
+                const years = [...new Set(this.expenses.map(e => new Date(e.date).getFullYear()))].sort((a, b) => b - a);
+                const activities = [...new Set(this.expenses.map(e => e.activity))].sort();
+                const projects = [...new Set(this.expenses.map(e => e.project))].sort();
+
+                this.updateSelectOptions('yearFilter', years);
+                this.updateSelectOptions('activityFilter', activities);
+                this.updateSelectOptions('projectFilter', projects);
+            }
+
+            updateSelectOptions(selectId, options) {
+                const select = document.getElementById(selectId);
+                const currentValue = select.value;
+                const firstOption = select.options[0];
+                
+                select.innerHTML = '';
+                select.appendChild(firstOption);
+
+                options.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    select.appendChild(optionElement);
+                });
+
+                select.value = currentValue;
+            }
+
+            applyFilters() {
+                const yearFilter = document.getElementById('yearFilter').value;
+                const activityFilter = document.getElementById('activityFilter').value;
+                const projectFilter = document.getElementById('projectFilter').value;
+                const minAmount = parseFloat(document.getElementById('minAmount').value) || 0;
+                const maxAmount = parseFloat(document.getElementById('maxAmount').value) || Infinity;
+
+                this.filteredExpenses = this.expenses.filter(expense => {
+                    const expenseYear = new Date(expense.date).getFullYear().toString();
+                    const matchesSearch = this.searchTerm === '' || 
+                        Object.values(expense).some(value => 
+                            value.toString().toLowerCase().includes(this.searchTerm.toLowerCase())
+                        );
+
+                    return (!yearFilter || expenseYear === yearFilter) &&
+                           (!activityFilter || expense.activity === activityFilter) &&
+                           (!projectFilter || expense.project === projectFilter) &&
+                           (expense.amount >= minAmount && expense.amount <= maxAmount) &&
+                           matchesSearch;
+                });
+
+                this.updateTable();
+                this.updateStatistics();
+                this.updateRecordCount();
+            }
+
+            updateTable() {
+                const tbody = document.getElementById('expensesTableBody');
+                
+                if (this.filteredExpenses.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h3>Nenhuma despesa encontrada</h3>
+                                <p>Ajuste os filtros ou adicione novas despesas ao sistema</p>
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = this.filteredExpenses.map(expense => `
+                    <tr>
+                        <td>${this.formatDate(expense.date)}</td>
+                        <td>
+                            <div style="font-weight: 500;">${expense.activity}</div>
+                        </td>
+                        <td>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                                ${expense.project}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="amount positive">
+                                ${this.formatCurrency(expense.amount)}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                                ${expense.description || '<span style="color: var(--text-secondary); font-style: italic;">Sem descrição</span>'}
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-danger" onclick="expenseManager.deleteExpense('${expense.id}')" 
+                                    title="Eliminar despesa">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            updateStatistics() {
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth();
+                
+                const yearlyExpenses = this.filteredExpenses.filter(e => 
+                    new Date(e.date).getFullYear() === currentYear
+                );
+                
+                const monthlyExpenses = this.filteredExpenses.filter(e => {
+                    const date = new Date(e.date);
+                    return date.getFullYear() === currentYear && date.getMonth() === currentMonth;
+                });
+
+                const yearlyTotal = yearlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+                const monthlyTotal = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+                const monthlyCount = monthlyExpenses.length;
+                const averageExpense = this.filteredExpenses.length > 0 ? 
+                    this.filteredExpenses.reduce((sum, e) => sum + e.amount, 0) / this.filteredExpenses.length : 0;
+
+                document.getElementById('totalAnual').textContent = this.formatCurrency(yearlyTotal);
+                document.getElementById('totalMensal').textContent = this.formatCurrency(monthlyTotal);
+                document.getElementById('despesasMes').textContent = monthlyCount.toString();
+                document.getElementById('mediaDespesa').textContent = this.formatCurrency(averageExpense);
+            }
+
+            updateRecordCount() {
+                document.getElementById('recordCount').textContent = this.filteredExpenses.length.toString();
+            }
+
+            setupEventListeners() {
+                // Filtros
+                ['yearFilter', 'activityFilter', 'projectFilter', 'minAmount', 'maxAmount'].forEach(id => {
+                    document.getElementById(id).addEventListener('change', () => this.applyFilters());
+                });
+
+                // Pesquisa global
+                const searchInput = document.getElementById('globalSearch');
+                searchInput.addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value;
+                    this.applyFilters();
+                });
+
+                // Formulário
+                document.getElementById('expenseForm').addEventListener('submit', (e) => this.handleFormSubmit(e));
+            }
+
+            async handleFormSubmit(event) {
+                event.preventDefault();
+
+                const formData = {
+                    date: document.getElementById('newDate').value,
+                    activity: document.getElementById('newActivity').value.trim(),
+                    project: document.getElementById('newProject').value.trim(),
+                    amount: parseFloat(document.getElementById('newAmount').value),
+                    description: document.getElementById('newDescription').value.trim()
+                };
+
+                // Validação
+                if (!formData.date || !formData.activity || !formData.project || isNaN(formData.amount) || formData.amount <= 0) {
+                    this.showNotification('Por favor, preencha todos os campos obrigatórios', 'error');
+                    return;
+                }
+
+                try {
+                    await this.addExpense(formData);
+                    this.clearForm();
+                } catch (error) {
+                    console.error('Erro ao adicionar despesa:', error);
+                }
+            }
+
+            clearForm() {
+                document.getElementById('expenseForm').reset();
+                this.setDefaultDate();
+            }
+
+            setDefaultDate() {
+                document.getElementById('newDate').valueAsDate = new Date();
+            }
+
+            refreshData() {
+                if (this.isConnected) {
+                    this.showNotification('Dados atualizados', 'success');
+                    // Os dados já são atualizados em tempo real via Firebase
+                } else {
+                    this.showNotification('Sistema em modo demonstração', 'warning');
+                }
+            }
+
+            showNotification(message, type = 'success') {
+                // Remove notificação existente
+                const existing = document.querySelector('.notification');
+                if (existing) {
+                    existing.remove();
+                }
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 4000);
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-PT', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('pt-PT', {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                }).format(amount);
+            }
+
+            exportToCSV() {
+                const headers = ['Data', 'Departamento', 'Projeto', 'Valor (EUR)', 'Descrição'];
+                const rows = this.filteredExpenses.map(expense => [
+                    this.formatDate(expense.date),
+                    expense.activity,
+                    expense.project,
+                    expense.amount.toFixed(2).replace('.', ','),
+                    expense.description || ''
+                ]);
+
+                const csvContent = [headers, ...rows]
+                    .map(row => row.map(cell => `"${cell}"`).join(';'))
+                    .join('\n');
+
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `despesas_grupo_armindo_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+
+                this.showNotification('Relatório CSV exportado com sucesso', 'success');
+            }
+
+            exportToPDF() {
+    // Abre a nova janela
+    const printWindow = window.open('', '_blank');
+    const printContent = this.generatePrintContent();
+
+    // Escreve o conteúdo
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Espera o carregamento da imagem (logo) antes de imprimir
+    const logo = printWindow.document.querySelector('img');
+    if (logo) {
+        logo.onload = () => {
+            printWindow.focus();
+            printWindow.print();
+        };
+    } else {
+        // fallback: caso não haja logo, imprime logo
+        printWindow.focus();
+        printWindow.print();
+    }
+
+    this.showNotification('Relatório enviado para impressão', 'success');
+}
+
+
+            generatePrintContent() {
+                const totalValue = this.filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+                
+                return `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Relatório de Gestão Financeira</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; }
+                            .header img { height: 60px; margin-bottom: 10px; }
+                            .header h1 { color: #1e3a8a; margin: 10px 0 5px 0; font-size: 24px; }
+                            .summary { background: #f8fafc; padding: 15px; margin: 20px 0; border-radius: 8px; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+                            th { background-color: #1e3a8a; color: white; }
+                            tr:nth-child(even) { background-color: #f2f2f2; }
+                            .total { font-weight: bold; background-color: #e6f2ff; }
+                            .footer { margin-top: 30px; font-size: 10px; color: #666; text-align: center; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <img src="Grupo_armindo_logo_colorida_fundo_trasparente.png" alt="Grupo Armindo">
+                            <h1>RELATÓRIO DE GESTÃO FINANCEIRA</h1>
+                            <p style="margin: 5px 0; font-size: 14px; color: #666;">Gerado no dia: ${new Date().toLocaleDateString('pt-PT')}</p>
+                        </div>
+                        
+                        <div class="summary">
+                            <h2>Resumo:</h2>
+                            <p><strong>Total de Registos:</strong> ${this.filteredExpenses.length}</p>
+                            <p><strong>Valor Total:</strong> ${this.formatCurrency(totalValue)}</p>
+                            <p><strong>Valor Médio:</strong> ${this.formatCurrency(totalValue / this.filteredExpenses.length || 0)}</p>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Departamento</th>
+                                    <th>Centro de Custo</th>
+                                    <th>Valor (€)</th>
+                                    <th>Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${this.filteredExpenses.map(expense => `
+                                    <tr>
+                                        <td>${this.formatDate(expense.date)}</td>
+                                        <td>${expense.activity}</td>
+                                        <td>${expense.project}</td>
+                                        <td style="text-align: right;">${this.formatCurrency(expense.amount)}</td>
+                                        <td>${expense.description || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                                <tr class="total">
+                                    <td colspan="3"><strong>TOTAL GERAL</strong></td>
+                                    <td style="text-align: right;"><strong>${this.formatCurrency(totalValue)}</strong></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="footer">
+                            <p>Este relatório foi gerado automaticamente pelo Sistema de Gestão de Despesas do Grupo Armindo.</p>
+                            <p>Para questões ou esclarecimentos, contacte o departamento financeiro.</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+            }
+        }
+
+        // Funções globais para compatibilidade
+        let expenseManager;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            expenseManager = new ExpenseManager();
+        });
+
+        // Funções globais para botões
+        function refreshData() {
+            expenseManager.refreshData();
+        }
+
+        function clearForm() {
+            expenseManager.clearForm();
+        }
+
+        function exportToCSV() {
+            expenseManager.exportToCSV();
+        }
+
+        function exportToPDF() {
+            expenseManager.exportToPDF();
+        }
+    </script>
+</body>
+</html>
