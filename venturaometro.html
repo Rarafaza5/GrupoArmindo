@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venturômetro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 31, 63, 0.5);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            border: 5px solid #001f3f;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            margin: -40px -40px 30px -40px;
+            padding: 30px;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+        }
+
+        .ventura-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin-bottom: 15px;
+            background: #f0f0f0;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .ventura-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+
+        .chega-logo {
+            color: white;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-top: 10px;
+        }
+
+        .counter-display {
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0, 31, 63, 0.3);
+            border: 3px solid #001f3f;
+        }
+
+        #counter {
+            font-size: 5em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .counter-label {
+            color: white;
+            font-size: 1.2em;
+            margin-top: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button {
+            flex: 1;
+            padding: 18px 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        .btn-verdade {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: 3px solid #1e8449;
+        }
+
+        .btn-mentira {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            color: white;
+            border: 3px solid #922b21;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            color: white;
+            margin-top: 10px;
+            border: 3px solid #001f3f;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 31, 63, 0.2);
+            border: 3px solid #001f3f;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-verdade {
+            color: #27ae60;
+        }
+
+        .stat-mentira {
+            color: #c0392b;
+        }
+
+        .stat-label {
+            color: #001f3f;
+            font-size: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .percentage {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            border-radius: 10px;
+            border: 3px solid #001f3f;
+        }
+
+        .percentage-text {
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #001f3f;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .quote {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 5px solid #001f3f;
+            margin: 20px 0;
+            font-style: italic;
+            color: #001f3f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="ventura-image">
+                <img src="https://www.noticiasdecoimbra.pt/wp-content/uploads/2024/03/andre-ventura-facebook.jpg" alt="André Ventura">
+            </div>
+            <h1>VENTURÔMETRO</h1>
+            <p class="subtitle">O Contador de mentiras do Chega!</p>
+        </div>
+
+        <div class="quote">
+            "...Para ir a um festival de hamburgueres..."
+        </div>
+
+        <div class="counter-display">
+            <div id="counter">0</div>
+            <div class="counter-label">Total de Mentiras</div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-mentira" onclick="addMentira()">✗ MENTIRA</button>
+        </div>
+
+        <button class="btn-reset" onclick="reset()">↻ RESETAR</button>
+
+        <div class="stats">
+        
+       
+
+    </div>
+
+    <script>
+        let total = 0;
+        let verdades = 0;
+        let mentiras = 0;
+
+        function updateDisplay() {
+            document.getElementById('counter').textContent = total;
+            document.getElementById('verdades').textContent = verdades;
+            document.getElementById('mentiras').textContent = mentiras;
+
+            if (total > 0) {
+                const percVerdade = ((verdades / total) * 100).toFixed(1);
+                const percMentira = ((mentiras / total) * 100).toFixed(1);
+                document.getElementById('percentage').innerHTML = 
+                    `📊 VERDADES: <strong>${percVerdade}%</strong> | MENTIRAS: <strong>${percMentira}%</strong>`;
+            } else {
+                document.getElementById('percentage').textContent = '📊 Aguardando análise...';
+            }
+        }
+
+        function addVerdade() {
+            verdades++;
+            total++;
+            updateDisplay();
+            animateCounter();
+        }
+
+        function addMentira() {
+            mentiras++;
+            total++;
+            updateDisplay();
+            animateCounter();
+        }
+
+        function reset() {
+            if (total > 0 && confirm('Tem certeza que deseja resetar todos os dados?')) {
+                total = 0;
+                verdades = 0;
+                mentiras = 0;
+                updateDisplay();
+            }
+        }
+
+        function animateCounter() {
+            const counter = document.getElementById('counter');
+            counter.classList.remove('pulse');
+            void counter.offsetWidth;
+            counter.classList.add('pulse');
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
