@@ -307,6 +307,22 @@
             width: 100%;
         }
 
+        .edit-word-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .modal-buttons-detail {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons-detail button {
+            flex: 1;
+        }
+
         .modal-header {
             font-size: 1.8em;
             color: #667eea;
@@ -424,7 +440,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>📚 O melhor dicionário de sempre</h1>
+            <h1>📚 O Verdadeiro Dicionário</h1>
             <p class="subtitle">Construído pela comunidade, para a comunidade</p>
         </header>
 
@@ -448,8 +464,9 @@
 
     <div class="modal" id="addModal">
         <div class="modal-content">
-            <h2 class="modal-header">Adicionar Nova Palavra</h2>
+            <h2 class="modal-header" id="formTitle">Adicionar Nova Palavra</h2>
             <form id="addWordForm">
+                <input type="hidden" id="editWordId" />
                 <div class="form-group">
                     <label for="wordInput">Palavra *</label>
                     <input type="text" id="wordInput" required />
@@ -497,7 +514,7 @@
                     <input type="text" id="relatedInput" placeholder="ex: beleza, embelezar" />
                 </div>
                 <div class="modal-buttons">
-                    <button type="submit">💾 Salvar</button>
+                    <button type="submit" id="submitBtn">💾 Salvar</button>
                     <button type="button" class="btn-cancel" onclick="closeModal()">❌ Cancelar</button>
                 </div>
             </form>
@@ -507,13 +524,16 @@
     <div class="modal" id="wordDetailModal">
         <div class="modal-content word-detail-modal">
             <div id="wordDetailContent"></div>
-            <button class="close-modal-btn" onclick="closeDetailModal()">✖ Fechar</button>
+            <div class="modal-buttons-detail">
+                <button class="edit-word-btn" onclick="editCurrentWord()">✏️ Editar Palavra</button>
+                <button class="close-modal-btn" onclick="closeDetailModal()">✖ Fechar</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, push, set, onValue, query, orderByChild, startAt, endAt } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, push, set, onValue, query, orderByChild, startAt, endAt, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
   apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
@@ -531,6 +551,7 @@
         const wordsRef = ref(database, 'words');
 
         let allWords = [];
+        let currentEditingWord = null;
 
         // Criar navegação alfabética
         function createAlphabetNav() {
@@ -598,6 +619,8 @@
 
         // Abrir modal com detalhes completos da palavra
         window.openWordDetail = function(word) {
+            currentEditingWord = word; // Guardar palavra atual para edição
+            
             let detailsHTML = `
                 <div class="word-detail-header">
                     <div class="word-title">${word.word}</div>
@@ -728,12 +751,41 @@
 
         // Modal
         window.openModal = function() {
+            document.getElementById('formTitle').textContent = 'Adicionar Nova Palavra';
+            document.getElementById('submitBtn').textContent = '💾 Salvar';
+            document.getElementById('editWordId').value = '';
+            currentEditingWord = null;
             document.getElementById('addModal').style.display = 'flex';
         };
 
         window.closeModal = function() {
             document.getElementById('addModal').style.display = 'none';
             document.getElementById('addWordForm').reset();
+            document.getElementById('editWordId').value = '';
+            currentEditingWord = null;
+        };
+
+        // Editar palavra atual
+        window.editCurrentWord = function() {
+            if (!currentEditingWord) return;
+            
+            document.getElementById('formTitle').textContent = 'Editar Palavra';
+            document.getElementById('submitBtn').textContent = '✏️ Atualizar';
+            document.getElementById('editWordId').value = currentEditingWord.id;
+            
+            // Preencher formulário com dados existentes
+            document.getElementById('wordInput').value = currentEditingWord.word || '';
+            document.getElementById('classInput').value = currentEditingWord.class || '';
+            document.getElementById('definitionInput').value = currentEditingWord.definition || '';
+            document.getElementById('exampleInput').value = currentEditingWord.example || '';
+            document.getElementById('synonymsInput').value = currentEditingWord.synonyms ? currentEditingWord.synonyms.join(', ') : '';
+            document.getElementById('antonymsInput').value = currentEditingWord.antonyms ? currentEditingWord.antonyms.join(', ') : '';
+            document.getElementById('etymologyInput').value = currentEditingWord.etymology || '';
+            document.getElementById('pronunciationInput').value = currentEditingWord.pronunciation || '';
+            document.getElementById('relatedInput').value = currentEditingWord.related ? currentEditingWord.related.join(', ') : '';
+            
+            closeDetailModal();
+            document.getElementById('addModal').style.display = 'flex';
         };
 
         // Fechar modais ao clicar fora
@@ -748,10 +800,11 @@
             }
         };
 
-        // Adicionar palavra
+        // Adicionar ou atualizar palavra
         document.getElementById('addWordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const editWordId = document.getElementById('editWordId').value;
             const word = document.getElementById('wordInput').value.trim();
             const wordClass = document.getElementById('classInput').value;
             const definition = document.getElementById('definitionInput').value.trim();
@@ -772,25 +825,35 @@
             const antonyms = antonymsInput ? antonymsInput.split(',').map(a => a.trim()).filter(a => a) : [];
             const related = relatedInput ? relatedInput.split(',').map(r => r.trim()).filter(r => r) : [];
 
-            try {
-                const newWordRef = push(wordsRef);
-                await set(newWordRef, {
-                    word: word,
-                    class: wordClass,
-                    definition: definition,
-                    example: example,
-                    synonyms: synonyms,
-                    antonyms: antonyms,
-                    related: related,
-                    etymology: etymology,
-                    pronunciation: pronunciation,
-                    timestamp: Date.now()
-                });
+            const wordData = {
+                word: word,
+                class: wordClass,
+                definition: definition,
+                example: example,
+                synonyms: synonyms,
+                antonyms: antonyms,
+                related: related,
+                etymology: etymology,
+                pronunciation: pronunciation,
+                timestamp: currentEditingWord ? currentEditingWord.timestamp : Date.now(),
+                lastUpdated: Date.now()
+            };
 
-                alert('✅ Palavra adicionada com sucesso!');
+            try {
+                if (editWordId) {
+                    // Atualizar palavra existente
+                    const wordRef = ref(database, `words/${editWordId}`);
+                    await update(wordRef, wordData);
+                    alert('✅ Palavra atualizada com sucesso!');
+                } else {
+                    // Adicionar nova palavra
+                    const newWordRef = push(wordsRef);
+                    await set(newWordRef, wordData);
+                    alert('✅ Palavra adicionada com sucesso!');
+                }
                 closeModal();
             } catch (error) {
-                alert('❌ Erro ao adicionar palavra. Tente novamente.');
+                alert('❌ Erro ao salvar palavra. Tente novamente.');
                 console.error(error);
             }
         });
