@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicionário Colaborativo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .search-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .word-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .word-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .word-card-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .word-card-preview .word-title {
+            margin-bottom: 0;
+        }
+
+        .word-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .word-class {
+            display: inline-block;
+            background: #f8f9fa;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .word-card-preview .word-class {
+            margin-bottom: 0;
+        }
+
+        .click-hint {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .word-definition {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .word-example {
+            font-style: italic;
+            color: #666;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .word-details {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .detail-section {
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .tag:hover {
+            transform: scale(1.05);
+        }
+
+        .tag.antonym {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .tag.related {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .pronunciation {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            color: #333;
+        }
+
+        .etymology {
+            font-style: italic;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .word-meta {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .word-detail-modal {
+            max-width: 900px;
+        }
+
+        .word-detail-header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .word-detail-header .word-title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .word-detail-content {
+            line-height: 1.8;
+        }
+
+        .word-detail-content .word-definition {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .close-modal-btn {
+            background: #6c757d;
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .modal-header {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .no-results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .alphabet-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .letter-btn {
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .letter-btn:hover,
+        .letter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 O melhor dicionário de sempre</h1>
+            <p class="subtitle">Construído pela comunidade, para a comunidade</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Pesquisar palavra..." />
+                <button onclick="searchWord()">🔍 Pesquisar</button>
+                <button class="btn-add" onclick="openModal()">➕ Adicionar Palavra</button>
+            </div>
+            <div class="alphabet-nav" id="alphabetNav"></div>
+            <div class="stats">
+                <span>📖 Total de palavras: <strong id="totalWords">0</strong></span>
+                <span>👥 Colaboradores ativos</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h2 class="modal-header">Adicionar Nova Palavra</h2>
+            <form id="addWordForm">
+                <div class="form-group">
+                    <label for="wordInput">Palavra *</label>
+                    <input type="text" id="wordInput" required />
+                </div>
+                <div class="form-group">
+                    <label for="classInput">Classe Gramatical *</label>
+                    <select id="classInput" required>
+                        <option value="">Selecione...</option>
+                        <option value="substantivo">Substantivo</option>
+                        <option value="verbo">Verbo</option>
+                        <option value="adjetivo">Adjetivo</option>
+                        <option value="advérbio">Advérbio</option>
+                        <option value="pronome">Pronome</option>
+                        <option value="preposição">Preposição</option>
+                        <option value="conjunção">Conjunção</option>
+                        <option value="interjeição">Interjeição</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="definitionInput">Definição *</label>
+                    <textarea id="definitionInput" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInput">Exemplo de uso</label>
+                    <textarea id="exampleInput" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="synonymsInput">Sinónimos (separados por vírgula)</label>
+                    <input type="text" id="synonymsInput" placeholder="ex: bonito, formoso, belo" />
+                </div>
+                <div class="form-group">
+                    <label for="antonymsInput">Antónimos (separados por vírgula)</label>
+                    <input type="text" id="antonymsInput" placeholder="ex: feio, horrível" />
+                </div>
+                <div class="form-group">
+                    <label for="etymologyInput">Etimologia / Origem</label>
+                    <input type="text" id="etymologyInput" placeholder="ex: Do latim 'pulcher'" />
+                </div>
+                <div class="form-group">
+                    <label for="pronunciationInput">Pronúncia (IPA ou fonética)</label>
+                    <input type="text" id="pronunciationInput" placeholder="ex: /pu.ˈlkɾu/" />
+                </div>
+                <div class="form-group">
+                    <label for="relatedInput">Palavras Relacionadas (separadas por vírgula)</label>
+                    <input type="text" id="relatedInput" placeholder="ex: beleza, embelezar" />
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">💾 Salvar</button>
+                    <button type="button" class="btn-cancel" onclick="closeModal()">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="wordDetailModal">
+        <div class="modal-content word-detail-modal">
+            <div id="wordDetailContent"></div>
+            <button class="close-modal-btn" onclick="closeDetailModal()">✖ Fechar</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, push, set, onValue, query, orderByChild, startAt, endAt } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+  measurementId: "G-NLLMB9THVX"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const wordsRef = ref(database, 'words');
+
+        let allWords = [];
+
+        // Criar navegação alfabética
+        function createAlphabetNav() {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            const nav = document.getElementById('alphabetNav');
+            alphabet.forEach(letter => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-btn';
+                btn.textContent = letter;
+                btn.onclick = () => filterByLetter(letter);
+                nav.appendChild(btn);
+            });
+        }
+
+        // Filtrar por letra
+        window.filterByLetter = function(letter) {
+            const filtered = allWords.filter(w => 
+                w.word.toUpperCase().startsWith(letter)
+            );
+            displayWords(filtered);
+            
+            document.querySelectorAll('.letter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === letter);
+            });
+        };
+
+        // Carregar todas as palavras
+        onValue(wordsRef, (snapshot) => {
+            allWords = [];
+            const data = snapshot.val();
+            if (data) {
+                Object.entries(data).forEach(([key, value]) => {
+                    allWords.push({ id: key, ...value });
+                });
+                allWords.sort((a, b) => a.word.localeCompare(b.word));
+            }
+            document.getElementById('totalWords').textContent = allWords.length;
+            displayWords(allWords.slice(0, 20));
+        });
+
+        // Exibir palavras (apenas preview)
+        function displayWords(words) {
+            const results = document.getElementById('results');
+            if (words.length === 0) {
+                results.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">📭</div>
+                        <h3>Nenhuma palavra encontrada</h3>
+                        <p>Seja o primeiro a adicionar esta palavra ao dicionário!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            results.innerHTML = words.map(word => `
+                <div class="word-card" onclick='openWordDetail(${JSON.stringify(word).replace(/'/g, "&apos;")})'>
+                    <div class="word-card-preview">
+                        <div class="word-title">${word.word}</div>
+                        <span class="word-class">${word.class}</span>
+                    </div>
+                    <div class="click-hint">👆 Clique para ver detalhes completos</div>
+                </div>
+            `).join('');
+        }
+
+        // Abrir modal com detalhes completos da palavra
+        window.openWordDetail = function(word) {
+            let detailsHTML = `
+                <div class="word-detail-header">
+                    <div class="word-title">${word.word}</div>
+                    <span class="word-class">${word.class}</span>
+                </div>
+                <div class="word-detail-content">
+            `;
+            
+            // Pronúncia
+            if (word.pronunciation) {
+                detailsHTML += `
+                    <div class="detail-section">
+                        <div class="detail-label">🔊 Pronúncia:</div>
+                        <div class="pronunciation">${word.pronunciation}</div>
+                    </div>
+                `;
+            }
+
+            // Definição (destacada)
+            detailsHTML += `
+                <div class="detail-section">
+                    <div class="detail-label">📖 Definição:</div>
+                    <div class="word-definition">${word.definition}</div>
+                </div>
+            `;
+
+            // Exemplo
+            if (word.example) {
+                detailsHTML += `
+                    <div class="detail-section">
+                        <div class="detail-label">💬 Exemplo de uso:</div>
+                        <div class="word-example">"${word.example}"</div>
+                    </div>
+                `;
+            }
+
+            // Sinónimos
+            if (word.synonyms && word.synonyms.length > 0) {
+                detailsHTML += `
+                    <div class="detail-section">
+                        <div class="detail-label">✨ Sinónimos:</div>
+                        <div class="tag-list">
+                            ${word.synonyms.map(s => `<span class="tag" onclick="closeDetailModal(); searchForWord('${s}')">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Antónimos
+            if (word.antonyms && word.antonyms.length > 0) {
+                detailsHTML += `
+                    <div class="detail-section">
+                        <div class="detail-label">⚡ Antónimos:</div>
+                        <div class="tag-list">
+                            ${word.antonyms.map(a => `<span class="tag antonym" onclick="closeDetailModal(); searchForWord('${a}')">${a}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Palavras Relacionadas
+            if (word.related && word.related.length > 0) {
+                detailsHTML += `
+                    <div class="detail-section">
+                        <div class="detail-label">🔗 Palavras Relacionadas:</div>
+                        <div class="tag-list">
+                            ${word.related.map(r => `<span class="tag related" onclick="closeDetailModal(); searchForWord('${r}')">${r}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Etimologia
+            if (word.etymology) {
+                detailsHTML += `
+                    <div class="detail-section">
+                        <div class="detail-label">📜 Etimologia:</div>
+                        <div class="etymology">${word.etymology}</div>
+                    </div>
+                `;
+            }
+
+            detailsHTML += `
+                    <div class="word-meta">
+                        Adicionada em ${new Date(word.timestamp).toLocaleDateString('pt-BR', { 
+                            day: 'numeric', 
+                            month: 'long', 
+                            year: 'numeric' 
+                        })}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('wordDetailContent').innerHTML = detailsHTML;
+            document.getElementById('wordDetailModal').style.display = 'flex';
+        };
+
+        // Fechar modal de detalhes
+        window.closeDetailModal = function() {
+            document.getElementById('wordDetailModal').style.display = 'none';
+        };
+
+        // Pesquisar palavra
+        window.searchWord = function() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!searchTerm) {
+                displayWords(allWords.slice(0, 20));
+                return;
+            }
+
+            const filtered = allWords.filter(w => 
+                w.word.toLowerCase().includes(searchTerm) ||
+                w.definition.toLowerCase().includes(searchTerm)
+            );
+            displayWords(filtered);
+        };
+
+        // Pesquisar palavra específica (usado pelos tags clicáveis)
+        window.searchForWord = function(word) {
+            document.getElementById('searchInput').value = word;
+            searchWord();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchWord();
+        });
+
+        // Modal
+        window.openModal = function() {
+            document.getElementById('addModal').style.display = 'flex';
+        };
+
+        window.closeModal = function() {
+            document.getElementById('addModal').style.display = 'none';
+            document.getElementById('addWordForm').reset();
+        };
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            const addModal = document.getElementById('addModal');
+            const detailModal = document.getElementById('wordDetailModal');
+            if (event.target === addModal) {
+                closeModal();
+            }
+            if (event.target === detailModal) {
+                closeDetailModal();
+            }
+        };
+
+        // Adicionar palavra
+        document.getElementById('addWordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const word = document.getElementById('wordInput').value.trim();
+            const wordClass = document.getElementById('classInput').value;
+            const definition = document.getElementById('definitionInput').value.trim();
+            const example = document.getElementById('exampleInput').value.trim();
+            const synonymsInput = document.getElementById('synonymsInput').value.trim();
+            const antonymsInput = document.getElementById('antonymsInput').value.trim();
+            const etymology = document.getElementById('etymologyInput').value.trim();
+            const pronunciation = document.getElementById('pronunciationInput').value.trim();
+            const relatedInput = document.getElementById('relatedInput').value.trim();
+
+            if (!word || !wordClass || !definition) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
+                return;
+            }
+
+            // Processar listas separadas por vírgula
+            const synonyms = synonymsInput ? synonymsInput.split(',').map(s => s.trim()).filter(s => s) : [];
+            const antonyms = antonymsInput ? antonymsInput.split(',').map(a => a.trim()).filter(a => a) : [];
+            const related = relatedInput ? relatedInput.split(',').map(r => r.trim()).filter(r => r) : [];
+
+            try {
+                const newWordRef = push(wordsRef);
+                await set(newWordRef, {
+                    word: word,
+                    class: wordClass,
+                    definition: definition,
+                    example: example,
+                    synonyms: synonyms,
+                    antonyms: antonyms,
+                    related: related,
+                    etymology: etymology,
+                    pronunciation: pronunciation,
+                    timestamp: Date.now()
+                });
+
+                alert('✅ Palavra adicionada com sucesso!');
+                closeModal();
+            } catch (error) {
+                alert('❌ Erro ao adicionar palavra. Tente novamente.');
+                console.error(error);
+            }
+        });
+
+        createAlphabetNav();
+    </script>
+</body>
+</html>
