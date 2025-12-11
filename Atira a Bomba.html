@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demolição da Casa do Jorge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(to bottom, #1a1a2e, #16213e, #0f3460);
+            font-family: 'Arial Black', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+        }
+        #gameContainer {
+            text-align: center;
+            position: relative;
+        }
+        canvas {
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 60%, #90EE90 60%, #228B22 100%);
+            border: 4px solid #ff6b35;
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.8), inset 0 0 50px rgba(0,0,0,0.3);
+            cursor: crosshair;
+            border-radius: 10px;
+        }
+        #score {
+            font-size: 28px;
+            margin: 20px 0;
+            text-shadow: 0 0 15px #ff6b35, 2px 2px 4px #000;
+            background: rgba(0,0,0,0.7);
+            padding: 15px 30px;
+            border-radius: 10px;
+            display: inline-block;
+            border: 2px solid #ff6b35;
+        }
+        #gameOver {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 50px;
+            border: 4px solid #ff6b35;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 107, 53, 0.8);
+            z-index: 10;
+        }
+        #gameOver h2 {
+            color: #ff6b35;
+            font-size: 48px;
+            text-shadow: 0 0 20px #ff6b35;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.5);
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #f7931e, #ff6b35);
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(255, 107, 53, 0.8);
+        }
+        #instructions {
+            font-size: 18px;
+            margin-top: 15px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        #health {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid #ff0000;
+            font-size: 20px;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="score">Pontuação: 0 | Acertos: 0</div>
+        <canvas id="gameCanvas" width="900" height="700"></canvas>
+        <div id="health">Resistência da Casa: 100%</div>
+        <div id="instructions">🎯 Clique nas bombas para lançá-las na Casa do Jorge!</div>
+        <div id="gameOver">
+            <h2>VITÓRIA!</h2>
+            <p id="finalScore" style="font-size: 24px; margin: 20px 0;"></p>
+            <button onclick="restartGame()">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let score = 0;
+        let hits = 0;
+        let houseHealth = 100;
+        let gameRunning = true;
+        let bombs = [];
+        let explosions = [];
+        let clouds = [];
+        let particles = [];
+        
+        const house = {
+            x: canvas.width / 2 - 100,
+            y: canvas.height - 200,
+            width: 200,
+            height: 150,
+            shaking: 0
+        };
+        
+        // Criar nuvens
+        for (let i = 0; i < 5; i++) {
+            clouds.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * 200,
+                size: 40 + Math.random() * 40,
+                speed: 0.3 + Math.random() * 0.5
+            });
+        }
+        
+        class Bomb {
+            constructor() {
+                this.x = Math.random() * (canvas.width - 100) + 50;
+                this.y = -30;
+                this.size = 15;
+                this.speed = 2 + Math.random() * 2;
+                this.launched = false;
+                this.vx = 0;
+                this.vy = 0;
+            }
+            
+            update() {
+                if (!this.launched) {
+                    this.y += this.speed;
+                } else {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vy += 0.3; // gravidade
+                }
+            }
+            
+            draw() {
+                // Corpo da bomba
+                ctx.fillStyle = '#2a2a2a';
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, this.size, this.size * 1.3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Pavio
+                ctx.strokeStyle = '#8B4513';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y - this.size * 1.3);
+                ctx.lineTo(this.x + 5, this.y - this.size * 1.8);
+                ctx.stroke();
+                
+                // Faísca
+                if (!this.launched) {
+                    ctx.fillStyle = Math.random() > 0.5 ? '#ff6600' : '#ffaa00';
+                    ctx.beginPath();
+                    ctx.arc(this.x + 5, this.y - this.size * 1.8, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            checkClick(mx, my) {
+                const dist = Math.sqrt((mx - this.x) ** 2 + (my - this.y) ** 2);
+                return dist < this.size + 10;
+            }
+            
+            checkHouseCollision() {
+                return this.x > house.x && this.x < house.x + house.width &&
+                       this.y > house.y && this.y < house.y + house.height;
+            }
+        }
+        
+        class Explosion {
+            constructor(x, y, big = false) {
+                this.x = x;
+                this.y = y;
+                this.particles = [];
+                const count = big ? 30 : 20;
+                for (let i = 0; i < count; i++) {
+                    this.particles.push({
+                        x: 0,
+                        y: 0,
+                        vx: (Math.random() - 0.5) * (big ? 12 : 8),
+                        vy: (Math.random() - 0.5) * (big ? 12 : 8),
+                        life: big ? 50 : 40,
+                        maxLife: big ? 50 : 40,
+                        size: big ? 6 : 4
+                    });
+                }
+            }
+            
+            update() {
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2;
+                    p.life--;
+                });
+                this.particles = this.particles.filter(p => p.life > 0);
+            }
+            
+            draw() {
+                this.particles.forEach(p => {
+                    const alpha = p.life / p.maxLife;
+                    const colors = ['#ff4500', '#ff6600', '#ffaa00', '#ff8800'];
+                    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)] + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+                    ctx.beginPath();
+                    ctx.arc(this.x + p.x, this.y + p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+            
+            isDone() {
+                return this.particles.length === 0;
+            }
+        }
+        
+        function drawHouse() {
+            ctx.save();
+            if (house.shaking > 0) {
+                ctx.translate(Math.random() * 6 - 3, Math.random() * 6 - 3);
+                house.shaking--;
+            }
+            
+            const damage = 1 - (houseHealth / 100);
+            
+            // Corpo da casa
+            ctx.fillStyle = damage > 0.5 ? '#8B4513' : '#D2691E';
+            ctx.fillRect(house.x, house.y + 50, house.width, 100);
+            
+            // Telhado
+            ctx.fillStyle = damage > 0.3 ? '#8B0000' : '#DC143C';
+            ctx.beginPath();
+            ctx.moveTo(house.x - 20, house.y + 50);
+            ctx.lineTo(house.x + house.width / 2, house.y);
+            ctx.lineTo(house.x + house.width + 20, house.y + 50);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Janelas
+            ctx.fillStyle = damage > 0.7 ? '#333333' : '#87CEEB';
+            ctx.fillRect(house.x + 30, house.y + 80, 40, 40);
+            ctx.fillRect(house.x + 130, house.y + 80, 40, 40);
+            
+            // Porta
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(house.x + 80, house.y + 100, 40, 50);
+            
+            // Placa
+            ctx.fillStyle = '#F5DEB3';
+            ctx.fillRect(house.x + 50, house.y - 30, 100, 25);
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Casa do Jorge', house.x + 100, house.y - 10);
+            
+            // Rachaduras se estiver danificada
+            if (damage > 0.2) {
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < damage * 10; i++) {
+                    ctx.beginPath();
+                    const x = house.x + Math.random() * house.width;
+                    const y = house.y + 50 + Math.random() * 100;
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + Math.random() * 20 - 10, y + Math.random() * 30);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawClouds() {
+            clouds.forEach(cloud => {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.beginPath();
+                ctx.arc(cloud.x, cloud.y, cloud.size, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.size * 0.6, cloud.y, cloud.size * 0.8, 0, Math.PI * 2);
+                ctx.arc(cloud.x + cloud.size * 1.2, cloud.y, cloud.size * 0.9, 0, Math.PI * 2);
+                ctx.fill();
+                
+                cloud.x += cloud.speed;
+                if (cloud.x > canvas.width + cloud.size * 2) {
+                    cloud.x = -cloud.size * 2;
+                }
+            });
+        }
+        
+        function drawGround() {
+            // Grama
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+            
+            // Flores decorativas
+            for (let i = 0; i < 10; i++) {
+                const x = (i * canvas.width / 10) + 20;
+                ctx.fillStyle = ['#FF69B4', '#FFFF00', '#FF0000'][i % 3];
+                ctx.beginPath();
+                ctx.arc(x, canvas.height - 55, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function spawnBomb() {
+            if (gameRunning && houseHealth > 0) {
+                bombs.push(new Bomb());
+            }
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = `Pontuação: ${score} | Acertos: ${hits}`;
+            document.getElementById('health').textContent = `Resistência da Casa: ${Math.max(0, houseHealth)}%`;
+            
+            if (houseHealth <= 0) {
+                gameOver();
+            }
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = `Casa Destruída! Pontuação Final: ${score} | Total de Acertos: ${hits}`;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        function restartGame() {
+            score = 0;
+            hits = 0;
+            houseHealth = 100;
+            gameRunning = true;
+            bombs = [];
+            explosions = [];
+            document.getElementById('gameOver').style.display = 'none';
+            updateScore();
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            if (!gameRunning) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            
+            for (let i = bombs.length - 1; i >= 0; i--) {
+                if (!bombs[i].launched && bombs[i].checkClick(mx, my)) {
+                    const bomb = bombs[i];
+                    bomb.launched = true;
+                    
+                    const targetX = house.x + house.width / 2;
+                    const targetY = house.y + house.height / 2;
+                    
+                    const dx = targetX - bomb.x;
+                    const dy = targetY - bomb.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    bomb.vx = (dx / dist) * 8;
+                    bomb.vy = (dy / dist) * 8 - 5;
+                    
+                    score += 5;
+                    updateScore();
+                    break;
+                }
+            }
+        });
+        
+        function gameLoop() {
+            // Céu
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(0.6, '#87CEEB');
+            gradient.addColorStop(0.6, '#90EE90');
+            gradient.addColorStop(1, '#228B22');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawClouds();
+            drawGround();
+            drawHouse();
+            
+            bombs.forEach((bomb, index) => {
+                bomb.update();
+                bomb.draw();
+                
+                if (bomb.launched && bomb.checkHouseCollision()) {
+                    explosions.push(new Explosion(bomb.x, bomb.y, true));
+                    bombs.splice(index, 1);
+                    houseHealth -= 10;
+                    hits++;
+                    score += 20;
+                    house.shaking = 10;
+                    updateScore();
+                } else if (bomb.y > canvas.height + 50) {
+                    bombs.splice(index, 1);
+                }
+            });
+            
+            explosions.forEach((explosion, index) => {
+                explosion.update();
+                explosion.draw();
+                if (explosion.isDone()) {
+                    explosions.splice(index, 1);
+                }
+            });
+            
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        setInterval(spawnBomb, 1200);
+        gameLoop();
+    </script>
+</body>
+</html>
