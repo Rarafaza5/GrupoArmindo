@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armindo Awards 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(249, 216, 73, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+            animation: glow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .sparkle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #d4af37;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkleAnim 2s ease-in-out infinite;
+            box-shadow: 0 0 10px #d4af37;
+        }
+
+        @keyframes sparkleAnim {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        .trophy-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.6));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #d4af37 0%, #f9d849 25%, #fff4c4 50%, #f9d849 75%, #d4af37 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            animation: shimmer 3s linear infinite;
+            text-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .header p {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: #d4af37;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .divider {
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+            margin: 40px auto;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '◆';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #d4af37;
+            font-size: 20px;
+            background: #000;
+            padding: 0 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 40px 0;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f9d849, #d4af37);
+            background-size: 200% 100%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8);
+            animation: progressShimmer 2s linear infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .phase-info {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+            border-radius: 20px;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .phase-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .phase-number {
+            font-size: 1.4rem;
+            color: #d4af37;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        .category-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #d4af37 0%, #f9d849 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nominees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .nominee-card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(0, 0, 0, 0.95) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 35px 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .nominee-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+        }
+
+        .nominee-card:hover::before {
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        .nominee-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: #d4af37;
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4), 0 0 40px rgba(212, 175, 55, 0.2);
+        }
+
+        .nominee-card.selected {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(249, 216, 73, 0.15) 100%);
+            border-color: #f9d849;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.6), inset 0 0 30px rgba(212, 175, 55, 0.1);
+            transform: scale(1.05);
+        }
+
+        .nominee-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #d4af37, #f9d849);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.6);
+            animation: checkmark 0.4s ease;
+        }
+
+        @keyframes checkmark {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .nominee-name {
+            font-size: 1.15rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #d4af37 0%, #f9d849 100%);
+            color: #000;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.7);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #d4af37;
+            border: 2px solid #d4af37;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 80px 20px;
+            display: none;
+        }
+
+        .completion-screen.active {
+            display: block;
+        }
+
+        .completion-icon {
+            font-size: 120px;
+            margin-bottom: 40px;
+            animation: celebration 1s ease;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.8));
+        }
+
+        @keyframes celebration {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .completion-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            background: linear-gradient(135deg, #d4af37 0%, #f9d849 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            font-weight: 900;
+        }
+
+        .completion-message {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .voting-screen {
+            display: block;
+        }
+
+        .voting-screen.hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 150px 20px;
+            font-size: 1.8rem;
+            color: #d4af37;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .already-voted {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .already-voted-icon {
+            font-size: 100px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+        }
+
+        @media (max-width: 768px) {
+            .nominees-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                padding: 15px 35px;
+                font-size: 1rem;
+            }
+
+            .header h1 {
+                letter-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="trophy-icon">🏆</div>
+            <h1>Armindo Awards</h1>
+            <p>Semifinal | Edição 2025</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div id="loadingScreen" class="loading">
+            A carregar a cerimónia...
+        </div>
+
+        <div id="alreadyVotedScreen" class="already-voted" style="display: none;">
+            <div class="already-voted-icon">✨</div>
+            <h2 class="completion-title">Já Votaste!</h2>
+            <p class="completion-message">
+                O teu voto já foi registado para a Semifinal dos Armindo Awards 2025.<br>
+                Obrigado pela tua participação nesta prestigiada gala.
+            </p>
+        </div>
+
+        <div id="votingScreen" class="voting-screen hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="phase-info">
+                <div class="phase-number" id="phaseNumber">Semifinal dos Armindo Awards</div>
+                <h2 class="category-title" id="categoryTitle"></h2>
+            </div>
+
+            <div class="nominees-grid" id="nomineesGrid"></div>
+
+            <div class="button-container">
+                <button class="btn btn-secondary" id="prevBtn" style="display: none;">← Anterior</button>
+                <button class="btn btn-primary" id="nextBtn" disabled>Próxima →</button>
+            </div>
+        </div>
+
+        <div id="completionScreen" class="completion-screen">
+            <div class="completion-icon">🎉</div>
+            <h2 class="completion-title">Votação Completa!</h2>
+            <p class="completion-message">
+                O teu voto já foi registado para a Semifinal dos Armindo Awards 2025.<br>
+                Obrigado por participar nesta prestigiada gala.
+                
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+            authDomain: "aawards.firebaseapp.com",
+            databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+            projectId: "aawards",
+            storageBucket: "aawards.firebasestorage.app",
+            messagingSenderId: "839334918366",
+            appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+            measurementId: "G-NLLMB9THVX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const categories = [
+            {
+                name: "Piada Interna do Ano",
+                nominees: [
+                    "gOLFO dA aMéRICA - Rafael Diogo e Jorge Figueira",
+                    "Fundação We Love Avós",
+                    "OMAIGODE",
+                    "A Frigideira é Resistente?",
+                    "Chalupa Profissional",
+                    "Malta",
+                    "Espéculo Vaginal Dab",
+                    "Stickers da Cecília"
+                ]
+            },
+            {
+                name: "Jogo do Ano",
+                nominees: [
+                    "Clair Obscur: Expedition 33",
+                    "Death Stranding 2: On the Beach",
+                    "Donkey Kong Bananza",
+                    "Hades II",
+                    "Hollow Knight: Silksong",
+                    "Kingdom Come: Deliverance II"
+                ]
+            },
+            {
+                name: "Música do Ano",
+                nominees: [
+                    "João Carreira - Katya",
+                    "Deslocado - NAPA",
+                    "Wasted Love - JJ",
+                    "Espresso Macchiato - Tommy Cash",
+                    "Bara Bada Bastu - KAJ",
+                    "Predador de Perereca - BLOW RECORDS, Mc Jhey",
+                    "Chupa Xoxota - BLOW RECORDS, mc 2k",
+                    "Pôr do Sol - Vizinhos",
+                    "Soda Pop - Saja Boys, Andrew Choi, Neckwav, Danny Chung, KEVIN WOO, samUIL Lee, KPop Demon Hunters Cast",
+                    "Golden - HUNTR/X, EJAE, AUDREY NUNA, REI AMI, KPop Demon Hunters Cast",
+                    "Um Gajo Muita Fixe - Manuel João Vieira"
+                ]
+            },
+            {
+                name: "Ator do Ano",
+                nominees: [
+                    "Jesuíta Barbosa",
+                    "David Corenswet",
+                    "Jack Black",
+                    "Jonathan Bailey"
+                ]
+            },
+             {
+                name: "Atriz do Ano",
+                nominees: [
+                    "Maia Kealoha",
+                    "Ariana Grande",
+                    "Cynthia Erivo",
+                  
+                ]
+            },
+            {
+                name: "Filme do Ano",
+                nominees: [
+                    "Um Filme Minecraft",
+                    "Elio",
+                    "F1 - O Filme",
+                    "Lilo e Stitch",
+                    "Wicked - Pelo Bem",
+                    "Avatar: Fogo e Cinzas",
+                    "Zootrópolis 2",
+                    "Spongebob O Filme: À Procura das Calças Quadradas",
+                    "Homem com H",
+                    "Missão: Impossível - O Ajuste de Contas Final",
+                    "Plâncton: O Filme",
+                    "Superman",
+                    "Guerreiras do K-Pop"
+                ]
+            }
+        ];
+
+        let currentPhase = 0;
+        let votes = {};
+        let userIdentifier = '';
+        let userIP = '';
+        let userFingerprint = '';
+
+        function createSparkles() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        setInterval(createSparkles, 3000);
+        createSparkles();
+
+        async function generateFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('fingerprint', 2, 2);
+            const canvasData = canvas.toDataURL();
+            
+            const data = `${canvasData}-${navigator.userAgent}-${navigator.language}-${screen.width}x${screen.height}-${new Date().getTimezoneOffset()}`;
+            
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(data);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function getIPAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error('Erro ao obter IP:', error);
+                return 'unknown';
+            }
+        }
+
+        async function initializeUser() {
+            userIP = await getIPAddress();
+            userFingerprint = await generateFingerprint();
+            const sanitizedIP = userIP.replace(/\./g, '-');
+            userIdentifier = `${sanitizedIP}_${userFingerprint}`;
+        }
+
+        async function checkIfVoted() {
+            const voteRef = ref(database, `votes/${userIdentifier}`);
+            const snapshot = await get(voteRef);
+            
+            return snapshot.exists();
+        }
+
+        function renderPhase() {
+            const category = categories[currentPhase];
+            document.getElementById('phaseNumber').textContent = `Voto ${currentPhase + 1} de ${categories.length}`;
+            document.getElementById('categoryTitle').textContent = category.name;
+            
+            const progress = ((currentPhase + 1) / categories.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            const grid = document.getElementById('nomineesGrid');
+            grid.innerHTML = '';
+
+            category.nominees.forEach((nominee) => {
+                const card = document.createElement('div');
+                card.className = 'nominee-card';
+                if (votes[currentPhase] === nominee) {
+                    card.classList.add('selected');
+                }
+                
+                card.innerHTML = `<div class="nominee-name">${nominee}</div>`;
+                
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.nominee-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    votes[currentPhase] = nominee;
+                    document.getElementById('nextBtn').disabled = false;
+                });
+
+                grid.appendChild(card);
+            });
+
+            document.getElementById('prevBtn').style.display = currentPhase > 0 ? 'block' : 'none';
+            document.getElementById('nextBtn').disabled = !votes[currentPhase];
+            
+            if (currentPhase === categories.length - 1) {
+                document.getElementById('nextBtn').textContent = 'Submeter Votos ✨';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Próxima →';
+            }
+        }
+
+        async function submitVotes() {
+            try {
+                const voteData = {
+                    timestamp: Date.now(),
+                    votes: categories.map((cat, idx) => ({
+                        category: cat.name,
+                        vote: votes[idx]
+                    }))
+                };
+
+                await set(ref(database, `votes/${userIdentifier}`), voteData);
+                
+                document.getElementById('votingScreen').classList.add('hidden');
+                document.getElementById('completionScreen').classList.add('active');
+                createSparkles();
+            } catch (error) {
+                console.error('Erro ao submeter votos:', error);
+                alert('Erro ao submeter votos. Por favor, tenta novamente.');
+            }
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentPhase < categories.length - 1) {
+                currentPhase++;
+                renderPhase();
+            } else {
+                submitVotes();
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentPhase > 0) {
+                currentPhase--;
+                renderPhase();
+            }
+        });
+
+        async function init() {
+            await initializeUser();
+            const hasVoted = await checkIfVoted();
+            document.getElementById('loadingScreen').style.display = 'none';
+            
+            if (hasVoted) {
+                document.getElementById('alreadyVotedScreen').style.display = 'block';
+            } else {
+                document.getElementById('votingScreen').classList.remove('hidden');
+                renderPhase();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

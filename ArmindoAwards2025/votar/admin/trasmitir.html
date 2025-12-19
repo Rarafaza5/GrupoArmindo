@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armindo Awards - Transmissão</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            font-family: 'Montserrat', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(212, 175, 55, 0.2) 0%, transparent 60%),
+                radial-gradient(circle at 70% 60%, rgba(249, 216, 73, 0.15) 0%, transparent 60%);
+            animation: bgGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgGlow {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #d4af37;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 8s ease-in-out infinite;
+            box-shadow: 0 0 15px #d4af37;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(1080px) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+        }
+
+        .header {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 40px;
+            margin-bottom: 3px;
+            animation: logoFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #d4af37 0%, #f9d849 25%, #fff4c4 50%, #f9d849 75%, #d4af37 100%);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            animation: titleShimmer 4s linear infinite;
+            text-shadow: 0 0 50px rgba(212, 175, 55, 0.6);
+            margin-bottom: 2px;
+        }
+
+        @keyframes titleShimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 300% center; }
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #d4af37;
+            font-weight: 300;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        .content {
+            position: absolute;
+            top: 140px;
+            left: 0;
+            right: 0;
+            padding: 0 80px;
+        }
+
+        .category-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .category-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .category-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #d4af37 0%, #f9d849 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 35px;
+            margin-top: 40px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        .results-container {
+            display: flex;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .winner-section {
+            flex: 1.2;
+        }
+
+        .winner-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(0, 0, 0, 0.9) 100%);
+            border: 4px solid #d4af37;
+            border-radius: 25px;
+            padding: 35px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            box-shadow: 
+                0 0 50px rgba(212, 175, 55, 0.6),
+                inset 0 0 60px rgba(212, 175, 55, 0.1);
+            animation: winnerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes winnerPulse {
+            0%, 100% { box-shadow: 0 0 50px rgba(212, 175, 55, 0.6), inset 0 0 60px rgba(212, 175, 55, 0.1); }
+            50% { box-shadow: 0 0 80px rgba(212, 175, 55, 0.9), inset 0 0 80px rgba(212, 175, 55, 0.2); }
+        }
+
+        .winner-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            animation: cardRotate 6s linear infinite;
+        }
+
+        @keyframes cardRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .winner-icon {
+            font-size: 80px;
+            margin-bottom: 15px;
+            animation: winnerBounce 1.5s ease infinite;
+            filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.8));
+        }
+
+        @keyframes winnerBounce {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(10deg); }
+        }
+
+        .winner-label {
+            font-size: 32px;
+            font-weight: 800;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .winner-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 44px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.3;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 25px;
+        }
+
+        .winner-stats {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 38px;
+            font-weight: 900;
+            color: #f9d849;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 3px;
+        }
+
+        .rankings-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .ranking-card {
+            background: rgba(26, 26, 26, 0.85);
+            border: 3px solid rgba(212, 175, 55, 0.4);
+            border-radius: 18px;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.2), transparent);
+            transition: width 0.6s ease;
+        }
+
+        .ranking-card.animate::before {
+            width: 100%;
+        }
+
+        .ranking-position {
+            font-size: 60px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .ranking-info {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ranking-name {
+            font-size: 26px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .ranking-bar-container {
+            width: 100%;
+            height: 16px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ranking-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f9d849);
+            border-radius: 8px;
+            width: 0;
+            transition: width 1.5s ease;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+        }
+
+        .ranking-votes {
+            position: relative;
+            z-index: 1;
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .votes-number {
+            font-size: 30px;
+            font-weight: 900;
+            color: #d4af37;
+            display: block;
+        }
+
+        .votes-label {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        .total-votes {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 2px;
+        }
+
+        .total-votes span {
+            color: #d4af37;
+            font-weight: 700;
+        }
+
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            z-index: 100;
+        }
+
+        .loading-text {
+            font-size: 48px;
+            color: #d4af37;
+        }
+
+        .loading-text::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 5px solid rgba(212, 175, 55, 0.3);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-screen.hidden {
+            display: none;
+        }
+
+        .category-indicator {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #d4af37;
+            letter-spacing: 2px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-button {
+            position: fixed;
+            width: 200px;
+            height: 100%;
+            top: 0;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-button:hover {
+            opacity: 0.05;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav-left {
+            left: 0;
+        }
+
+        .nav-right {
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="nav-button nav-left" onclick="previousCategory()"></div>
+    <div class="nav-button nav-right" onclick="nextCategory()"></div>
+
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">A carregar resultados...</div>
+    </div>
+
+    <div class="category-indicator" id="categoryIndicator"></div>
+
+    <div class="header">
+        <br>
+        <h1 class="title">Armindo Awards</h1>
+        <p class="subtitle">Edição 2025</p>
+    </div>
+
+    <div class="content" id="content"></div>
+
+    <div class="footer">
+        <div class="total-votes" id="totalVotesDisplay"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+            authDomain: "aawards.firebaseapp.com",
+            databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+            projectId: "aawards",
+            storageBucket: "aawards.firebasestorage.app",
+            messagingSenderId: "839334918366",
+            appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+            measurementId: "G-NLLMB9THVX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let categoryResults = [];
+        let currentCategoryIndex = 0;
+        let totalVoters = 0;
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (5 + Math.random() * 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        async function loadResults() {
+            try {
+                const votesRef = ref(database, 'votes');
+                const snapshot = await get(votesRef);
+
+                if (!snapshot.exists()) {
+                    document.getElementById('loadingScreen').innerHTML = '<div class="loading-text">Aguardando votos...</div>';
+                    setTimeout(loadResults, 5000);
+                    return;
+                }
+
+                const allVotes = snapshot.val();
+                const votesList = Object.values(allVotes);
+                totalVoters = votesList.length;
+
+                const results = {};
+                votesList.forEach(voter => {
+                    voter.votes.forEach(vote => {
+                        if (!results[vote.category]) {
+                            results[vote.category] = {};
+                        }
+                        results[vote.category][vote.vote] = (results[vote.category][vote.vote] || 0) + 1;
+                    });
+                });
+
+                categoryResults = Object.keys(results).map(category => {
+                    const sortedResults = Object.entries(results[category])
+                        .sort((a, b) => b[1] - a[1]);
+
+                    return {
+                        name: category,
+                        results: sortedResults.slice(0, 5)
+                    };
+                });
+
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('totalVotesDisplay').innerHTML = `Total de Votantes: <span>${totalVoters}</span>`;
+                displayCategory(0);
+                startAutoRotation();
+
+            } catch (error) {
+                console.error('Erro ao carregar resultados:', error);
+                setTimeout(loadResults, 5000);
+            }
+        }
+
+        function displayCategory(index) {
+            if (index < 0 || index >= categoryResults.length) return;
+
+            currentCategoryIndex = index;
+            const category = categoryResults[index];
+            const content = document.getElementById('content');
+
+            document.getElementById('categoryIndicator').textContent = `${index + 1}/${categoryResults.length}`;
+
+            const winner = category.results[0];
+            const winnerPercentage = ((winner[1] / totalVoters) * 100).toFixed(1);
+
+            const otherResults = category.results.slice(1, 5);
+
+            content.innerHTML = `
+                <div class="category-section">
+                    <div class="category-title">${category.name}</div>
+                    <div class="results-container">
+                        <div class="winner-section">
+                            <div class="winner-card">
+                                <div class="winner-icon">🏆</div>
+                                <div class="winner-label">Vencedor</div>
+                                <div class="winner-name">${winner[0]}</div>
+                                <div class="winner-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-number">${winner[1]}</span>
+                                        <span class="stat-label">Votos</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-number">${winnerPercentage}%</span>
+                                        <span class="stat-label">Total</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rankings-section">
+                            ${otherResults.map((result, idx) => {
+                                const percentage = ((result[1] / totalVoters) * 100).toFixed(1);
+                                const barWidth = (result[1] / winner[1]) * 100;
+                                const positions = ['🥈', '🥉', '4️⃣', '5️⃣'];
+                                return `
+                                    <div class="ranking-card">
+                                        <div class="ranking-position">${positions[idx]}</div>
+                                        <div class="ranking-info">
+                                            <div class="ranking-name">${result[0]}</div>
+                                            <div class="ranking-bar-container">
+                                                <div class="ranking-bar" data-width="${barWidth}"></div>
+                                            </div>
+                                        </div>
+                                        <div class="ranking-votes">
+                                            <span class="votes-number">${result[1]}</span>
+                                            <span class="votes-label">${percentage}%</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                document.querySelector('.category-section').classList.add('active');
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.ranking-bar').forEach(bar => {
+                        bar.style.width = bar.dataset.width + '%';
+                    });
+                    document.querySelectorAll('.ranking-card').forEach(card => {
+                        card.classList.add('animate');
+                    });
+                }, 300);
+            }, 100);
+        }
+
+        window.nextCategory = function() {
+            const nextIndex = (currentCategoryIndex + 1) % categoryResults.length;
+            
+            document.querySelector('.category-section')?.classList.remove('active');
+            
+            setTimeout(() => {
+                displayCategory(nextIndex);
+            }, 500);
+        };
+
+        window.previousCategory = function() {
+            const prevIndex = currentCategoryIndex - 1 < 0 ? categoryResults.length - 1 : currentCategoryIndex - 1;
+            
+            document.querySelector('.category-section')?.classList.remove('active');
+            
+            setTimeout(() => {
+                displayCategory(prevIndex);
+            }, 500);
+        };
+
+        function startAutoRotation() {
+            setInterval(() => {
+                const nextIndex = (currentCategoryIndex + 1) % categoryResults.length;
+                
+                document.querySelector('.category-section').classList.remove('active');
+                
+                setTimeout(() => {
+                    displayCategory(nextIndex);
+                }, 1000);
+                
+            }, 12000);
+        }
+
+        loadResults();
+    </script>
+</body>
+</html>
