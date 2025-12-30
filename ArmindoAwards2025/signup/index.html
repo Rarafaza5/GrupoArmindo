@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscrição - Eurovisão Eleitoral 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+   /* Animação de gradiente de fundo */
+   @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(270deg, #111111, #252525,#111111, #1e1d1d);
+      background-size: 800% 800%;
+      animation: gradientAnimation 15s ease infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 40px 50px;
+      border-radius: 15px;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      width: 350px;
+      border: 5px solid;
+      border-image-slice: 1;
+      border-image-source: linear-gradient(0deg, #f1c40f, #f1c40f, #f1c40f, #f1c40f);
+      animation: neonClockwise 2s linear infinite, scaleUp 0.8s ease forwards;
+      box-shadow: 0 0 10px #f1c40f;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes neonClockwise {
+      0% { border-image-source: linear-gradient(0deg, #f1c40f, #ffffff); }
+      25% { border-image-source: linear-gradient(90deg, #f1c40f, #ffffff); }
+      50% { border-image-source: linear-gradient(180deg, #f1c40f, #ffffff); }
+      75% { border-image-source: linear-gradient(270deg, #f1c40f, #ffffff); }
+      100% { border-image-source: linear-gradient(360deg, #f1c40f, #ffffff); }
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #f1c40f;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    input[type="text"],
+    input[type="email"] {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      font-size: 1em;
+      transition: box-shadow 0.3s;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
+    }
+    button {
+      padding: 12px;
+      background: #f1c40f;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    button:hover {
+      background: #d4ac0d;
+      transform: scale(1.05);
+    }
+    .message {
+      margin-top: 15px;
+      font-size: 1em;
+      color: white;
+    }
+    .checkbox-container {
+      font-size: 0.9em;
+      color: white;
+    }
+    /* Transições de fade para as páginas */
+    .page {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    .page.active {
+      opacity: 1;
+      position: relative;
+    }
+    a {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="mainContainer">
+    <!-- Será preenchido pelo script -->
+  </div>
+
+  <script type="module">
+    async function main() {
+      const deadline = new Date('2026-01-7T19:00:00');
+      const now = new Date();
+      const container = document.getElementById('mainContainer');
+
+      if (now < deadline) {
+        // Mostrar formulário de inscrição
+        container.innerHTML = `
+          <div id="page1" class="page active">
+            <h1>Armindo Awards 2025</h1>
+            <form id="nomeForm">
+              <input type="text" id="nome" placeholder="Seu Nome" required>
+              <button type="button" id="seguinteBtn">Seguinte</button>
+            </form>
+          </div>
+          <div id="page2" class="page" style="display: none;">
+            <h1>Consentimentos</h1>
+            <form id="aceitarForm">
+              <div class="checkbox-container">
+                <label>
+                  Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento.</strong>
+                </label>
+              </div>
+              <button type="submit">Aceitar e Continuar</button>
+            </form>
+          </div>
+          <div class="message" id="message"></div>
+          <audio id="audioPlayer" style="display: none;">
+            <source src="https://grupoarmindo.site/Eurovisão/Inscrições/pronto.mp3" type="audio/mp3">
+          </audio>
+        `;
+
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js");
+        const { getFirestore, collection, addDoc } = await import("https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js");
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBmaIc7aA25g5WVP_DTGHOCEtnW1ZXuyNc",
+          authDomain: "aawards.firebaseapp.com",
+          databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+          projectId: "aawards",
+          storageBucket: "aawards.firebasestorage.app",
+          messagingSenderId: "839334918366",
+          appId: "1:839334918366:web:81f2bbfc78fd85f046ea4f",
+          measurementId: "G-Z9YLSTGHST"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let userName = "";
+
+        document.getElementById("seguinteBtn").addEventListener("click", () => {
+          const nomeInput = document.getElementById("nome").value.trim();
+          if (!nomeInput) {
+            alert("Por favor, insira seu nome.");
+            return;
+          }
+          userName = nomeInput;
+          document.getElementById("page1").classList.remove("active");
+          setTimeout(() => {
+            document.getElementById("page1").style.display = "none";
+            document.getElementById("page2").style.display = "block";
+            void document.getElementById("page2").offsetWidth;
+            document.getElementById("page2").classList.add("active");
+          }, 500);
+        });
+
+        document.getElementById("aceitarForm").addEventListener("submit", async e => {
+          e.preventDefault();
+          const btn = document.querySelector("#aceitarForm button");
+          if (btn.disabled) return;
+          btn.disabled = true;
+          setTimeout(() => btn.disabled = false, 10000);
+
+          try {
+            await addDoc(collection(db, "inscricoes"), {
+              nome: userName,
+              timestamp: new Date()
+            });
+            document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
+            const audio = document.getElementById("audioPlayer");
+            await audio.play();
+            audio.onended = () => window.location.href = "ArmindoAwards2025/Inscrições/concluido.html";
+          } catch (err) {
+            document.getElementById("message").textContent = "Erro ao inscrever: " + err.message;
+          }
+        });
+
+      } else {
+        // Mostrar mensagem de inscrições fechadas
+        container.innerHTML = `
+          <h1>Inscrições Fechadas</h1>
+          <p class="message">Agradecemos o seu interesse!</p>
+        `;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', main);
+  </script>
+</body>
+</html>
