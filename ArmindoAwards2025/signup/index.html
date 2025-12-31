@@ -203,7 +203,7 @@
             document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
             const audio = document.getElementById("audioPlayer");
             await audio.play();
-            audio.onended = () => window.location.href = "ArmindoAwards2025/signup/concluido.html";
+            audio.onended = () => window.location.href = "/concluido.html";
           } catch (err) {
             document.getElementById("message").textContent = "Erro ao inscrever: " + err.message;
           }
