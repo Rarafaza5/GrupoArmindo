@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Inscrição - Eurovisão Eleitoral 2025</title>
+  <title>Inscrição - Armindo Awards 2025</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
    /* Animação de gradiente de fundo */
@@ -122,7 +122,7 @@
 
   <script type="module">
     async function main() {
-      const deadline = new Date('2026-01-7T19:00:00');
+      const deadline = new Date('2026-01-7');
       const now = new Date();
       const container = document.getElementById('mainContainer');
 
@@ -141,7 +141,7 @@
             <form id="aceitarForm">
               <div class="checkbox-container">
                 <label>
-                  Aceito os <a href="https://docs.google.com/document/d/1IN0wDBSep2t29A_Ri4LeGejFW8SJt-G9Y3G9Kf4kKnI/edit?usp=sharing" target="_blank">Termos e Condições e Políticas de Privacidade</a> do evento.</strong>
+                  Aceito os <a href="https://docs.google.com/document/d/1NfC_6Av_231icD34wIoHXCMzRK2QD9EbKJgDYmwm3cM/edit?usp=sharing" target="_blank">Politicas de Privacidade e Regulamento do Evento </a> do evento.</strong>
                 </label>
               </div>
               <button type="submit">Aceitar e Continuar</button>
@@ -203,7 +203,7 @@
             document.getElementById("message").textContent = "Inscrição realizada com sucesso!";
             const audio = document.getElementById("audioPlayer");
             await audio.play();
-            audio.onended = () => window.location.href = "ArmindoAwards2025/Inscrições/concluido.html";
+            audio.onended = () => window.location.href = "ArmindoAwards2025/signup/concluido.html";
           } catch (err) {
             document.getElementById("message").textContent = "Erro ao inscrever: " + err.message;
           }
