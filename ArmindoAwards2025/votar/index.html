@@ -466,7 +466,7 @@
         <div class="header">
             <div class="trophy-icon">🏆</div>
             <h1>Armindo Awards</h1>
-            <p>Semifinal | Edição 2025</p>
+            <p>Grande Final | Edição 2025</p>
         </div>
 
         <div class="divider"></div>
@@ -479,7 +479,7 @@
             <div class="already-voted-icon">✨</div>
             <h2 class="completion-title">Já Votaste!</h2>
             <p class="completion-message">
-                O teu voto já foi registado para a Semifinal dos Armindo Awards 2025.<br>
+                O teu voto já foi registado para a Grande Final dos Armindo Awards 2025.<br>
                 Obrigado pela tua participação nesta prestigiada gala.
             </p>
         </div>
@@ -490,7 +490,7 @@
             </div>
 
             <div class="phase-info">
-                <div class="phase-number" id="phaseNumber">Semifinal dos Armindo Awards</div>
+                <div class="phase-number" id="phaseNumber">Grande Final dos Armindo Awards</div>
                 <h2 class="category-title" id="categoryTitle"></h2>
             </div>
 
@@ -509,7 +509,7 @@
             <div class="completion-icon">🎉</div>
             <h2 class="completion-title">Votação Completa!</h2>
             <p class="completion-message">
-                O teu voto já foi registado para a Semifinal dos Armindo Awards 2025.<br>
+                O teu voto já foi registado para a Grande Final dos Armindo Awards 2025.<br>
                 Obrigado por participar nesta prestigiada gala.
                 
             </p>
@@ -536,54 +536,57 @@
 
         const categories = [
             {
+                name: "Personalidade do Ano",
+                nominees: [
+                   "Armindo",
+"Papa Francisco",
+"Luís Montenegro",
+"Donald Trump",
+"Leão XIV",
+"Joana Marques",
+"Ricardo Leão",
+"Felca",
+"D4vd",
+"Emmanuel Macron",
+"Zohran Mamdani",
+"Cláudio Valente"
+                ]
+            },
+            {
                 name: "Piada Interna do Ano",
                 nominees: [
-                    "gOLFO dA aMéRICA - Rafael Diogo e Jorge Figueira",
                     "Fundação We Love Avós",
-                    "OMAIGODE",
-                    "A Frigideira é Resistente?",
-                    "Chalupa Profissional",
-                    "Malta",
-                    "Espéculo Vaginal Dab",
-                    "Stickers da Cecília"
+"OMAIGODE",
+"A Frigideira é Resistente?",
+"Chalupa Profissional",
+"Malta",
+"Espéculo Vaginal Dab"
+
+                ]
+            },
+            {
+                name: "Projeto do Grupo Armindo do Ano",
+                nominees: [
+                    "Eurovisão Eleitoral 2025",
+"Risco Coletivo 2025",
+"Criador de Petições 2000",
+"The Debate Game",
+"Especial AN - Entrevistas Autárquicas 2025",
+"Verdadeiro Dicionário",
+"Atira a Bomba (à Casa do Jorge)"
+
                 ]
             },
             {
                 name: "Jogo do Ano",
                 nominees: [
-                    "Clair Obscur: Expedition 33",
-                    "Death Stranding 2: On the Beach",
-                    "Donkey Kong Bananza",
-                    "Hades II",
-                    "Hollow Knight: Silksong",
-                    "Kingdom Come: Deliverance II"
-                ]
-            },
-            {
-                name: "Música do Ano",
-                nominees: [
-                    "João Carreira - Katya",
-                    "Deslocado - NAPA",
-                    "Wasted Love - JJ",
-                    "Espresso Macchiato - Tommy Cash",
-                    "Bara Bada Bastu - KAJ",
-                    "Predador de Perereca - BLOW RECORDS, Mc Jhey",
-                    "Chupa Xoxota - BLOW RECORDS, mc 2k",
-                    "Pôr do Sol - Vizinhos",
-                    "Soda Pop - Saja Boys, Andrew Choi, Neckwav, Danny Chung, KEVIN WOO, samUIL Lee, KPop Demon Hunters Cast",
-                    "Golden - HUNTR/X, EJAE, AUDREY NUNA, REI AMI, KPop Demon Hunters Cast",
-                    "Um Gajo Muita Fixe - Manuel João Vieira"
-                ]
-            },
-            {
-                name: "Ator do Ano",
-                nominees: [
-                    "Jesuíta Barbosa",
-                    "David Corenswet",
-                    "Jack Black",
-                    "Jonathan Bailey",
-                    "Wagner Moura",
-                    "Owen Cooper"
+                   " Clair Obscur: Expedition 33"
+"Death Stranding 2: On the Beach"
+"Donkey Kong Bananza"
+"Hades II"
+"Hollow Knight: Silksong"
+"Kingdom Come: Deliverance II"
+
                 ]
             },
              {
@@ -599,23 +602,125 @@
                 ]
             },
             {
+                name: "Acontecimento do Ano",
+                nominees: [
+                   "Incêndio em Los Angeles",
+"Sismo de 4.7 em Lisboa",
+"Sismo de 7.7 no sudeste asiático",
+"Morte do Papa Francisco",
+"Eleições legislativas de 18 de maio de 2025",
+"Guerra entre Irão e Israel",
+"Morte de Diogo Jota e André Silva",
+"Incêndios florestais no verão em Portugal",
+"Descarrilamento do Ascensor da Glória",
+"Assalto ao Museu do Louvre, em Paris, França",
+"Passagem da depressão Cláudia por Portugal",
+"Greve geral de 11 de dezembro de 2025"
+
+                ]
+            },
+              {
+                name: "Música do Ano",
+                nominees: [
+                   "Deslocado - NAPA",
+"Wasted Love - JJ",
+                   "Predador de Perereca - BLOW RECORDS, Mc Jhey,
+"Chupa Xoxota - BLOW RECORDS, mc 2k",
+"Pôr do Sol - Vizinhos",
+"Soda Pop - Saja Boys, Andrew Choi, Neckwav, Danny Chung, KEVIN WOO, samUIL Lee, KPop Demon Hunters Cast"
+
+
+
+                ]
+            },
+            {
+                name: "Atriz do Ano",
+                nominees: [
+                   "Maia Kealoha",
+"Ariana Grande",
+"Cynthia Erivo",
+"Scarlett Johansson",
+"Mia Goth",
+"Rachel Brosnahan"
+
+
+                ]
+            },
+            {
+                name: "Ator do Ano",
+                nominees: [
+                "Jesuíta Barbosa",
+"David Corenswet",
+"Jack Black",
+"Jonathan Bailey",
+"Wagner Moura",
+"Owen Cooper"
+   
+                ]
+            },
+
+{
                 name: "Filme do Ano",
                 nominees: [
-                    "Um Filme Minecraft",
-                    "Elio",
-                    "F1 - O Filme",
-                    "Lilo e Stitch",
-                    "Wicked - Pelo Bem",
-                    "Avatar: Fogo e Cinzas",
-                    "Zootrópolis 2",
-                    "Spongebob O Filme: À Procura das Calças Quadradas",
-                    "Homem com H",
-                    "Missão: Impossível - O Ajuste de Contas Final",
-                    "Plâncton: O Filme",
-                    "Superman",
-                    "Guerreiras do K-Pop"
+"Wicked - Pelo Bem",
+"Spongebob O Filme: À Procura das Calças Quadradas",
+"Homem com H",
+"Missão: Impossível - O Ajuste de Contas Final",
+"Superman",
+"Guerreiras do K-Pop"
+
+
                 ]
-            }
+            },
+
+            {
+                name: "Ator do Clube de Teatro do Ano",
+                nominees: [
+
+"Gonçalo Capitão"
+"Jorge Figueira"
+"Rafael Diogo"
+"Xavier Silva"
+
+
+                ]
+            },            {
+                name: "Atriz do Clube de Teatro do Ano",
+                nominees: [
+
+"Ana Ferreira"
+"Cecília Fernández"
+"Melissa Figueiredo"
+"Mila Loureiro"
+
+
+
+                ]
+            },
+
+
+                        {
+                name: "Membro do Grupo Armindo do Ano",
+                nominees: [
+"Afonso Martins"
+"Ana Ferreira"
+"André Gonçalves"
+"Camile Hasse"
+"Cecília Fernández"
+"Eduardo Pessoa"
+"Eya Daghfous"
+"Haku Fortunato"
+"Jorge Figueira"
+"Melissa Figueiredo"
+"Mila Loureiro"
+"Nicolau Guedes"
+"Rafael Diogo"
+"Xavier Silva"
+
+
+                ]
+            },
+            
         ];
 
         let currentPhase = 0;
