@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub de Controle - Armindo Awards 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #6366f1;
+            --accent-hover: #818cf8;
+            --text-color: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 20px;
+            perspective: 1000px;
+        }
+
+        .hub-button {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            cursor: pointer;
+        }
+
+        .hub-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent);
+            transition: 0.5s;
+        }
+
+        .hub-button:hover::before {
+            left: 100%;
+        }
+
+        .hub-button:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-color);
+            box-shadow: 0 15px 45px rgba(99, 102, 241, 0.3);
+        }
+
+        .hub-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .button-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            color: var(--text-color);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ambient Background Glows */
+        .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(150px);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .glow-1 {
+            background: #4f46e5;
+            top: -200px;
+            left: -200px;
+        }
+
+        .glow-2 {
+            background: #7c3aed;
+            bottom: -200px;
+            right: -200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="container">
+        <!-- Replace href="#" with actual URLs as needed -->
+        <a href="https://docs.google.com/forms/d/1HCzGExZ2RK_fRbhdmXjHHbM0L5zxuZWDf6z5jz74qaA/viewanalytics"
+            class="hub-button">
+            <span class="button-text">1</span>
+        </a>
+        <a href="https://rarafaza5.github.io/Party/FamilyFeud/" class="hub-button">
+            <span class="button-text">2 PPT</span>
+        </a>
+        <a href="https://rarafaza5.github.io/Party/FamilyFeud/tv.html" class="hub-button">
+            <span class="button-text">2 Jogo</span>
+        </a>
+        <a href="https://bad.cards/" class="hub-button">
+            <span class="button-text">3</span>
+        </a>
+
+        <a href="https://crowdparty.app/game/friendly-fire" class="hub-button">
+            <span class="button-text">4</span>
+        </a>
+        <a href="https://funocracy.com/pt" class="hub-button">
+            <span class="button-text">5</span>
+        </a>
+        <a href="https://deathbyai.gg/" class="hub-button">
+            <span class="button-text">6</span>
+        </a>
+
+    </div>
+
+    <script>
+        // Simple animation for buttons entry
+        document.querySelectorAll('.hub-button').forEach((btn, index) => {
+            btn.style.opacity = '0';
+            btn.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                btn.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                btn.style.opacity = '1';
+                btn.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    </script>
+</body>
+
+</html>
