@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Configurações de Perfil - Armindo Forms">
+    <title>Perfil - Armindo Forms</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/armindo.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .profile-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .profile-section-header {
+            margin-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--space-md);
+        }
+
+        .profile-avatar-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .data-export-info {
+            background: rgba(74, 95, 229, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-top: var(--space-md);
+            font-size: var(--font-size-sm);
+        }
+
+        .danger-zone {
+            border-color: var(--error);
+        }
+
+        .danger-zone .profile-section-header {
+            color: var(--error);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div class="loader-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-brand">
+                <img src="Grupo_armindo_logo_colorida_fundo_trasparente.png" alt="Grupo Armindo" class="sidebar-logo">
+                <span class="sidebar-title">Forms</span>
+            </a>
+            <button class="sidebar-toggle hide-desktop" id="sidebarToggle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="editor.html" class="nav-item">
+                <span class="nav-icon">✏️</span>
+                <span class="nav-text">Criar Formulário</span>
+            </a>
+            <a href="templates.html" class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Templates</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Configurações</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info" id="userInfo">
+                <div class="avatar" id="userAvatar">?</div>
+                <div class="user-details">
+                    <span class="user-name" id="userName">Carregando...</span>
+                    <span class="user-email" id="userEmail">...</span>
+                </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="logoutBtn">
+                <span>🚪</span>
+                <span>Sair</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Mobile Header -->
+        <header class="mobile-header hide-desktop">
+            <button class="btn btn-icon btn-ghost" id="menuToggle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18" />
+                </svg>
+            </button>
+            <img src="Grupo_armindo_logo_colorida_fundo_trasparente.png" alt="Logo" style="height: 32px;">
+        </header>
+
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1 class="page-title">Configurações de Perfil</h1>
+                <p class="page-subtitle">Gerencie suas informações pessoais e preferências</p>
+            </div>
+
+            <!-- Personal Info -->
+            <div class="profile-section">
+                <div class="profile-section-header">
+                    <h3>Informações Pessoais</h3>
+                </div>
+
+                <div class="profile-header-content">
+                    <div class="profile-avatar-wrapper">
+                        <div class="profile-avatar-large" id="profileAvatarLarge">?</div>
+                        <div class="avatar-overlay" id="avatarOverlay" title="Alterar foto">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                </path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div>
+                        <h2 id="profileName">Carregando...</h2>
+                        <p class="text-secondary" id="profileEmail">...</p>
+                    </div>
+                </div>
+                <p class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--space-sm)">
+                    A foto é gerida através da sua conta Google ou Gravatar associado ao email.
+                </p>
+
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label" for="displayName">Nome de Exibição</label>
+                        <input type="text" class="form-input" id="displayName" placeholder="Seu nome">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" class="form-input" id="email" disabled
+                            style="opacity: 0.7; cursor: not-allowed;">
+                        <p class="text-muted" style="font-size: var(--font-size-xs); margin-top: 5px;">O email não pode
+                            ser alterado.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                        <span>💾</span> Guardar Alterações
+                    </button>
+                </form>
+            </div>
+
+            <!-- GDPR / Data Privacy -->
+            <div class="profile-section">
+                <div class="profile-section-header">
+                    <h3>Privacidade e Dados (RGPD)</h3>
+                </div>
+
+                <p class="mb-md">De acordo com o Regulamento Geral sobre a Proteção de Dados (RGPD), você tem o direito
+                    de aceder aos seus dados ou solicitar a sua eliminação.</p>
+
+                <div class="flex flex-col gap-md">
+                    <div class="form-group">
+                        <h4 class="mb-sm">Exportar os seus dados</h4>
+                        <p class="text-muted text-sm mb-sm">Descarregue uma cópia de todos os seus formulários e
+                            respostas em formato JSON.</p>
+                        <button class="btn btn-secondary" id="exportDataBtn">
+                            <span>📥</span> Descarregar Meus Dados
+                        </button>
+                        <div class="data-export-info">
+                            O ficheiro conterá todos os formulários criados por si, bem como as configurações e
+                            metadados associados. As respostas recolhidas também serão incluídas.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="profile-section danger-zone">
+                <div class="profile-section-header">
+                    <h3>Zona de Perigo</h3>
+                </div>
+
+                <p class="mb-lg">Estas ações são irreversíveis.</p>
+
+                <button class="btn btn-danger" id="deleteAccountBtn">
+                    <span>🗑️</span> Eliminar Conta
+                </button>
+            </div>
+
+            <!-- Legal Links Footer -->
+            <div class="text-center mt-2xl pt-xl" style="border-top: 1px solid var(--border-color);">
+                <div class="flex justify-center gap-lg flex-wrap">
+                    <a href="terms.html" class="text-muted hover:text-primary">Termos e Condições</a>
+                    <a href="privacy.html" class="text-muted hover:text-primary">Política de Privacidade</a>
+                    <a href="#" class="text-muted hover:text-primary"
+                        onclick="ArmindoForms.CookieConsent.showSettings()">Preferências de Cookies</a>
+                </div>
+                <p class="text-muted text-sm mt-md">© 2025 Grupo Armindo Forms. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Account Confirmation -->
+    <div class="modal-overlay" id="deleteAccountModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title text-error">Eliminar Conta</h3>
+                <button class="modal-close" onclick="closeDeleteAccountModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-md">Tem a certeza absoluta? Esta ação irá <strong>eliminar permanentemente</strong>:</p>
+                <ul style="list-style: disc; padding-left: 20px; margin-bottom: 20px; color: var(--text-secondary);">
+                    <li>O seu perfil e configurações</li>
+                    <li>Todos os seus formulários</li>
+                    <li>Todas as respostas recolhidas</li>
+                </ul>
+                <p class="mb-md">Esta ação não pode ser desfeita.</p>
+
+                <div class="form-group">
+                    <label class="form-label">Digite "ELIMINAR" para confirmar</label>
+                    <input type="text" class="form-input" id="deleteConfirmationInput">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteAccountModal()">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteAccountBtn" disabled>Eliminar Definitivamente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/cookie-consent.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/dashboard.js"></script> <!-- Reusing dashboard logic for sidebar/auth -->
+</body>
+
+</html>

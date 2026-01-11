@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor - Grupo Armindo '25</title>
+    <link rel="icon" type="image/png" href="/armindo.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+</head>
+
+<body class="editor-body">
+
+    <!-- App Layout -->
+    <div class="app-layout">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-left">
+                <a href="dashboard.html" class="icon-btn" title="Voltar"><i class="fa-solid fa-arrow-left"></i></a>
+                <div class="form-meta">
+                    <input type="text" id="headerTitle" class="meta-input" placeholder="Formulário sem título"
+                        value="Formulário sem título">
+                    <span id="saveStatus" class="save-badge ms-2 text-muted text-xs">Guardado</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="openCollabModalBtn" class="btn-text" onclick="openCollabModal()"><i
+                        class="fa-solid fa-user-plus"></i> <span class="hide-mobile">Colaborar</span></button>
+                <button id="previewBtn" class="btn-text"><i class="fa-regular fa-eye"></i> <span
+                        class="hide-mobile">Preview</span></button>
+                <button id="publishBtn" class="btn-primary-sm">Publicar</button>
+                <div class="user-avatar-sm" id="userAvatar"></div>
+            </div>
+        </header>
+
+        <!-- MAIN EDITOR GRID -->
+        <main class="editor-grid">
+
+            <!-- LEFT: TOOLBOX -->
+            <aside class="sidebar-left">
+                <div class="sidebar-header">
+                    <span class="sidebar-label">Ferramentas</span>
+                </div>
+                <div class="tools-list" id="toolsList">
+                    <!-- Specific question types injected by JS -->
+                </div>
+            </aside>
+
+            <!-- CENTER: CANVAS -->
+            <section class="editor-canvas" id="editorCanvas">
+                <div class="canvas-container">
+
+                    <!-- Form Header Block -->
+                    <div class="form-block header-block" id="formHeaderBlock">
+                        <input type="text" id="formTitle" class="block-title-input" placeholder="Título do Formulário">
+                        <textarea id="formDescription" class="block-desc-input" placeholder="Adicione uma descrição..."
+                            rows="1"></textarea>
+                    </div>
+
+                    <!-- Questions List -->
+                    <div id="questionsList" class="questions-list">
+                        <!-- Dynamic content -->
+                    </div>
+
+                    <!-- Add Button (Canvas Footer) -->
+                    <div class="canvas-footer">
+                        <button id="addBlockBtn" class="btn-add-block">
+                            <i class="fa-solid fa-plus"></i> Adicionar Pergunta
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- RIGHT: PROPERTIES & DESIGN -->
+            <aside class="sidebar-right" id="rightSidebar">
+                <!-- Tab Header -->
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" onclick="switchTab('properties')">Propriedades</button>
+                    <button class="tab-btn" onclick="switchTab('design')">Design</button>
+                </div>
+
+                <!-- PANEL: PROPERTIES -->
+                <div id="panel-properties" class="panel-content">
+
+                    <!-- State: Empty -->
+                    <div id="emptyProperties" class="empty-properties">
+                        <i class="fa-solid fa-sliders"></i>
+                        <p>Selecione um elemento para editar</p>
+                        <button id="openFormSettings" class="btn-text-sm mt-4">Configurações do Formulário</button>
+                    </div>
+
+                    <!-- State: Question Properties -->
+                    <div id="questionProperties" class="properties-content hidden">
+                        <div class="sidebar-header">
+                            <span class="sidebar-label">Propriedades</span>
+                            <button id="deleteQuestionBtn" class="icon-btn-danger"><i
+                                    class="fa-regular fa-trash-can"></i></button>
+                        </div>
+
+                        <div class="prop-group">
+                            <label>Tipo</label>
+                            <select id="propType" class="prop-select"></select>
+                        </div>
+
+                        <div class="prop-group">
+                            <label class="toggle-row">
+                                <span>Obrigatório</span>
+                                <input type="checkbox" id="propRequired" class="toggle-switch">
+                            </label>
+                        </div>
+
+                        <div id="propOptionsContainer" class="prop-group hidden">
+                            <label>Opções</label>
+                            <div id="propOptionsList" class="prop-list"></div>
+                            <button id="addOptionBtn" class="btn-dashed-sm">+ Opção</button>
+                        </div>
+                    </div>
+
+                    <!-- State: Form Settings -->
+                    <div id="formSettings" class="properties-content hidden">
+                        <div class="sidebar-header">
+                            <span class="sidebar-label">Configurações Gerais</span>
+                        </div>
+
+                        <div class="prop-group">
+                            <label class="toggle-row">
+                                <span>Login Necessário</span>
+                                <input type="checkbox" id="settLogin" class="toggle-switch">
+                            </label>
+                        </div>
+
+                        <div class="prop-group">
+                            <label class="toggle-row">
+                                <span>Múltiplas Respostas</span>
+                                <input type="checkbox" id="settMultiple" class="toggle-switch">
+                            </label>
+                        </div>
+
+                        <div class="prop-group">
+                            <label class="toggle-row">
+                                <span>Apenas 1 Resposta/Pessoa</span>
+                                <input type="checkbox" id="settLimitOne" class="toggle-switch">
+                            </label>
+                        </div>
+
+                        <div class="prop-group">
+                            <label>Mensagem de Sucesso</label>
+                            <textarea id="settSuccessMsg" class="prop-input" rows="3"
+                                placeholder="Mensagem ao finalizar..."></textarea>
+                        </div>
+
+                        <div class="prop-group">
+                            <label>Data Limite</label>
+                            <input type="datetime-local" id="settEndDate" class="prop-input">
+                        </div>
+                    </div>
+
+                </div> <!-- End panel-properties -->
+
+                <!-- PANEL: DESIGN -->
+                <div id="panel-design" class="panel-content hidden">
+                    <div class="prop-group mt-4">
+                        <label>Cor Principal</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="designColor" class="color-input" value="#F59E0B">
+                            <input type="text" id="designColorHex" class="prop-input" value="#F59E0B">
+                        </div>
+                    </div>
+
+                    <div class="prop-group">
+                        <label>Cor de Fundo</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="designBgColor" class="color-input" value="#000000"
+                                oninput="updateTheme('backgroundColor', this.value)">
+                            <input type="text" class="prop-input" value="#000000"
+                                onchange="document.getElementById('designBgColor').value=this.value; updateTheme('backgroundColor', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="prop-group">
+                        <label>Logo (URL ou Upload)</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="designLogo" class="prop-input" placeholder="https://..."
+                                onchange="updateTheme('logoUrl', this.value)">
+                            <label for="designLogoUpload" class="icon-btn"
+                                style="cursor: pointer; border: 1px solid var(--border-active); display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-upload"></i>
+                            </label>
+                            <input type="file" id="designLogoUpload" accept="image/png, image/jpeg" class="hidden">
+                        </div>
+                    </div>
+
+                    <div class="prop-group">
+                        <label>Texto do Botão</label>
+                        <input type="text" id="designBtnText" class="prop-input" value="Enviar"
+                            oninput="updateTheme('buttonText', this.value)">
+                    </div>
+
+                    <div class="prop-group">
+                        <label>Tipografia</label>
+                        <select id="designFont" class="prop-select">
+                            <option value="'Inter', sans-serif">Inter (Padrão)</option>
+                            <option value="'Roboto', sans-serif">Roboto</option>
+                            <option value="'Playfair Display', serif">Playfair Display</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                        </select>
+                    </div>
+
+                    <div class="prop-group">
+                        <label>Arredondamento</label>
+                        <div class="radius-options">
+                            <button class="radius-btn" data-r="0px" onclick="updateRadius('0px')"><i
+                                    class="fa-regular fa-square"></i></button>
+                            <button class="radius-btn active" data-r="8px" onclick="updateRadius('8px')"><i
+                                    class="fa-regular fa-square" style="border-radius: 4px;"></i></button>
+                            <button class="radius-btn" data-r="20px" onclick="updateRadius('20px')"><i
+                                    class="fa-regular fa-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay hidden" id="publishModal">
+        <div class="modal-box">
+            <h3>Publicar Formulário</h3>
+            <p>O seu formulário está pronto para ser partilhado.</p>
+            <div class="url-box">
+                <input type="text" id="publishUrl" readonly>
+                <button id="copyUrlBtn">Copiar</button>
+            </div>
+            <button class="btn-primary w-100 mt-4" onclick="closeModal('publishModal')">Concluir</button>
+        </div>
+    </div>
+
+    <!-- Collaboration Modal -->
+    <div class="modal-overlay hidden" id="collabModal">
+        <div class="modal-box collab-modal">
+            <div class="modal-header">
+                <h3>Partilhar com Editores</h3>
+                <button class="icon-btn" onclick="closeModal('collabModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-dim text-sm mb-4">Adicione emails para permitir que outras pessoas editem este formulário em
+                tempo real.</p>
+
+            <div class="prop-group mb-4">
+                <div style="display:flex; gap:10px;">
+                    <input type="email" id="newCollabEmail" class="prop-input"
+                        style="background: rgba(255,255,255,0.05)" placeholder="email@exemplo.com">
+                    <button class="btn-primary-sm" onclick="addCollaborator()">Convidar</button>
+                </div>
+            </div>
+
+            <div class="collab-list-container">
+                <label class="sidebar-label mb-2 block">Pessoas com acesso</label>
+                <div id="collabList" class="collab-list-compact"></div>
+            </div>
+
+            <button class="btn-text w-100 mt-4" onclick="closeModal('collabModal')">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="js/editor.js"></script>
+</body>
+
+</html>

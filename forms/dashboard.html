@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard - Armindo Forms">
+    <title>Dashboard - Armindo Forms</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/armindo.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div class="loader-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-brand">
+                <img src="Grupo_armindo_logo_colorida_fundo_trasparente.png" alt="Grupo Armindo" class="sidebar-logo">
+                <span class="sidebar-title">Forms</span>
+            </a>
+            <button class="sidebar-toggle hide-desktop" id="sidebarToggle" aria-label="Fechar menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active" aria-label="Ir para Dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="editor.html" class="nav-item" aria-label="Criar novo formulário">
+                <span class="nav-icon">✏️</span>
+                <span class="nav-text">Criar Formulário</span>
+            </a>
+            <a href="templates.html" class="nav-item" id="templatesLink" aria-label="Ver templates">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Templates</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info" id="userInfo" role="button" tabindex="0" aria-label="Ver perfil de utilizador">
+                <div class="avatar" id="userAvatar">?</div>
+                <div class="user-details">
+                    <span class="user-name" id="userName">Carregando...</span>
+                    <span class="user-email" id="userEmail">...</span>
+                </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="logoutBtn">
+                <span>🚪</span>
+                <span>Sair</span>
+            </button>
+            <button class="btn btn-ghost btn-xs" onclick="ArmindoForms.CookieConsent.showSettings()"
+                style="margin-top: var(--space-xs); width: 100%; justify-content: flex-start; color: var(--text-tertiary);">
+                <span>🍪</span>
+                <span>Cookies</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Mobile Header -->
+        <header class="mobile-header hide-desktop">
+            <button class="btn btn-icon btn-ghost" id="menuToggle" aria-label="Abrir menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18" />
+                </svg>
+            </button>
+            <img src="Grupo_armindo_logo_colorida_fundo_trasparente.png" alt="Logo" style="height: 32px;">
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Os Meus Formulários</h1>
+                <p class="page-subtitle">Gerir e visualizar todos os seus formulários</p>
+            </div>
+            <a href="editor.html" class="btn btn-primary" aria-label="Criar novo formulário">
+                <span>✨</span>
+                <span>Novo Formulário</span>
+            </a>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-row" role="region" aria-label="Estatísticas gerais">
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="totalForms">0</span>
+                    <span class="stat-label">Formulários</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📬</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="totalResponses">0</span>
+                    <span class="stat-label">Respostas Totais</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="activeFormsCount">0</span>
+                    <span class="stat-label">Ativos</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="recentResponses">0</span>
+                    <span class="stat-label">Respostas Hoje</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forms List -->
+        <div class="forms-section">
+            <div class="section-header-row">
+                <h2>Formulários</h2>
+                <div class="view-toggle" role="group" aria-label="Opções de visualização">
+                    <button class="view-btn active" data-view="grid" title="Vista em grelha"
+                        aria-label="Vista em grelha">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                    </button>
+                    <button class="view-btn" data-view="list" title="Vista em lista" aria-label="Vista em lista">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <line x1="3" y1="6" x2="3.01" y2="6" />
+                            <line x1="3" y1="12" x2="3.01" y2="12" />
+                            <line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">📝</div>
+                <h3>Nenhum formulário ainda</h3>
+                <p>Crie o seu primeiro formulário e comece a recolher respostas!</p>
+                <a href="editor.html" class="btn btn-primary">
+                    <span>✨</span>
+                    <span>Criar Primeiro Formulário</span>
+                </a>
+            </div>
+
+            <!-- Forms Grid -->
+            <div class="forms-grid" id="formsGrid">
+                <!-- Forms will be loaded here dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Eliminar Formulário</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Tem a certeza que deseja eliminar este formulário? Esta ação irá também eliminar todas as respostas
+                    associadas e não pode ser revertida.</p>
+                <p style="margin-top: var(--space-md); color: var(--error);">
+                    <strong>Formulário:</strong> <span id="deleteFormName">-</span>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">
+                    <span>🗑️</span>
+                    <span>Eliminar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Partilhar Formulário</h3>
+                <button class="modal-close" onclick="closeShareModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Link do Formulário</label>
+                    <div class="input-group">
+                        <input type="text" class="form-input" id="shareLink" readonly>
+                        <button class="btn btn-primary" id="copyLinkBtn">
+                            <span>📋</span>
+                            <span>Copiar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="share-options">
+                    <p class="form-label" style="margin-bottom: var(--space-md);">Partilhar em:</p>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn whatsapp" id="shareWhatsapp" target="_blank">
+                            <span>📱</span> WhatsApp
+                        </a>
+                        <a href="#" class="share-btn email" id="shareEmail">
+                            <span>📧</span> Email
+                        </a>
+                        <a href="#" class="share-btn facebook" id="shareFacebook" target="_blank">
+                            <span>📘</span> Facebook
+                        </a>
+                    </div>
+                </div>
+
+                <div class="embed-section">
+                    <p class="form-label" style="margin-bottom: var(--space-md);">Código para Embeber</p>
+                    <textarea class="form-textarea" id="embedCode" readonly rows="3"></textarea>
+                    <button class="btn btn-secondary btn-sm mt-md" id="copyEmbedBtn">Copiar Código</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/cookie-consent.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

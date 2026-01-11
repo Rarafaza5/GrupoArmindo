@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Formulário">
+    <title>Formulário</title>
+
+    <!-- Favicon - dynamically updated -->
+    <link rel="icon" type="image/png" href="/armindo.png">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Formulário">
+    <meta property="og:description" content="Responda a este formulário">
+    <meta property="og:type" content="website">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/form.css">
+
+    <!-- Dynamic Theme CSS -->
+    <style id="dynamicTheme"></style>
+</head>
+
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loader-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-page" id="errorPage" style="display: none;">
+        <div class="error-content glass-card">
+            <span class="error-icon">😢</span>
+            <h2>Formulário não disponível</h2>
+            <p id="errorMessage">Este formulário não existe ou já foi encerrado.</p>
+            <button class="btn btn-primary" onclick="history.back()">Voltar</button>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container" id="formContainer" style="display: none;">
+        <!-- Form Header -->
+        <header class="form-header glass-card">
+            <img src="" alt="" class="form-logo" id="formLogo" style="display: none;">
+            <div class="form-brand" id="formBrand" style="display: none;"></div>
+            <h1 class="form-title" id="formTitle">Carregando...</h1>
+            <p class="form-description" id="formDescription"></p>
+        </header>
+
+        <!-- Questions -->
+        <form id="formQuestions" class="form-questions">
+            <!-- Questions will be rendered here -->
+        </form>
+
+        <!-- Navigation -->
+        <div class="form-navigation">
+            <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                <span>←</span>
+                <span>Anterior</span>
+            </button>
+            <div class="question-counter" id="questionCounter">
+                <span id="currentQuestion">1</span> / <span id="totalQuestions">1</span>
+            </div>
+            <button type="button" class="btn btn-primary" id="nextBtn">
+                <span>Seguinte</span>
+                <span>→</span>
+            </button>
+            <button type="button" class="btn btn-primary" id="submitBtn" style="display: none;">
+                <span>Enviar</span>
+                <span>✓</span>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="form-footer" id="formFooter">
+            <!-- Powered by shown if configured -->
+        </footer>
+    </div>
+
+    <!-- Success Page -->
+    <div class="success-page" id="successPage" style="display: none;">
+        <div class="success-content glass-card">
+            <div class="success-animation">
+                <span class="success-icon">✓</span>
+            </div>
+            <h2>Resposta Enviada!</h2>
+            <p id="successMessage">Obrigado pela sua resposta!</p>
+            <div class="success-actions">
+                <button class="btn btn-secondary" id="submitAnotherBtn" style="display: none;">
+                    Enviar outra resposta
+                </button>
+                <button class="btn btn-primary" onclick="window.close(); history.back();">
+                    Fechar
+                </button>
+            </div>
+        </div>
+        <div class="confetti" id="confetti"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/cookie-consent.js"></script>
+    <script src="js/form.js"></script>
+</body>
+
+</html>

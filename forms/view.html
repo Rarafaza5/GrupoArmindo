@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grupo Armindo '25</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <link rel="stylesheet" href="css/view.css">
+</head>
+
+<body>
+
+    <!-- Loading -->
+    <div id="loading">
+        <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color:var(--primary)"></i>
+    </div>
+
+    <!-- Main Content -->
+    <div class="form-container hidden" id="mainContainer">
+
+        <!-- Header -->
+        <header class="form-header">
+            <img id="formLogo" class="form-logo" alt="Logo">
+            <h1 id="formTitleView" class="form-title"></h1>
+            <p id="formDescView" class="form-desc"></p>
+        </header>
+
+        <!-- Form -->
+        <form id="publicForm">
+            <div id="questionsContainer"></div>
+
+            <div class="form-footer">
+                <button type="submit" class="btn-submit" id="submitBtn">Enviar</button>
+            </div>
+        </form>
+
+        <div class="branding">
+            Powered by <strong>Grupo Armindo</strong>
+        </div>
+    </div>
+
+    <!-- Success View -->
+    <div id="successView" class="form-container hidden" style="text-align: center; padding: 60px 0;">
+        <i class="fa-regular fa-circle-check" style="font-size: 64px; color: var(--primary); margin-bottom: 24px;"></i>
+        <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 12px;">Obrigado!</h2>
+        <p id="successMsgText" style="color: var(--text-dim);">A sua resposta foi registada com sucesso.</p>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/view.js"></script>
+</body>
+
+</html>
