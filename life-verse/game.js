@@ -96,6 +96,35 @@ const PROPERTIES = {
     penthouse: { label: 'Penthouse Foz do Porto', cost: 1800000, rent: 5000, happiness: 45 }
 };
 
+
+const INTERVIEW_QUESTIONS = {
+    programmer: [
+        { q: "O que significa 'HTML'?", a: ["HyperText Markup Language", "HighTech Modern Language", "Home Tool Markup Language"], correct: 0 },
+        { q: "Qual destes é uma linguagem de programação?", a: ["Python", "JSON", "Markdown"], correct: 0 },
+        { q: "O que faz um 'loop'?", a: ["Repete código", "Para o programa", "Cria um erro"], correct: 0 }
+    ],
+    nurse: [
+        { q: "Qual é a temperatura corporal normal?", a: ["36-37°C", "38-39°C", "34-35°C"], correct: 0 },
+        { q: "O que significa 'Soro'?", a: ["Solução fisiológica", "Tipo de veneno", "Remédio para dormir"], correct: 0 }
+    ],
+    teacher: [
+        { q: "Quem descobriu o caminho marítimo para a Índia?", a: ["Vasco da Gama", "Pedro Álvares Cabral", "D. Afonso Henriques"], correct: 0 },
+        { q: "Qual é a capital de Portugal?", a: ["Lisboa", "Porto", "Coimbra"], correct: 0 }
+    ],
+    lawyer: [
+        { q: "O que é o 'Diário da República'?", a: ["Jornal oficial do Estado", "Um jornal desportivo", "Livro de culinária"], correct: 0 },
+        { q: "Em que ano foi aprovada a Constituição atual?", a: ["1976", "1910", "1986"], correct: 0 }
+    ],
+    doctor: [
+        { q: "Onde fica o fémur?", a: ["Na perna", "No braço", "Na cabeça"], correct: 0 },
+        { q: "O que transporta o oxigénio no sangue?", a: ["Hemoglobina", "Plaquetas", "Leucócitos"], correct: 0 }
+    ],
+    general: [
+        { q: "Quanto é 15 + 27?", a: ["42", "32", "52"], correct: 0 },
+        { q: "Qual é a cor resultante de azul + amarelo?", a: ["Verde", "Roxo", "Laranja"], correct: 0 }
+    ]
+};
+
 const VEHICLES = {
     bicycle: { label: 'Bicicleta', cost: 300, happiness: 2, fitness: 5 },
     motorcycle: { label: 'Motocicleta', cost: 5000, happiness: 8 },
@@ -160,7 +189,8 @@ const COOLDOWNS = {
     practice_skill: 3600000, // 1 hour
     crime: 43200000,       // 12 hours
     volunteer: 14400000,   // 4 hours
-    meditate: 1800000      // 30 minutes
+    meditate: 1800000,     // 30 minutes
+    pride: 252000000       // 70 hours
 };
 
 const RANDOM_EVENTS = [
@@ -433,14 +463,11 @@ function getErrorMessage(code) {
 // CHARACTER MANAGEMENT - MELHORADO
 // ============================================
 async function createCharacter(userId, name, gender) {
-    const now = new Date();
-
     const character = {
         userId,
         name,
         gender,
-        birthDate: now.toISOString(),
-        age: 0,
+        age: 1, // Start at 1 for simplicity in 1:1 sync (or 0)
         alive: true,
 
         // Stats
@@ -547,6 +574,7 @@ async function loadCharacter() {
                         startGameLoop();
                         loadActivities();
                         loadAllPlayers();
+                        startDiceDuelListener();
                         hideLoading();
                     } else {
                         // Updates from admin or other sources
@@ -569,13 +597,12 @@ function updateAgeFromBirthDate() {
 
     const birth = new Date(currentCharacter.birthDate);
     const now = new Date(Date.now() + serverTimeOffset);
-    const ageMs = now - birth;
+    const diff = now - birth;
 
-    // Velocidade base: 1 dia real = 1 ano de jogo (86,400,000 ms = 1 ano)
-    const yearInMs = (1000 * 60 * 60 * 24) / (gameSettings.timeSpeed || 1);
-    const ageYears = ageMs / yearInMs;
-
-    const newAge = Math.floor(ageYears);
+    // Calcula duração de um ano em MS baseado no timeSpeed
+    // timeSpeed = 1 significa 1 dia real = 1 ano de jogo
+    const yearMs = (1000 * 60 * 60 * 24) / (gameSettings.timeSpeed || 1);
+    const newAge = Math.floor(diff / yearMs);
 
     // Only update if age changed
     if (newAge !== currentCharacter.age) {
@@ -696,9 +723,11 @@ async function saveCharacter() {
     if (!currentCharacter) return;
 
     try {
-        const { id, ...data } = currentCharacter;
+        // Obter apenas campos mutáveis para evitar sobrescrever mudanças do admin
+        const { id, name, birthDate, createdAt, ...mutableData } = currentCharacter;
+
         await db.collection('characters').doc(id).update({
-            ...data,
+            ...mutableData,
             lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
         });
     } catch (error) {
@@ -753,24 +782,13 @@ function stopGameLoop() {
 }
 
 function updateClock() {
-    const realNow = Date.now() + serverTimeOffset;
-    const elapsedReal = realNow - WORLD_START_TIME;
-
-    // Multiplicador: 1 dia real = 1 ano de jogo (365.25)
-    // Se timeSpeed for 2, 1 dia real = 2 anos de jogo, etc.
-    const multiplier = 365.25 * (gameSettings.timeSpeed || 1);
-    const elapsedGame = elapsedReal * multiplier;
-
-    const gameDate = new Date(WORLD_START_TIME + elapsedGame);
+    const realNow = new Date(Date.now() + serverTimeOffset);
 
     const timeEl = document.getElementById('globalTime');
     const dateEl = document.getElementById('globalDate');
 
-    if (timeEl) timeEl.textContent = gameDate.toLocaleTimeString('pt-PT');
-    if (dateEl) {
-        // Mostrar data do jogo com um indicador de "Ano Virtual" se necessário
-        dateEl.textContent = gameDate.toLocaleDateString('pt-PT');
-    }
+    if (timeEl) timeEl.textContent = realNow.toLocaleTimeString('pt-PT');
+    if (dateEl) dateEl.textContent = realNow.toLocaleDateString('pt-PT');
 }
 
 // Sincronizar relógio com servidor Firebase
@@ -948,10 +966,17 @@ function updateStat(statName, value) {
 
 function updateAllTabs() {
     updateActionsTab();
-    updateCareerTab();
-    showRelationshipsTab();
-    showFamilyTab();
-    showSocialTab();
+
+    // Only update expensive/complex tabs if they are currently visible
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab) {
+        const tabName = activeTab.getAttribute('data-tab');
+        if (tabName === 'career') showCareerTab();
+        if (tabName === 'assets') updateAssetsTab();
+        if (tabName === 'relationships') showRelationshipsTab();
+        if (tabName === 'family') showFamilyTab();
+        if (tabName === 'social') showSocialTab();
+    }
 }
 
 function updateActionsTab() {
@@ -959,216 +984,227 @@ function updateActionsTab() {
     if (!grid) return;
 
     const age = currentCharacter.age;
-    const actions = [];
 
-    // Basic actions
+    // Categories
+    const categories = {
+        'Vitalidade & Mente': [],
+        'Lazer & Social': [],
+        'Hobbies & Crescimento': [],
+        'Educação & Trabalho': [],
+        'Outros': []
+    };
+
+    // 1. VITALITY & MIND
+    categories['Vitalidade & Mente'].push({
+        icon: '🏋️', name: 'Academia', desc: '+15 Fitness', cost: 10, cooldown: 'gym', onclick: 'goToGym()'
+    });
+    categories['Vitalidade & Mente'].push({
+        icon: '🧘', name: 'Meditar', desc: '+10 Saúde, +5 Fel.', cost: null, cooldown: 'meditate', onclick: 'meditate()'
+    });
+    categories['Vitalidade & Mente'].push({
+        icon: '🩺', name: 'Check-up Médico', desc: '+30 Saúde', cost: 100, cooldown: 'doctor', onclick: 'goToDoctor()'
+    });
+    categories['Vitalidade & Mente'].push({
+        icon: '😴', name: 'Sesta', desc: '+5 Saúde, -5 Soc.', cost: null, cooldown: null, onclick: 'takeANap()'
+    });
+    categories['Vitalidade & Mente'].push({
+        icon: '🏃', name: 'Correr', desc: '+10 Fitness, +5 Saud.', cost: null, cooldown: 'gym', onclick: 'goRunning()'
+    });
+
+    // 2. LEISURE & SOCIAL
     if (age >= 13) {
-        actions.push({
-            icon: '🏋️',
-            name: 'Academia',
-            desc: '+15 Fitness, +5 Saúde',
-            cost: null,
-            cooldown: 'gym',
-            onclick: 'goToGym()'
+        categories['Lazer & Social'].push({
+            icon: '📺', name: 'Ver Netflix', desc: '+15 Fel., -5 Int.', cost: null, cooldown: null, onclick: 'watchNetflix()'
+        });
+        categories['Lazer & Social'].push({
+            icon: '🌳', name: 'Passear no Parque', desc: '+5 Saúde, +5 Fel.', cost: null, cooldown: null, onclick: 'walkInPark()'
+        });
+        categories['Lazer & Social'].push({
+            icon: '🎲', name: 'Duelo de Dados', desc: 'Aposta rápida vs Online', cost: 50, cooldown: null, onclick: 'quickDiceMatch()'
+        });
+        categories['Lazer & Social'].push({
+            icon: '🥳', name: 'Ir à Festa', desc: '+20 Soc., -10 Int.', cost: 50, cooldown: 'socialize', onclick: 'goToParty()'
+        });
+        categories['Lazer & Social'].push({
+            icon: '🎳', name: 'Bowling', desc: '+10 Soc., +5 Fel.', cost: 20, cooldown: 'socialize', onclick: 'goBowling()'
         });
     }
-
-    if (age >= 6) {
-        actions.push({
-            icon: '👥',
-            name: 'Socializar',
-            desc: '+12 Social, +8 Felicidade',
-            cost: null,
-            cooldown: 'socialize',
-            onclick: 'socialize()'
-        });
-    }
-
-    actions.push({
-        icon: '⚕️',
-        name: 'Médico',
-        desc: '+30 Saúde',
-        cost: 100,
-        cooldown: 'doctor',
-        onclick: 'goToDoctor()'
-    });
-
-    actions.push({
-        icon: '🧘',
-        name: 'Terapia',
-        desc: '+20 Felicidade',
-        cost: 150,
-        cooldown: 'therapy',
-        onclick: 'goToTherapy()'
-    });
-
     if (age >= 18) {
-        actions.push({
-            icon: '✈️',
-            name: 'Viajar',
-            desc: '+25 Felicidade, +10 Social',
-            cost: 500,
-            cooldown: 'travel',
-            onclick: 'travel()'
+        categories['Lazer & Social'].push({
+            icon: '✈️', name: 'Viajar', desc: '+30 Fel., +10 Soc.', cost: 1500, cooldown: 'travel', onclick: 'travel()'
         });
     }
 
-    // Skill practice
-    if (age >= 10) {
-        actions.push({
-            icon: '⭐',
-            name: 'Treinar Habilidade',
-            desc: 'Melhore suas habilidades',
-            cost: null,
-            cooldown: 'practice_skill',
-            onclick: 'showSkillsMenu()'
-        });
-    }
-
-    // Crime (risky money)
-    if (age >= 13) {
-        actions.push({
-            icon: '🎭',
-            name: 'Atividade Arriscada',
-            desc: 'Ganhe dinheiro de forma arriscada',
-            cost: null,
-            cooldown: 'crime',
-            onclick: 'commitCrime()'
-        });
-    }
-
-    // Volunteer
-    if (age >= 16) {
-        actions.push({
-            icon: '❤️',
-            name: 'Voluntariado',
-            desc: '+15 Felicidade, +10 Social',
-            cost: null,
-            cooldown: 'volunteer',
-            onclick: 'volunteer()'
-        });
-    }
-
-    // Meditation
-    if (age >= 10) {
-        actions.push({
-            icon: '🧘‍♂️',
-            name: 'Meditar',
-            desc: '+10 Saúde, +5 Felicidade',
-            cost: null,
-            cooldown: 'meditate',
-            onclick: 'meditate()'
-        });
-    }
-
-    // Shopping
-    if (age >= 18) {
-        actions.push({
-            icon: '🛒',
-            name: 'Comprar Propriedade',
-            desc: 'Compre casa ou apartamento',
-            cost: null,
-            cooldown: null,
-            onclick: 'showPropertiesShop()'
-        });
-
-        actions.push({
-            icon: '🚗',
-            name: 'Comprar Veículo',
-            desc: 'Compre carro ou moto',
-            cost: null,
-            cooldown: null,
-            onclick: 'showVehiclesShop()'
-        });
-    }
-
-    // Achievements
-    actions.push({
-        icon: '🏆',
-        name: 'Conquistas',
-        desc: `${currentCharacter.achievements ? currentCharacter.achievements.length : 0}/${Object.keys(ACHIEVEMENTS).length}`,
-        cost: null,
-        cooldown: null,
-        onclick: 'showAchievements()'
-    });
-
-    grid.innerHTML = actions.map(action => createActionButton(action)).join('');
-}
-
-function updateCareerTab() {
-    const grid = document.getElementById('careerGrid');
-    if (!grid) return;
-
-    const age = currentCharacter.age;
-    const actions = [];
-
-    // 1. Education
+    // 3. HOBBIES & GROWTH
     if (age >= 6) {
-        actions.push({
-            icon: '📚',
-            name: 'Estudar',
-            desc: '+10 Inteligência',
-            cost: null,
-            cooldown: 'study',
-            onclick: 'study()'
+        categories['Hobbies & Crescimento'].push({
+            icon: '🎮', name: 'Jogar Videojogos', desc: '+10 Fel., -5 Fit.', cost: null, cooldown: null, onclick: 'playGames()'
         });
-
-        actions.push({
-            icon: '🎓',
-            name: 'Educação / Cursos',
-            desc: 'Inscreva-se em escolas ou cursos',
-            cost: null,
-            cooldown: null,
-            onclick: 'showEducationMenu()'
+        categories['Hobbies & Crescimento'].push({
+            icon: '🎨', name: 'Desenhar', desc: '+15 Fel., +2 Int.', cost: null, cooldown: null, onclick: 'drawArt()'
+        });
+    }
+    if (age >= 10) {
+        categories['Hobbies & Crescimento'].push({
+            icon: '📖', name: 'Ler Livro', desc: '+15 Int., -5 Fel.', cost: null, cooldown: null, onclick: 'readBook()'
+        });
+        categories['Hobbies & Crescimento'].push({
+            icon: '💻', name: 'Codar', desc: '+20 Int., -10 Soc.', cost: null, cooldown: null, onclick: 'practiceCoding()'
+        });
+        categories['Hobbies & Crescimento'].push({
+            icon: '🗣️', name: 'Aprender Língua', desc: '+10 Int., +5 Soc.', cost: 200, cooldown: null, onclick: 'learnLanguage()'
+        });
+        categories['Hobbies & Crescimento'].push({
+            icon: '🎸', name: 'Tocar Guitarra', desc: '+10 Soc., +5 Int.', cost: null, cooldown: null, onclick: 'playGuitar()'
+        });
+        categories['Hobbies & Crescimento'].push({
+            icon: '🧶', name: 'Crochet', desc: '+10 Fel., +5 Int.', cost: null, cooldown: null, onclick: 'doCrochet()'
         });
     }
 
-    // 2. Work
-    if (age >= 16) {
+    // 4. EDUCATION & WORK
+    if (age >= 6 && age < 18) {
+        categories['Educação & Trabalho'].push({
+            icon: '📚', name: 'Estudar', desc: '+10 Inteligência', cost: null, cooldown: 'study', onclick: 'study()'
+        });
+    }
+    if (age >= 18) {
+        categories['Educação & Trabalho'].push({
+            icon: '🎓', name: 'Educação / Cursos', desc: 'Ver opções de estudo', cost: null, cooldown: null, onclick: 'showEducationMenu()'
+        });
         if (currentCharacter.occupation === 'unemployed') {
-            actions.push({
-                icon: '💼',
-                name: 'Procurar Emprego',
-                desc: 'Candidate-se a vagas',
-                cost: null,
-                cooldown: null,
-                onclick: 'showJobsMenu()'
-            });
-        } else {
-            actions.push({
-                icon: '💼',
-                name: 'Trabalhar Extra',
-                desc: 'Ganhe dinheiro extra',
-                cost: null,
-                cooldown: 'work',
-                onclick: 'workExtra()'
-            });
-
-            actions.push({
-                icon: '🚪',
-                name: 'Pedir Demissão',
-                desc: 'Sair do emprego atual',
-                cost: null,
-                cooldown: null,
-                onclick: 'quitJob()'
+            categories['Educação & Trabalho'].push({
+                icon: '💼', name: 'Agência de Emprego', desc: 'Ver vagas de trabalho', cost: null, cooldown: null, onclick: 'showJobsMenu()'
             });
         }
     }
 
-    grid.innerHTML = actions.map(action => createActionButton(action)).join('');
+    // 5. OTHER
+    categories['Outros'].push({
+        icon: '🏆', name: 'Conquistas', desc: `${currentCharacter.achievements ? currentCharacter.achievements.length : 0}/${Object.keys(ACHIEVEMENTS).length}`, cost: null, cooldown: null, onclick: 'showAchievements()'
+    });
+    if (age >= 18) {
+        categories['Outros'].push({
+            icon: '🦹', name: 'Crime', desc: 'Risco vs Recompensa', cost: null, cooldown: 'crime', onclick: 'commitCrime()'
+        });
+        categories['Outros'].push({
+            icon: '🏠', name: 'Imobiliária', desc: 'Comprar propriedades', cost: null, cooldown: null, onclick: 'showRealEstateMenu()'
+        });
+        categories['Outros'].push({
+            icon: '🚗', name: 'Stand de Carros', desc: 'Comprar veículos', cost: null, cooldown: null, onclick: 'showCarDealerMenu()'
+        });
+        categories['Outros'].push({
+            icon: '🏳️‍🌈', name: 'Pride', desc: '+30% Todos os Stats', cost: null, cooldown: 'pride', onclick: 'prideAction()'
+        });
+    }
+
+    let html = '';
+    for (const cat in categories) {
+        if (categories[cat].length === 0) continue;
+        html += `<h3 style="grid-column: 1/-1; margin: 1.5rem 0 1rem; font-size: 1.1rem; opacity: 0.8; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">${cat}</h3>`;
+        html += categories[cat].map(action => createActionButton(action)).join('');
+    }
+
+    grid.innerHTML = html;
 }
 
-function updateRelationshipsTab() {
-    // To be implemented
-}
-
-function updateFamilyTab() {
-    // To be implemented
-}
 
 function updateSocialTab() {
-    // To be implemented
+    const friendsList = document.getElementById('friendsList');
+    if (!friendsList) return;
+
+    if (!currentCharacter.friends || currentCharacter.friends.length === 0) {
+        friendsList.innerHTML = '<div style="padding: 1rem; opacity: 0.5;">Você ainda não tem amigos.</div>';
+        return;
+    }
+
+    const friends = allPlayers.filter(p => currentCharacter.friends.includes(p.id));
+    friendsList.innerHTML = friends.map(friend => `
+        <div class="player-card">
+            <div class="player-info">
+                <div class="player-avatar">${getGenderEmoji(friend.gender)}</div>
+                <div class="player-name-wrap">
+                    <div class="player-name">${friend.name}</div>
+                    <div class="player-meta">${friend.age} anos | ${friend.occupation || 'Desempregado'}</div>
+                </div>
+            </div>
+            <div class="player-actions">
+                <button class="btn btn-primary btn-sm" onclick="openPrivateChat('${friend.id}')">Chat</button>
+                <button class="btn btn-secondary btn-sm" onclick="openSendMoneyModal('${friend.id}')">€</button>
+                <button class="btn btn-danger btn-sm" onclick="removeFriend('${friend.id}')">🗑️</button>
+            </div>
+        </div>
+    `).join('');
 }
+
+function updateAssetsTab() {
+    const grid = document.getElementById('assetsGrid');
+    if (!grid) return;
+
+    const assets = [];
+
+    // Properties (Private + Shared)
+    const householdMembers = [];
+    if (currentCharacter.spouse) householdMembers.push(currentCharacter.spouse);
+    if (currentCharacter.family && currentCharacter.family.parents) {
+        householdMembers.push(...currentCharacter.family.parents);
+    }
+
+    const myProperties = currentCharacter.properties || [];
+    const sharedProperties = [];
+
+    householdMembers.forEach(mid => {
+        const member = allPlayers.find(p => p.id === mid);
+        if (member && member.properties) {
+            sharedProperties.push(...member.properties);
+        }
+    });
+
+    const allProps = [...new Set([...myProperties, ...sharedProperties])];
+
+    allProps.forEach(propKey => {
+        const prop = PROPERTIES[propKey];
+        if (prop) {
+            const isShared = !myProperties.includes(propKey);
+            assets.push({
+                icon: '🏠',
+                name: prop.label + (isShared ? ' (Família)' : ''),
+                desc: `${isShared ? 'Casa Partilhada' : 'Propriedade Privada'} | Felicidade: +${prop.happiness}`,
+                tag: 'CASA'
+            });
+        }
+    });
+
+    // Vehicles
+    if (currentCharacter.vehicles && currentCharacter.vehicles.length > 0) {
+        currentCharacter.vehicles.forEach(vehKey => {
+            const veh = VEHICLES[vehKey];
+            if (veh) {
+                assets.push({
+                    icon: '🚗',
+                    name: veh.label,
+                    desc: `Veículo | Estilo: +${veh.social}`,
+                    tag: 'VEÍCULO'
+                });
+            }
+        });
+    }
+
+    if (assets.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; opacity: 0.5;">Você ainda não possui nenhum património.</div>';
+        return;
+    }
+
+    grid.innerHTML = assets.map(asset => `
+        <div class="action-card">
+            <div class="action-icon">${asset.icon}</div>
+            <div class="asset-tag">${asset.tag}</div>
+            <div class="action-title">${asset.name}</div>
+            <div class="action-desc">${asset.desc}</div>
+        </div>
+    `).join('');
+}
+
 
 function createActionButton(action) {
     const cooldownRemaining = action.cooldown ? getCooldownRemaining(action.cooldown) : 0;
@@ -1350,8 +1386,202 @@ async function commitCrime() {
 }
 
 // ============================================
+// EXPANDED ACTIONS
+// ============================================
+
+async function takeANap() {
+    currentCharacter.health = Math.min(100, (currentCharacter.health || 100) + 5);
+    currentCharacter.social = Math.max(0, (currentCharacter.social || 50) - 5);
+    await addActivity(currentCharacter.id, 'Tirou uma sesta revigorante. 😴', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function watchNetflix() {
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 15);
+    currentCharacter.intelligence = Math.max(0, (currentCharacter.intelligence || 50) - 5);
+    await addActivity(currentCharacter.id, 'Ficou a ver Netflix e relaxou. 📺', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function walkInPark() {
+    currentCharacter.health = Math.min(100, (currentCharacter.health || 100) + 5);
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 5);
+    await addActivity(currentCharacter.id, 'Deu um passeio agradável no parque. 🌳', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function goToParty() {
+    if (!canPerformAction('socialize')) return;
+    if ((currentCharacter.money || 0) < 50) {
+        showNotification('Dinheiro insuficiente para a entrada!', 'error');
+        return;
+    }
+    currentCharacter.money -= 50;
+    currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 20);
+    currentCharacter.health = Math.max(0, (currentCharacter.health || 100) - 10);
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 15);
+
+    setCooldown('socialize');
+    await addActivity(currentCharacter.id, 'Foi a uma festa épica! 🥳', 'positive');
+    await saveCharacter();
+    updateUI();
+}
+
+async function playGames() {
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 10);
+    currentCharacter.fitness = Math.max(0, (currentCharacter.fitness || 50) - 5);
+    await addActivity(currentCharacter.id, 'Jogou videojogos durante horas. 🎮', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function readBook() {
+    currentCharacter.intelligence = Math.min(100, (currentCharacter.intelligence || 50) + 15);
+    currentCharacter.happiness = Math.max(0, (currentCharacter.happiness || 50) - 5);
+    await addActivity(currentCharacter.id, 'Leu um livro interessante e aprendeu algo novo. 📖', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function practiceCoding() {
+    currentCharacter.intelligence = Math.min(100, (currentCharacter.intelligence || 50) + 20);
+    currentCharacter.social = Math.max(0, (currentCharacter.social || 50) - 10);
+    practiceSkill('programming', 1);
+    await addActivity(currentCharacter.id, 'Passou a noite a codar. 💻', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function learnLanguage() {
+    if ((currentCharacter.money || 0) < 200) {
+        showNotification('Dinheiro insuficiente para o curso!', 'error');
+        return;
+    }
+    currentCharacter.money -= 200;
+    currentCharacter.intelligence = Math.min(100, (currentCharacter.intelligence || 50) + 10);
+    currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 5);
+    await addActivity(currentCharacter.id, 'Começou a aprender uma nova língua. 🗣️', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function goRunning() {
+    currentCharacter.fitness = Math.min(100, (currentCharacter.fitness || 50) + 10);
+    currentCharacter.health = Math.min(100, (currentCharacter.health || 100) + 5);
+    await addActivity(currentCharacter.id, 'Correu alguns quilómetros. 🏃', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function goBowling() {
+    if ((currentCharacter.money || 0) < 20) {
+        showNotification('Dinheiro insuficiente!', 'error');
+        return;
+    }
+    currentCharacter.money -= 20;
+    currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 10);
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 5);
+    await addActivity(currentCharacter.id, 'Jogou bowling com amigos. 🎳', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function playGuitar() {
+    currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 10);
+    currentCharacter.intelligence = Math.min(100, (currentCharacter.intelligence || 50) + 5);
+    practiceSkill('music', 1);
+    await addActivity(currentCharacter.id, 'Praticou guitarra e tocou uma música. 🎸', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+async function drawArt() {
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 15);
+    currentCharacter.intelligence = Math.min(100, (currentCharacter.intelligence || 50) + 2);
+    await addActivity(currentCharacter.id, 'Fez um desenho incrível. 🎨', 'normal');
+    await saveCharacter();
+    updateUI();
+}
+
+// ============================================
 // NEW: SKILLS SYSTEM
 // ============================================
+async function prideAction() {
+    if (!canPerformAction('pride')) return;
+
+    // Aumento de 30% em tudo (unidade ou percentual? o user disse "30%", assumirei multiplicador ou +30 pontos?)
+    // "aumenta tudo em 30%" - Geralmente significa +30 se for stats de 0-100 ou multiplicador. 
+    // Como os stats são 0-100, farei +30 pontos (ou 30% do total). 
+    // Farei +30 pontos fixos para ser impactante.
+
+    currentCharacter.health = Math.min(100, (currentCharacter.health || 100) + 30);
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 30);
+    currentCharacter.intelligence = Math.min(100, (currentCharacter.intelligence || 50) + 30);
+    currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 30);
+    currentCharacter.fitness = Math.min(100, (currentCharacter.fitness || 50) + 30);
+
+    setCooldown('pride');
+    await addActivity(currentCharacter.id, 'Celebrou o Pride com orgulho! 🏳️‍🌈 ✨', 'important');
+    await saveCharacter();
+    updateUI();
+    showNotification('Orgulho! Stats aumentados significativamente.', 'success');
+}
+
+async function doCrochet() {
+    currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 10);
+    currentCharacter.intelligence = Math.min(100, (currentCharacter.intelligence || 50) + 5);
+    practiceSkill('art', 1);
+    await addActivity(currentCharacter.id, 'Fez algum crochet e relaxou. 🧶', 'normal');
+    await saveCharacter();
+    updateUI();
+    showNotification('Fazer crochet é relaxante!', 'success');
+}
+
+async function quickDiceMatch() {
+    if ((currentCharacter.money || 0) < 50) {
+        showNotification('Precisas de €50 para apostar!', 'error');
+        return;
+    }
+
+    const now = Date.now();
+    const onlineThreshold = 5 * 60 * 1000;
+
+    // Check for online players
+    const onlinePlayers = allPlayers.filter(p => {
+        if (p.id === currentCharacter.id) return false;
+        if (!p.alive) return false;
+        if (!p.lastUpdate) return false;
+        const lastUpd = p.lastUpdate.toDate ? p.lastUpdate.toDate().getTime() : new Date(p.lastUpdate).getTime();
+        return (now - lastUpd) < onlineThreshold;
+    });
+
+    if (onlinePlayers.length === 0) {
+        showNotification('Ninguém online no momento!', 'info');
+        return;
+    }
+
+    const target = onlinePlayers[Math.floor(Math.random() * onlinePlayers.length)];
+
+    // Pay at sending
+    currentCharacter.money -= 50;
+    await saveCharacter();
+    updateUI();
+
+    await db.collection('requests').add({
+        from: currentCharacter.id,
+        fromName: currentCharacter.name,
+        to: target.id,
+        type: 'dice_duel',
+        status: 'pending',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    showNotification(`Desafiou ${target.name} para Dados! €50 apostados.`, 'success');
+}
+
 function practiceSkill(skillName, amount = 1) {
     if (!currentCharacter.skills) currentCharacter.skills = {};
     if (!currentCharacter.skills[skillName]) currentCharacter.skills[skillName] = 0;
@@ -1739,7 +1969,38 @@ function showCareerTab() {
     const currentEdu = currentCharacter.education || 'none';
     const currentJob = currentCharacter.occupation || 'unemployed';
 
-    let content = '<h3 style="margin-bottom: 1rem;">Educação</h3>';
+    let content = '';
+
+    // 1. Quick Actions (Study / Work Extra)
+    if (age >= 6) {
+        content += '<h3 style="margin-bottom: 1rem;">Ações Rápidas</h3>';
+        content += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">';
+
+        // Study
+        content += createActionButton({
+            icon: '📚',
+            name: 'Estudar',
+            desc: '+10 Intel.',
+            cost: null,
+            cooldown: 'study',
+            onclick: 'study()'
+        });
+
+        // Work Extra
+        if (age >= 16 && currentJob !== 'unemployed') {
+            content += createActionButton({
+                icon: '💼',
+                name: 'Trabalhar Extra',
+                desc: 'Dinheiro bónus',
+                cost: null,
+                cooldown: 'work',
+                onclick: 'workExtra()'
+            });
+        }
+        content += '</div>';
+    }
+
+    content += '<h3 style="margin-bottom: 1rem;">Educação</h3>';
 
     // Education options
     Object.keys(EDUCATION).forEach(key => {
@@ -1849,7 +2110,67 @@ async function startEducation(eduKey) {
     showNotification(`Completou ${edu.label}!`, 'success');
 }
 
-async function applyForJob(jobKey) {
+async function applyForJob(careerKey) {
+    const career = CAREERS[careerKey];
+    if (!career) return;
+
+    const requiresEdu = career.education !== 'none' && career.education !== 'elementary';
+    const rand = Math.random();
+
+    if (requiresEdu) {
+        // 33% fail, 33% success, 33% interview
+        if (rand < 0.33) {
+            showNotification(`Infelizmente, a empresa decidiu não seguir com a sua candidatura para ${career.label}.`, 'error');
+            await addActivity(currentCharacter.id, `Candidatura para ${career.label} recusada.`, 'negative');
+        } else if (rand < 0.66) {
+            await applyChangeCareer(careerKey);
+            showNotification(`Parabéns! Foi contratado como ${career.label}! 💼`, 'success');
+        } else {
+            showJobInterview(careerKey);
+        }
+    } else {
+        // 50% chance
+        if (rand < 0.5) {
+            showNotification(`A vaga para ${career.label} já foi preenchida.`, 'error');
+            await addActivity(currentCharacter.id, `Não conseguiu a vaga de ${career.label}.`, 'negative');
+        } else {
+            await applyChangeCareer(careerKey);
+            showNotification(`Parabéns! Começou a trabalhar como ${career.label}! 💼`, 'success');
+        }
+    }
+}
+
+function showJobInterview(careerKey) {
+    const career = CAREERS[careerKey];
+    const category = INTERVIEW_QUESTIONS[careerKey] ? careerKey : 'general';
+    const pool = INTERVIEW_QUESTIONS[category];
+    const question = pool[Math.floor(Math.random() * pool.length)];
+
+    const buttons = question.a.map((ans, idx) => ({
+        text: ans,
+        class: 'btn btn-secondary',
+        onclick: `checkInterviewAnswer('${careerKey}', ${idx}, ${question.correct})`
+    }));
+
+    showModal(`Entrevista: ${career.label}`, `
+        <div style="text-align: center; padding: 1rem;">
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">"Para começar, uma pergunta técnica: <strong>${question.q}</strong>"</p>
+        </div>
+    `, buttons);
+}
+
+window.checkInterviewAnswer = async function (careerKey, selected, correct) {
+    closeModal();
+    if (selected === correct) {
+        await applyChangeCareer(careerKey);
+        showNotification(`Excelente resposta! Foi contratado! 💼`, 'success');
+    } else {
+        showNotification(`A resposta estava errada. A entrevista terminou aqui.`, 'error');
+        await addActivity(currentCharacter.id, `Falhou na entrevista para ${CAREERS[careerKey].label}.`, 'negative');
+    }
+};
+
+async function applyChangeCareer(jobKey) {
     const career = CAREERS[jobKey];
 
     const oldJob = currentCharacter.occupation;
@@ -1866,7 +2187,6 @@ async function applyForJob(jobKey) {
     await saveCharacter();
     updateUI();
     showCareerTab();
-    showNotification(`Você agora trabalha como ${career.label}!`, 'success');
 }
 
 async function quitJob() {
@@ -1900,12 +2220,25 @@ function showRelationshipsTab() {
         p.maritalStatus === 'single'
     );
 
-    if (singles.length === 0) {
-        list.innerHTML = '<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Nenhum jogador disponível</p>';
-        return;
+    let content = '';
+
+    if (currentCharacter.age < 18 && currentCharacter.family && currentCharacter.family.parents && currentCharacter.family.parents.length > 0 && !currentCharacter.family.isEmancipated) {
+        content += `
+            <div class="action-btn" onclick="requestEmancipation()">
+                <div class="action-icon">🕊️</div>
+                <div class="action-name">Pedir Emancipação</div>
+                <div class="action-desc">Tornar-se legalmente independente dos seus pais.</div>
+            </div>
+            <hr style="margin: 2rem 0; border-color: rgba(255,255,255,0.1);">
+        `;
     }
 
-    list.innerHTML = singles.map(player => createPlayerCard(player, 'relationship')).join('');
+    if (singles.length === 0) {
+        content += '<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Nenhum jogador disponível</p>';
+    } else {
+        content += singles.map(player => createPlayerCard(player, 'relationship')).join('');
+    }
+    list.innerHTML = content;
 }
 
 function showFamilyTab() {
@@ -1956,8 +2289,19 @@ function showSocialTab(searchQuery = '') {
     const friendsList = document.getElementById('friendsList');
     if (!socialList || !friendsList) return;
 
+    // Chat Buttons at the top
+    let chatHeader = `
+        <div class="chat-shortcuts" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin-bottom: 2rem;">
+            <button class="btn btn-primary" onclick="openGlobalChat()">Chat Global 🌍</button>
+            <button class="btn btn-primary" onclick="openWorkChat()">Chat Trabalho 💼</button>
+            <button class="btn btn-primary" onclick="openEduChat()">Chat Escola 🎓</button>
+            <button class="btn btn-primary" onclick="openFamilyChat()">Chat Família 🏠</button>
+        </div>
+        <hr style="margin: 2rem 0; border-color: rgba(255,255,255,0.1);">
+    `;
+
     if (!allPlayers || allPlayers.length === 0) {
-        socialList.innerHTML = '<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Carregando jogadores...</p>';
+        socialList.innerHTML = chatHeader + '<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Carregando jogadores...</p>';
         friendsList.innerHTML = '<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Nenhum amigo ainda</p>';
         return;
     }
@@ -1985,17 +2329,18 @@ function showSocialTab(searchQuery = '') {
             p.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
     } else {
-        // Just show some random people if no search
-        otherPlayers = otherPlayers.slice(0, 5);
+        otherPlayers = otherPlayers.slice(0, 10);
     }
 
+    let otherHtml = chatHeader;
     if (otherPlayers.length === 0) {
-        socialList.innerHTML = searchQuery ?
+        otherHtml += searchQuery ?
             '<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Nenhum jogador encontrado</p>' :
             '<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Nenhum jogador disponível</p>';
     } else {
-        socialList.innerHTML = otherPlayers.map(player => createPlayerCard(player, 'social')).join('');
+        otherHtml += otherPlayers.map(player => createPlayerCard(player, 'social')).join('');
     }
+    socialList.innerHTML = otherHtml;
 }
 
 function handlePlayerSearch(query) {
@@ -2005,49 +2350,46 @@ function handlePlayerSearch(query) {
 function createPlayerCard(player, type) {
     const relation = player.relation || '';
     const avatar = getGenderEmoji(player.gender);
+    const isFriend = currentCharacter.friends && currentCharacter.friends.includes(player.id);
+    const isHousehold = currentCharacter.family?.parents?.includes(player.id) ||
+        currentCharacter.family?.children?.includes(player.id) ||
+        currentCharacter.family?.spouse === player.id;
 
-    let actions = '';
+    let actions = `
+        <div class="player-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            ${isFriend || isHousehold ? `<button class="btn btn-sm btn-primary" onclick="openPrivateChat('${player.id}')">Chat 💬</button>` : ''}
+            <button class="btn btn-sm btn-secondary" onclick="interactWithPlayer('${player.id}', 'praise')">Elogiar ✨</button>
+            <button class="btn btn-sm btn-secondary" onclick="interactWithPlayer('${player.id}', 'insult')">Insultar 😡</button>
+            <button class="btn btn-sm btn-danger" onclick="interactWithPlayer('${player.id}', 'duel')">Duelo ⚔️</button>
+    `;
 
     if (type === 'relationship') {
-        if (currentCharacter.age >= 13 && player.age >= 13) {
-            actions = `
-                <button class="btn btn-secondary" onclick="askOnDate('${player.id}')">
-                    Convidar para Sair
-                </button>
-            `;
+        if (currentCharacter.age >= 13 && player.age >= 13 && player.maritalStatus === 'single') {
+            actions += `<button class="btn btn-sm btn-primary" onclick="askOnDate('${player.id}')">Sair 💑</button>`;
         }
     } else if (type === 'family' && relation === 'Cônjuge') {
-        actions = `
-            <button class="btn btn-danger" onclick="divorce('${player.id}')">
-                Divorciar
-            </button>
-        `;
+        actions += `<button class="btn btn-sm btn-danger" onclick="divorce('${player.id}')">Divorciar</button>`;
     } else if (type === 'social') {
-        const isFriend = currentCharacter.friends && currentCharacter.friends.includes(player.id);
-        if (!isFriend) {
-            actions += `
-                <button class="btn btn-primary" style="margin-right:0.5rem;" onclick="addFriend('${player.id}')">
-                    + Amigo
-                </button>
-            `;
+        if (!isFriend && !isHousehold) {
+            actions += `<button class="btn btn-sm btn-primary" onclick="addFriend('${player.id}')">+ Amigo 🤝</button>`;
         }
-        if (currentCharacter.age >= 18) {
-            actions += `
-                <button class="btn btn-secondary" onclick="adoptChild('${player.id}')">
-                    Adotar
-                </button>
-            `;
+        if (currentCharacter.age >= 18 && player.age < 18) {
+            actions += `<button class="btn btn-sm btn-primary" onclick="adoptChild('${player.id}')">Adotar 👶</button>`;
         }
     }
 
+    actions += '</div>';
+
     return `
-        <div class="player-card">
-            <div class="player-avatar">${avatar}</div>
-            <div class="player-info">
-                <div class="player-name">${player.name}</div>
-                <div class="player-details">
-                    ${player.age} anos | ${CAREERS[player.occupation]?.label || 'Desempregado'}
-                    ${relation ? `<br>Relação: ${relation}` : ''}
+        <div class="player-card" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 16px; margin-bottom: 1rem;">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="player-avatar" style="font-size: 2rem;">${avatar}</div>
+                <div class="player-info">
+                    <div class="player-name" style="font-weight: bold; font-size: 1.1rem;">${player.name}</div>
+                    <div class="player-details" style="opacity: 0.7; font-size: 0.9rem;">
+                        ${player.age} anos | ${CAREERS[player.occupation]?.label || 'Desempregado'}
+                        ${relation ? `<br><span style="color: var(--primary)">Relação: ${relation}</span>` : ''}
+                    </div>
                 </div>
             </div>
             ${actions}
@@ -2201,15 +2543,19 @@ async function divorce(spouseId) {
 // REQUESTS SYSTEM
 // ============================================
 async function checkRequests() {
+    if (!currentCharacter || !currentCharacter.id) return;
+
     const requests = await db.collection('requests')
         .where('to', '==', currentCharacter.id)
         .where('status', '==', 'pending')
         .get();
 
-    requests.forEach(doc => {
+    // Evitar mostrar múltiplos modais de uma vez
+    if (!requests.empty && !document.getElementById('modal').classList.contains('active')) {
+        const doc = requests.docs[0];
         const request = { id: doc.id, ...doc.data() };
         showRequestNotification(request);
-    });
+    }
 }
 
 function showRequestNotification(request) {
@@ -2240,6 +2586,24 @@ function showRequestNotification(request) {
             { text: 'Aceitar', class: 'btn btn-primary', onclick: `acceptRequest('${request.id}', 'friend')` },
             { text: 'Recusar', class: 'btn btn-secondary', onclick: `rejectRequest('${request.id}')` }
         ];
+    } else if (request.type === 'emancipation') {
+        message = `${request.fromName} pediu para ser emancipado(a)! 🕊️`;
+        buttons = [
+            { text: 'Aceitar', class: 'btn btn-primary', onclick: `acceptRequest('${request.id}', 'emancipation')` },
+            { text: 'Recusar', class: 'btn btn-secondary', onclick: `rejectRequest('${request.id}')` }
+        ];
+    } else if (request.type === 'duel') {
+        message = `${request.fromName} te desafiou para um ${request.duelType === 'force' ? 'Duelo de Força' : 'Duelo de Mentes'}! ⚔️`;
+        buttons = [
+            { text: 'Aceitar Desafio', class: 'btn btn-danger', onclick: `acceptRequest('${request.id}', 'duel')` },
+            { text: 'Recusar', class: 'btn btn-secondary', onclick: `rejectRequest('${request.id}')` }
+        ];
+    } else if (request.type === 'dice_duel') {
+        message = `${request.fromName} desafiou-te para um Duelo de Dados de €50! 🎲`;
+        buttons = [
+            { text: 'Aceitar Dados', class: 'btn btn-primary', onclick: `acceptRequest('${request.id}', 'dice_duel')` },
+            { text: 'Recusar', class: 'btn btn-secondary', onclick: `rejectRequest('${request.id}')` }
+        ];
     }
 
     if (message) {
@@ -2248,86 +2612,719 @@ function showRequestNotification(request) {
 }
 
 async function acceptRequest(requestId, type) {
-    closeModal();
+    try {
+        closeModal();
+        showLoading('Aceitando...');
 
-    const requestDoc = await db.collection('requests').doc(requestId).get();
-    if (!requestDoc.exists) return;
+        await db.collection('requests').doc(requestId).update({ status: 'accepted' });
 
-    const request = requestDoc.data();
+        const requestDoc = await db.collection('requests').doc(requestId).get();
+        const request = requestDoc.data();
+        const fromId = request.from;
 
-    if (type === 'date') {
-        currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 15);
-        currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 10);
+        if (type === 'friend') {
+            if (!currentCharacter.friends) currentCharacter.friends = [];
+            if (!currentCharacter.friends.includes(fromId)) {
+                currentCharacter.friends.push(fromId);
+            }
 
-        await db.collection('characters').doc(request.from).update({
-            happiness: firebase.firestore.FieldValue.increment(15),
-            social: firebase.firestore.FieldValue.increment(10)
-        });
+            // Update other player
+            const otherPlayerRef = db.collection('characters').doc(fromId);
+            const otherDoc = await otherPlayerRef.get();
+            const otherData = otherDoc.data();
+            const otherFriends = otherData.friends || [];
+            if (!otherFriends.includes(currentCharacter.id)) {
+                otherFriends.push(currentCharacter.id);
+                await otherPlayerRef.update({ friends: otherFriends });
+            }
 
-        await addActivity(currentCharacter.id, `Saiu com ${request.fromName}! 💑`, 'positive');
-        await addActivity(request.from, `Saiu com ${currentCharacter.name}! 💑`, 'positive');
+            await addActivity(currentCharacter.id, `Aceitou o pedido de amizade de ${request.fromName}! 🤝`, 'social');
+            await addActivity(fromId, `${currentCharacter.name} aceitou o seu pedido de amizade! 🤝`, 'social');
+        } else if (type === 'emancipation') {
+            // Check if all parents agree (soft implementation)
+            // For now, if one parent accepts, it proceeds (can be complex with multi-parent)
+            if (currentCharacter.family && currentCharacter.family.children) {
+                currentCharacter.family.children = currentCharacter.family.children.filter(id => id !== fromId);
+            }
 
-        // After 3 successful dates, can propose
-        showNotification('Encontro foi ótimo! Depois de alguns encontros você pode propor casamento.', 'success');
+            const childRef = db.collection('characters').doc(fromId);
+            const childDoc = await childRef.get();
+            const childData = childDoc.data();
 
-    } else if (type === 'marriage') {
-        currentCharacter.maritalStatus = 'married';
-        if (!currentCharacter.family) currentCharacter.family = {};
-        currentCharacter.family.spouse = request.from;
-        currentCharacter.happiness = Math.min(100, (currentCharacter.happiness || 50) + 30);
-        currentCharacter.stats.timesMarried = (currentCharacter.stats.timesMarried || 0) + 1;
+            if (childData.family && childData.family.parents) {
+                const newParents = childData.family.parents.filter(id => id !== currentCharacter.id);
+                await childRef.update({
+                    'family.parents': newParents,
+                    'family.isEmancipated': newParents.length === 0
+                });
+            }
 
-        await db.collection('characters').doc(request.from).update({
-            maritalStatus: 'married',
-            'family.spouse': currentCharacter.id,
-            happiness: firebase.firestore.FieldValue.increment(30)
-        });
+            await addActivity(currentCharacter.id, `Aceitou o pedido de emancipação de ${request.fromName}.`, 'social');
+            await addActivity(fromId, `${currentCharacter.name} aceitou o seu pedido de emancipação!`, 'social');
+        } else if (type === 'duel') {
+            const duelId = `duel_${requestId}`;
+            await db.collection('duels').doc(duelId).set({
+                challengerId: request.from,
+                opponentId: currentCharacter.id,
+                duelType: request.duelType,
+                status: 'active',
+                turn: 1,
+                hp: {
+                    [request.from]: 100,
+                    [currentCharacter.id]: 100
+                },
+                moves: {},
+                logs: [`O duelo começou! ${request.fromName} vs ${currentCharacter.name}`],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
 
-        await unlockAchievement('married');
-        await addActivity(currentCharacter.id, `Casou com ${request.fromName}! 💍`, 'important');
-        await addActivity(request.from, `Casou com ${currentCharacter.name}! 💍`, 'important');
+            enterDuelArena(duelId);
+        } else if (type === 'dice_duel') {
+            if (currentCharacter.money < 50) {
+                showNotification('Não tens dinheiro suficiente!', 'error');
+                return;
+            }
+            currentCharacter.money -= 50;
+            const diceResult = Math.floor(Math.random() * 6) + 1;
 
-    } else if (type === 'adoption') {
-        if (!currentCharacter.family) currentCharacter.family = {};
-        if (!currentCharacter.family.parents) currentCharacter.family.parents = [];
-        currentCharacter.family.parents.push(request.from);
+            await db.collection('dice_duels').add({
+                p1Id: request.from,
+                p2Id: currentCharacter.id,
+                p1Name: request.fromName,
+                p2Name: currentCharacter.name,
+                p2Roll: diceResult,
+                status: 'waiting_p1',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
 
-        await db.collection('characters').doc(request.from).update({
-            'family.children': firebase.firestore.FieldValue.arrayUnion(currentCharacter.id),
-            happiness: firebase.firestore.FieldValue.increment(25)
-        });
-
-        // Achievement for parent
-        const parentDoc = await db.collection('characters').doc(request.from).get();
-        const parent = parentDoc.data();
-        if (parent.stats) {
-            parent.stats.childrenAdopted = (parent.stats.childrenAdopted || 0) + 1;
+            await saveCharacter();
+            updateUI();
+            showNotification(`Lançaste um ${diceResult}! Aguardando adversário...`, 'success');
+        } else if (type === 'dice_duel_resolve') {
+            resolveDiceDuel(requestId);
         }
+        // ... (other types like marriage, adoption to be refined)
 
-        await addActivity(currentCharacter.id, `Foi adotado por ${request.fromName}! 👶`, 'important');
-        await addActivity(request.from, `Adotou ${currentCharacter.name}! 👶`, 'important');
-    } else if (type === 'friend') {
-        if (!currentCharacter.friends) currentCharacter.friends = [];
-        if (!currentCharacter.friends.includes(request.from)) {
-            currentCharacter.friends.push(request.from);
-        }
-
-        await db.collection('characters').doc(request.from).update({
-            'friends': firebase.firestore.FieldValue.arrayUnion(currentCharacter.id),
-            social: firebase.firestore.FieldValue.increment(15)
-        });
-
-        currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 15);
-
-        await addActivity(currentCharacter.id, `Tornou-se amigo de ${request.fromName}! 🤝`, 'social');
-        await addActivity(request.from, `Tornou-se amigo de ${currentCharacter.name}! 🤝`, 'social');
+        await saveCharacter();
+        hideLoading();
+        showNotification('Pedido aceite!', 'success');
+        updateUI();
+    } catch (error) {
+        console.error(error);
+        hideLoading();
+        showNotification('Erro ao aceitar pedido', 'error');
     }
-
-    await db.collection('requests').doc(requestId).update({ status: 'accepted' });
-    await saveCharacter();
-    loadAllPlayers();
 }
 
+// ============================================
+// CHAT SYSTEM
+// ============================================
+// ============================================
+// CHAT SYSTEM
+// ============================================
+let currentChatId = null;
+let currentChatType = null;
+let chatListener = null;
+
+window.openChatChannel = async function (type, id, title) {
+    const chatId = type === 'private' ? [currentCharacter.id, id].sort().join('_') : id;
+    currentChatId = chatId;
+    currentChatType = type;
+
+    showModal(title, `
+        <div id="chatMessages" class="chat-messages" style="height: 400px; overflow-y: auto; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 12px; margin-bottom: 1rem;"></div>
+        <div class="chat-actions-bar" style="display: flex; gap: 0.5rem; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 0.5rem;">
+            <button class="btn btn-sm btn-secondary" onclick="sendChatScene('abraço')">🫂 Abraço</button>
+            <button class="btn btn-sm btn-secondary" onclick="sendChatScene('coração')">❤️ Coração</button>
+            <button class="btn btn-sm btn-secondary" onclick="sendChatScene('festa')">🥳 Festa</button>
+            <button class="btn btn-sm btn-primary" onclick="showGiftMenu()" style="background: #E91E63; border-color: #E91E63;">🎁 Presente</button>
+        </div>
+        <div id="giftMenu" style="display: none; background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+            <div class="gift-opt" onclick="sendChatGift('chocolate')" style="cursor:pointer; text-align:center; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">🍫 €20</div>
+            <div class="gift-opt" onclick="sendChatGift('flores')" style="cursor:pointer; text-align:center; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">💐 €50</div>
+            <div class="gift-opt" onclick="sendChatGift('diamante')" style="cursor:pointer; text-align:center; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">💎 €500</div>
+        </div>
+        <div class="chat-input-wrap" style="display: flex; gap: 0.5rem;">
+            <input type="text" id="chatInput" class="form-input" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter') sendChannelMessage()">
+            <button class="btn btn-primary" onclick="sendChannelMessage()" style="width: auto; white-space: nowrap;">Enviar</button>
+        </div>
+    `, [{ text: 'Fechar', class: 'btn btn-secondary', onclick: 'closeChat()' }]);
+
+    if (chatListener) chatListener();
+
+    chatListener = db.collection('messages')
+        .where('chatId', '==', chatId)
+        .orderBy('createdAt', 'asc')
+        .limitToLast(50)
+        .onSnapshot(snapshot => {
+            const messagesDiv = document.getElementById('chatMessages');
+            if (!messagesDiv) return;
+
+            const messages = [];
+            snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+
+            messagesDiv.innerHTML = messages.map(msg => {
+                const isSystem = msg.type === 'system';
+                const time = msg.createdAt ? new Date(msg.createdAt.toDate()).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '';
+
+                if (isSystem) {
+                    return `<div class="chat-system-msg" style="text-align: center; color: var(--primary); font-size: 0.85rem; margin: 1rem 0; font-style: italic;">📢 ${parseChatMessage(msg.text)}</div>`;
+                }
+
+                return `
+                    <div class="chat-msg ${msg.from === currentCharacter.id ? 'sent' : 'received'}" style="margin-bottom: 0.8rem; display: flex; flex-direction: column; align-items: ${msg.from === currentCharacter.id ? 'flex-end' : 'flex-start'};">
+                        <div class="msg-author" style="font-size: 0.75rem; opacity: 0.6; margin-bottom: 0.2rem; display: flex; gap: 0.5rem;">
+                            <span>${msg.fromName || 'Invisível'}</span>
+                            <span style="opacity: 0.5;">${time}</span>
+                        </div>
+                        <div class="msg-text" style="background: ${msg.from === currentCharacter.id ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; padding: 0.6rem 1rem; border-radius: 12px; max-width: 85%; word-break: break-word; position: relative; ${msg.isGift ? 'border: 1px solid gold; box-shadow: 0 0 10px rgba(255,215,0,0.3);' : ''}">
+                            ${parseChatMessage(msg.text)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+};
+
+function parseChatMessage(text) {
+    if (!text) return '';
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/:smile:/g, '😊')
+        .replace(/:heart:/g, '❤️')
+        .replace(/:fire:/g, '🔥')
+        .replace(/:cash:/g, '💰');
+}
+
+window.showGiftMenu = function () {
+    const menu = document.getElementById('giftMenu');
+    menu.style.display = menu.style.display === 'none' ? 'grid' : 'none';
+};
+
+window.sendChatGift = async function (giftType) {
+    let cost = 0;
+    let text = '';
+    let bonus = 0;
+
+    if (giftType === 'chocolate') { cost = 20; text = 'enviou uma Caixa de Chocolates! 🍫'; bonus = 5; }
+    if (giftType === 'flores') { cost = 50; text = 'enviou um Ramo de Flores! 💐'; bonus = 12; }
+    if (giftType === 'diamante') { cost = 500; text = 'enviou um Diamante Raro! 💎'; bonus = 50; }
+
+    if (currentCharacter.money < cost) {
+        showNotification('Dinheiro insuficiente!', 'error');
+        return;
+    }
+
+    currentCharacter.money -= cost;
+    document.getElementById('giftMenu').style.display = 'none';
+
+    await db.collection('messages').add({
+        chatId: currentChatId,
+        from: currentCharacter.id,
+        fromName: currentCharacter.name,
+        text: `🎁 **${currentCharacter.name}** ${text}`,
+        isGift: true,
+        giftType,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Award bonus if it's a private chat
+    if (currentChatType === 'private') {
+        const friendId = currentChatId.replace(currentCharacter.id, '').replace('_', '');
+        await db.collection('characters').doc(friendId).update({
+            happiness: firebase.firestore.FieldValue.increment(bonus)
+        });
+    }
+
+    await saveCharacter();
+    updateUI();
+};
+
+window.sendChannelMessage = async function () {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    await db.collection('messages').add({
+        chatId: currentChatId,
+        from: currentCharacter.id,
+        fromName: currentCharacter.name,
+        text,
+        type: currentChatType,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    input.value = '';
+};
+
+window.sendChatScene = async function (sceneType) {
+    let text = '';
+    if (sceneType === 'abraço') text = `te mandou um abraço virtual! 🫂`;
+    if (sceneType === 'coração') text = `te mandou um coração! ❤️`;
+    if (sceneType === 'festa') text = `está a celebrar contigo! 🥳`;
+
+    await db.collection('messages').add({
+        chatId: currentChatId,
+        from: currentCharacter.id,
+        fromName: currentCharacter.name,
+        text: `✨ ${text}`,
+        isScene: true,
+        sceneType,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 1);
+    await saveCharacter();
+};
+
+window.closeChat = function () {
+    if (chatListener) chatListener();
+    chatListener = null;
+    currentChatId = null;
+    currentChatType = null;
+    closeModal();
+};
+
+// Simplified chat opens
+window.openPrivateChat = (id) => {
+    const p = allPlayers.find(pl => pl.id === id);
+    window.openChatChannel('private', id, `Chat com ${p?.name || 'Amigo'}`);
+};
+window.openGlobalChat = () => window.openChatChannel('global', 'global', 'Chat Global 🌍');
+window.openWorkChat = () => window.openChatChannel('work', `job_${currentCharacter.occupation || 'unemployed'}`, 'Chat do Trabalho 💼');
+window.openEduChat = () => window.openChatChannel('edu', `edu_${currentCharacter.education || 'none'}`, 'Chat da Escola 🎓');
+window.openFamilyChat = () => {
+    const famId = (currentCharacter.family?.parents?.[0]) || currentCharacter.id;
+    window.openChatChannel('family', `family_${famId}`, 'Chat da Família 🏠');
+};
+
+// ============================================
+// SOCIAL ACTIONS & INTERACTIONS
+// ============================================
+window.interactWithPlayer = async function (playerId, interactionType) {
+    const player = allPlayers.find(p => p.id === playerId);
+    if (!player) return;
+
+    if (interactionType === 'praise') {
+        await addActivity(playerId, `${currentCharacter.name} te elogiou! ✨`, 'social');
+        await db.collection('characters').doc(playerId).update({
+            happiness: firebase.firestore.FieldValue.increment(5)
+        });
+        currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 2);
+        showNotification(`Elogiaste ${player.name}!`, 'success');
+        await saveCharacter();
+        updateUI();
+    } else if (interactionType === 'insult') {
+        await addActivity(playerId, `${currentCharacter.name} te insultou! 😡`, 'negative');
+        await db.collection('characters').doc(playerId).update({
+            happiness: firebase.firestore.FieldValue.increment(-10)
+        });
+        currentCharacter.social = Math.max(0, (currentCharacter.social || 50) - 5);
+        showNotification(`Insultaste ${player.name}...`, 'warning');
+        await saveCharacter();
+        updateUI();
+    } else if (interactionType === 'duel') {
+        openDuelSelection(playerId);
+    }
+};
+
+window.openDuelSelection = function (playerId) {
+    const player = allPlayers.find(p => p.id === playerId);
+    showModal(`Desafiar ${player.name}`, `
+        <p>Escolha o tipo de duelo:</p>
+        <div class="trait-grid">
+            <div class="trait-option" onclick="requestDuel('${playerId}', 'force')">
+                <div class="trait-icon">⚔️</div>
+                <div class="trait-name">Duelo de Força</div>
+                <div class="trait-desc">Baseado em Fitness</div>
+            </div>
+            <div class="trait-option" onclick="requestDuel('${playerId}', 'minds')">
+                <div class="trait-icon">🧠</div>
+                <div class="trait-name">Duelo de Mentes</div>
+                <div class="trait-desc">Baseado em Inteligência</div>
+            </div>
+        </div>
+    `, [{ text: 'Cancelar', class: 'btn btn-secondary', onclick: 'closeModal()' }]);
+};
+
+window.requestDuel = async function (playerId, type) {
+    const player = allPlayers.find(p => p.id === playerId);
+    if (!player) return;
+
+    closeModal();
+    showLoading('Enviando desafio...');
+
+    await db.collection('requests').add({
+        type: 'duel',
+        from: currentCharacter.id,
+        fromName: currentCharacter.name,
+        to: playerId,
+        toName: player.name,
+        duelType: type,
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    hideLoading();
+    showNotification('Desafio enviado! Aguarde o oponente.', 'success');
+
+    // Listen for acceptance
+    const unsub = db.collection('duels')
+        .where('challengerId', '==', currentCharacter.id)
+        .where('opponentId', '==', playerId)
+        .where('status', '==', 'active')
+        .onSnapshot(snap => {
+            if (!snap.empty) {
+                unsub();
+                window.enterDuelArena(snap.docs[0].id);
+            }
+        });
+};
+
+let duelArenaListener = null;
+window.enterDuelArena = function (duelId) {
+    if (duelArenaListener) duelArenaListener();
+
+    duelArenaListener = db.collection('duels').doc(duelId).onSnapshot(doc => {
+        if (!doc.exists) return;
+        const duel = doc.data();
+
+        if (duel.status === 'finished') {
+            duelArenaListener();
+            window.showDuelResults(duel);
+            return;
+        }
+
+        const isChallenger = currentCharacter.id === duel.challengerId;
+        const myMove = duel.moves?.[currentCharacter.id];
+        const opponentId = isChallenger ? duel.opponentId : duel.challengerId;
+        const opponentMove = duel.moves?.[opponentId];
+        const opponent = allPlayers.find(p => p.id === opponentId);
+
+        const myHP = duel.hp[currentCharacter.id];
+        const oppHP = duel.hp[opponentId];
+
+        showModal(`Arena de Duelo: ${duel.duelType === 'force' ? 'Força' : 'Mentes'}`, `
+            <div style="text-align:center; padding: 1rem;">
+                <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <div style="font-size: 2rem;">${getGenderEmoji(currentCharacter.gender)}</div>
+                        <div style="font-weight: bold; color: var(--primary);">Você</div>
+                        <div class="hp-bar-container" style="background: #333; height: 10px; border-radius: 5px; margin: 0.5rem 0;">
+                            <div style="background: #4CAF50; width: ${myHP}%; height: 100%; border-radius: 5px; transition: width 0.3s;"></div>
+                        </div>
+                        <div style="font-size: 0.8rem;">${myHP}/100 HP</div>
+                        <div id="duelMyStatus" style="font-size: 0.7rem;">${myMove ? '✅ Pronto' : '⌛ Pensando...'}</div>
+                    </div>
+                    <div style="font-size: 1.5rem; align-self: center; opacity: 0.5;">VS</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 2rem;">${getGenderEmoji(opponent?.gender)}</div>
+                        <div style="font-weight: bold;">${opponent?.name}</div>
+                        <div class="hp-bar-container" style="background: #333; height: 10px; border-radius: 5px; margin: 0.5rem 0;">
+                            <div style="background: #e91e63; width: ${oppHP}%; height: 100%; border-radius: 5px; transition: width 0.3s;"></div>
+                        </div>
+                        <div style="font-size: 0.8rem;">${oppHP}/100 HP</div>
+                        <div id="duelOppStatus" style="font-size: 0.7rem;">${opponentMove ? '✅ Pronto' : '⌛ Pensando...'}</div>
+                    </div>
+                </div>
+
+                <div id="duelLogs" style="height: 100px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 8px; font-size: 0.8rem; margin-bottom: 1.5rem; text-align: left;">
+                    ${duel.logs.slice(-5).map(log => `<div>> ${log}</div>`).join('')}
+                </div>
+
+                ${!myMove ? `
+                    <p style="margin-bottom: 1rem; font-weight: bold;">Turno ${duel.turn}: Escolha sua ação</p>
+                    <div class="trait-grid">
+                        <div class="trait-option" onclick="submitDuelMove('${duelId}', 'quick')">
+                            <div class="trait-icon">⚡</div>
+                            <div class="trait-name">Ataque Rápido</div>
+                            <div class="trait-desc">Dano leve, alta precisão</div>
+                        </div>
+                        <div class="trait-option" onclick="submitDuelMove('${duelId}', 'heavy')">
+                            <div class="trait-icon">💥</div>
+                            <div class="trait-name">Golpe Pesado</div>
+                            <div class="trait-desc">Dano alto, precisão média</div>
+                        </div>
+                        <div class="trait-option" onclick="submitDuelMove('${duelId}', 'guard')">
+                            <div class="trait-icon">🛡️</div>
+                            <div class="trait-name">Defesa</div>
+                            <div class="trait-desc">Reduz dano no próximo turno</div>
+                        </div>
+                        <div class="trait-option" onclick="submitDuelMove('${duelId}', 'heal')">
+                            <div class="trait-icon">💊</div>
+                            <div class="trait-name">Recuperar</div>
+                            <div class="trait-desc">Cura um pouco de HP</div>
+                        </div>
+                    </div>
+                ` : `<div class="loading-dots">Aguardando oponente<span>.</span><span>.</span><span>.</span></div>`}
+            </div>
+        `, []);
+        const logsDiv = document.getElementById('duelLogs');
+        if (logsDiv) logsDiv.scrollTop = logsDiv.scrollHeight;
+    });
+};
+
+window.submitDuelMove = async function (duelId, move) {
+    const duelDoc = db.collection('duels').doc(duelId);
+    await duelDoc.update({
+        [`moves.${currentCharacter.id}`]: move
+    });
+
+    const doc = await duelDoc.get();
+    const duel = doc.data();
+    if (Object.keys(duel.moves || {}).length === 2) {
+        window.resolveDuel(duelId);
+    }
+};
+
+window.resolveDuel = async function (duelId) {
+    const duelDoc = db.collection('duels').doc(duelId);
+    const doc = await duelDoc.get();
+    const duel = doc.data();
+    if (duel.status === 'finished') return;
+
+    const p1Id = duel.challengerId;
+    const p2Id = duel.opponentId;
+    const m1 = duel.moves[p1Id];
+    const m2 = duel.moves[p2Id];
+
+    const p1 = allPlayers.find(p => p.id === p1Id);
+    const p2 = allPlayers.find(p => p.id === p2Id);
+
+    const stats1 = duel.duelType === 'force' ? (p1.fitness || 50) : (p1.intelligence || 50);
+    const stats2 = duel.duelType === 'force' ? (p2.fitness || 50) : (p2.intelligence || 50);
+
+    const newHP = { ...duel.hp };
+    const newLogs = [...duel.logs];
+    const newGuards = duel.guards || {};
+
+    const processMove = (casterId, targetId, move, casterStats, targetStats) => {
+        const casterName = casterId === p1Id ? p1.name : p2.name;
+        const targetName = targetId === p1Id ? p1.name : p2.name;
+
+        let damage = 0;
+        let heal = 0;
+        let hit = true;
+
+        if (move === 'quick') {
+            hit = Math.random() < 0.95;
+            damage = hit ? Math.floor((casterStats / 5) + Math.random() * 10 + 5) : 0;
+            if (hit) newLogs.push(`${casterName} usou Ataque Rápido! Dano: ${damage}`);
+            else newLogs.push(`${casterName} errou o Ataque Rápido!`);
+        } else if (move === 'heavy') {
+            hit = Math.random() < 0.7;
+            damage = hit ? Math.floor((casterStats / 3) + Math.random() * 15 + 10) : 0;
+            if (hit) newLogs.push(`${casterName} usou Golpe Pesado! Dano crítico: ${damage}`);
+            else newLogs.push(`${casterName} errou o Golpe Pesado!`);
+        } else if (move === 'guard') {
+            newGuards[casterId] = true;
+            newLogs.push(`${casterName} está em postura defensiva!`);
+        } else if (move === 'heal') {
+            hit = Math.random() < 0.8;
+            heal = hit ? 20 : 0;
+            if (hit) {
+                newHP[casterId] = Math.min(100, newHP[casterId] + heal);
+                newLogs.push(`${casterName} recuperou ${heal} de HP!`);
+            } else newLogs.push(`${casterName} falhou ao tentar curar!`);
+        }
+
+        if (damage > 0) {
+            if (newGuards[targetId]) {
+                damage = Math.floor(damage / 2);
+                newLogs.push(`A defesa de ${targetName} reduziu o dano!`);
+                delete newGuards[targetId];
+            }
+            newHP[targetId] = Math.max(0, newHP[targetId] - damage);
+        }
+    };
+
+    // Resolução simultânea ou aleatória de ordem (Pokemon style speed is complicated, let's go sequential)
+    processMove(p1Id, p2Id, m1, stats1, stats2);
+    if (newHP[p2Id] > 0) {
+        processMove(p2Id, p1Id, m2, stats2, stats1);
+    }
+
+    const isFinished = newHP[p1Id] <= 0 || newHP[p2Id] <= 0;
+
+    if (isFinished) {
+        const winnerId = newHP[p1Id] > 0 ? p1Id : p2Id;
+        const loserId = winnerId === p1Id ? p2Id : p1Id;
+        const winner = allPlayers.find(p => p.id === winnerId);
+        const loser = allPlayers.find(p => p.id === loserId);
+
+        await duelDoc.update({
+            status: 'finished',
+            hp: newHP,
+            logs: newLogs,
+            winnerId,
+            loserId,
+            resolveText: `${winner.name} saiu vitorioso deste duelo intenso!`
+        });
+    } else {
+        await duelDoc.update({
+            turn: (duel.turn || 1) + 1,
+            hp: newHP,
+            moves: {}, // Clear moves for next turn
+            logs: newLogs,
+            guards: newGuards
+        });
+    }
+};
+
+window.showDuelResults = function (duel) {
+    const isWinner = currentCharacter.id === duel.winnerId;
+
+    showModal(isWinner ? '🏆 Vitória!' : '💀 Derrota...', `
+        <div style="text-align:center; padding: 1rem;">
+            <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">${duel.resolveText}</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px;">
+                ${isWinner ?
+            `<p style="color: #4CAF50; font-weight: bold;">+ €150 | + Reputação</p>` :
+            `<p style="color: #f44336; font-weight: bold;">- Saúde | - Felicidade</p>`}
+            </div>
+        </div>
+    `, [{ text: 'Finalizar', class: 'btn btn-primary', onclick: 'finishDuelSync()' }]);
+
+    if (isWinner) {
+        currentCharacter.money += 150;
+        currentCharacter.social = Math.min(100, (currentCharacter.social || 50) + 5);
+    } else {
+        currentCharacter.happiness = Math.max(0, (currentCharacter.happiness || 50) - 15);
+        currentCharacter.health = Math.max(0, (currentCharacter.health || 100) - 10);
+    }
+    saveCharacter();
+    updateUI();
+};
+
+window.finishDuelSync = function () {
+    closeModal();
+};
+
+// ============================================
+// DICE DUEL SYSTEM
+// ============================================
+let diceDuelListener = null;
+
+function startDiceDuelListener() {
+    if (diceDuelListener) diceDuelListener();
+    diceDuelListener = db.collection('dice_duels')
+        .where('p1Id', '==', currentCharacter.id)
+        .where('status', '==', 'waiting_p1')
+        .onSnapshot(snapshot => {
+            snapshot.forEach(doc => {
+                const duel = doc.data();
+                showDiceRollModal(doc.id, duel);
+            });
+        });
+
+    // Also listen for results as P2 or P1
+    db.collection('dice_duels')
+        .where('status', '==', 'finished')
+        .orderBy('timestamp', 'desc')
+        .limit(1)
+        .onSnapshot(snapshot => {
+            snapshot.forEach(doc => {
+                const duel = doc.data();
+                // Omit for now or show auto notification if player part of it
+                if (duel.p1Id === currentCharacter.id || duel.p2Id === currentCharacter.id) {
+                    // Only show if timestamp is very recent
+                    const ts = duel.timestamp?.toDate().getTime() || 0;
+                    if (Date.now() - ts < 10000) {
+                        showDiceResults(duel);
+                    }
+                }
+            });
+        });
+}
+
+function showDiceRollModal(duelId, duel) {
+    showModal('Duelo de Dados: Tua Vez!', `
+        <div style="text-align: center;">
+            <p>${duel.p2Name} aceitou o desafio!</p>
+            <div style="font-size: 3rem; margin: 1rem;">🎲</div>
+            <p>Lança os dados para decidir quem ganha os €100!</p>
+        </div>
+    `, [
+        { text: 'Lançar Dados! 🎲', class: 'btn btn-primary', onclick: `resolveDiceDuel('${duelId}')` }
+    ]);
+}
+
+async function resolveDiceDuel(duelId) {
+    closeModal();
+    const duelRef = db.collection('dice_duels').doc(duelId);
+    const duelDoc = await duelRef.get();
+    if (!duelDoc.exists || duelDoc.data().status !== 'waiting_p1') return;
+
+    const duel = duelDoc.data();
+    const p1Roll = Math.floor(Math.random() * 6) + 1;
+    const p2Roll = duel.p2Roll;
+
+    let winnerId = null;
+    let resolveText = "";
+
+    if (p1Roll > p2Roll) {
+        winnerId = duel.p1Id;
+        resolveText = `Ganhaste! ${p1Roll} vs ${p2Roll}`;
+    } else if (p2Roll > p1Roll) {
+        winnerId = duel.p2Id;
+        resolveText = `Perdeste... ${p1Roll} vs ${p2Roll}`;
+    } else {
+        resolveText = `Empate! ${p1Roll} vs ${p2Roll}. O pote será dividido.`;
+    }
+
+    await duelRef.update({
+        p1Roll: p1Roll,
+        status: 'finished',
+        winnerId: winnerId,
+        resolveText: resolveText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    if (winnerId === currentCharacter.id) {
+        currentCharacter.money += 100;
+        await addActivity(currentCharacter.id, `Ganhou um duelo de dados contra ${duel.p2Name}! +€100 🎲`, 'positive');
+    } else if (!winnerId) {
+        currentCharacter.money += 50;
+        await addActivity(currentCharacter.id, `Empatou nos dados contra ${duel.p2Name}. €50 devolvidos.`, 'normal');
+    } else {
+        await addActivity(currentCharacter.id, `Perdeu nos dados contra ${duel.p2Name}... -€50 🎲`, 'negative');
+    }
+
+    await saveCharacter();
+    updateUI();
+}
+
+function showDiceResults(duel) {
+    // Optional additional modal or just notification
+    const isWinner = duel.winnerId === currentCharacter.id;
+    const isDraw = !duel.winnerId;
+
+    if (duel.status === 'finished' && duel.p1Id === currentCharacter.id) return; // Challenger already saw it in resolve function
+
+    // For P2 who waiting
+    if (duel.status === 'finished' && duel.p2Id === currentCharacter.id) {
+        if (isWinner) {
+            currentCharacter.money += 100;
+            saveCharacter();
+            updateUI();
+        } else if (isDraw) {
+            currentCharacter.money += 50;
+            saveCharacter();
+            updateUI();
+        }
+
+        showModal('Resultado dos Dados', `
+            <div style="text-align: center;">
+                <p>${duel.p1Name} lançou os dados!</p>
+                <div style="font-size: 2rem; margin: 1rem;">🎲 ${duel.p1Roll} vs ${duel.p2Roll} 🎲</div>
+                <h3 style="color: ${isWinner ? 'gold' : (isDraw ? 'white' : 'red')}">
+                    ${isWinner ? 'Ganhaste €100!' : (isDraw ? 'Empate! €50 devolvidos.' : 'Perdeste €50...')}
+                </h3>
+            </div>
+        `, [{ text: 'Continuar', class: 'btn btn-primary', onclick: 'closeModal()' }]);
+    }
+}
 async function rejectRequest(requestId) {
     closeModal();
 
@@ -2342,6 +3339,151 @@ async function rejectRequest(requestId) {
     showNotification('Pedido recusado', 'success');
 }
 
+// ============================================
+// ADMIN / GOD MODE FUNCTIONS
+// ============================================
+// ============================================
+// SOCIAL INTERACTIONS
+// ============================================
+window.removeFriend = async function (friendId) {
+    if (!currentCharacter || !currentCharacter.friends) return;
+
+    const friend = allPlayers.find(p => p.id === friendId);
+    if (!confirm(`Tens a certeza que queres desamigar ${friend?.name || 'este jogador'}?`)) return;
+
+    currentCharacter.friends = currentCharacter.friends.filter(id => id !== friendId);
+
+    // Update other player (soft removal)
+    const otherRef = db.collection('characters').doc(friendId);
+    const otherDoc = await otherRef.get();
+    if (otherDoc.exists) {
+        const otherData = otherDoc.data();
+        const otherFriends = (otherData.friends || []).filter(id => id !== currentCharacter.id);
+        await otherRef.update({ friends: otherFriends });
+    }
+
+    await saveCharacter();
+    updateUI();
+    showNotification('Amizade removida.', 'success');
+};
+
+window.openSendMoneyModal = function (toId) {
+    const target = allPlayers.find(p => p.id === toId);
+    showModal(`Enviar dinheiro para ${target.name}`, `
+            <p>Saldo disponível: €${formatMoney(currentCharacter.money || 0)}</p>
+            <input type="number" id="sendMoneyAmount" class="form-input" placeholder="Quantia €" min="1">
+        `, [
+        { text: 'Enviar', class: 'btn btn-primary', onclick: `sendMoney('${toId}')` },
+        { text: 'Cancelar', class: 'btn btn-secondary', onclick: 'closeModal()' }
+    ]);
+};
+
+window.sendMoney = async function (toId) {
+    const amount = parseInt(document.getElementById('sendMoneyAmount').value);
+    if (isNaN(amount) || amount <= 0) {
+        showNotification('Quantia inválida.', 'error');
+        return;
+    }
+
+    if ((currentCharacter.money || 0) < amount) {
+        showNotification('Saldo insuficiente.', 'error');
+        return;
+    }
+
+    closeModal();
+    showLoading('Enviando...');
+
+    currentCharacter.money -= amount;
+
+    await db.collection('characters').doc(toId).update({
+        money: firebase.firestore.FieldValue.increment(amount)
+    });
+
+    const target = allPlayers.find(p => p.id === toId);
+    await addActivity(currentCharacter.id, `Enviou €${formatMoney(amount)} para ${target.name}. 💸`, 'social');
+    await addActivity(toId, `Recebeu €${formatMoney(amount)} de ${currentCharacter.name}! 💰`, 'social');
+
+    await saveCharacter();
+    hideLoading();
+    updateUI();
+    showNotification(`Enviou €${formatMoney(amount)} com sucesso!`, 'success');
+};
+
+window.requestEmancipation = async function () {
+    if (!currentCharacter.family || !currentCharacter.family.parents || currentCharacter.family.parents.length === 0) return;
+
+    if (!confirm("Desejas solicitar o abandono da adoção/emancipação? Isso requer aprovação de todos os envolvidos.")) return;
+
+    const parents = currentCharacter.family.parents;
+    for (const parentId of parents) {
+        await db.collection('requests').add({
+            from: currentCharacter.id,
+            fromName: currentCharacter.name,
+            to: parentId,
+            type: 'emancipation',
+            status: 'pending',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
+
+    showNotification('Pedido de emancipação enviado aos pais.', 'success');
+};
+
+window.adminAddMoney = async function (amount) {
+    if (!currentCharacter) return;
+    currentCharacter.money = (currentCharacter.money || 0) + amount;
+    await saveCharacter();
+    updateUI();
+    showNotification(`Adicionado €${formatMoney(amount)}!`, 'success');
+};
+
+window.adminMaxStats = async function () {
+    if (!currentCharacter) return;
+    currentCharacter.health = 100;
+    currentCharacter.happiness = 100;
+    currentCharacter.intelligence = 100;
+    currentCharacter.social = 100;
+    currentCharacter.fitness = 100;
+    await saveCharacter();
+    updateUI();
+    showNotification('Todos os stats no máximo!', 'success');
+};
+
+window.adminResurrect = async function () {
+    if (!currentCharacter) return;
+    currentCharacter.alive = true;
+    currentCharacter.health = 100;
+    await saveCharacter();
+    updateUI();
+    closeModal();
+    showNotification('Personagem ressuscitado!', 'success');
+};
+
+window.adminSetAge = async function (newAge) {
+    if (!currentCharacter) return;
+    const age = parseInt(newAge);
+
+    const now = new Date(Date.now() + serverTimeOffset);
+    const yearMs = (1000 * 60 * 60 * 24) / (gameSettings.timeSpeed || 1);
+    const offsetMs = (age * yearMs) + (yearMs * 0.05); // 5% buffer
+    const newBirthDate = new Date(now.getTime() - offsetMs);
+
+    await db.collection('characters').doc(currentCharacter.id).update({
+        age: age,
+        birthDate: newBirthDate.toISOString()
+    });
+
+    showNotification(`Idade alterada para ${newAge} anos!`, 'success');
+};
+
+window.adminUnlockAllAchievements = async function () {
+    if (!currentCharacter) return;
+    const allKeys = Object.keys(ACHIEVEMENTS);
+    currentCharacter.achievements = allKeys;
+    await saveCharacter();
+    updateUI();
+    showNotification('Todas as conquistas desbloqueadas!', 'success');
+};
 // ============================================
 // ACTIVITIES & PLAYERS
 // ============================================
@@ -2711,10 +3853,15 @@ function showEducationMenu() {
     // University Courses section if high school is completed
     let uniList = '';
     if (currentCharacter.education === 'high') {
+        const ALL_UNIVERSITY_COURSES = {
+            ...UNIVERSITY_COURSES,
+            gestao: { label: 'Gestão de Empresas', area: 'all', duration: 3, cost: 697 }
+        };
+
         uniList = '<h3 style="margin: 1.5rem 0 1rem;">Cursos Universitários (Licenciatura)</h3>';
-        uniList += Object.keys(UNIVERSITY_COURSES).map(key => {
-            const course = UNIVERSITY_COURSES[key];
-            const areaMatch = (currentCharacter.educationArea === course.area);
+        uniList += Object.keys(ALL_UNIVERSITY_COURSES).map(key => {
+            const course = ALL_UNIVERSITY_COURSES[key];
+            const areaMatch = (course.area === 'all' || currentCharacter.educationArea === course.area);
             const canAfford = (currentCharacter.money || 0) >= course.cost;
 
             const onclick = (areaMatch && canAfford) ? `startUniversity('${key}')` : '';

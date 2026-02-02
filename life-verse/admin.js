@@ -320,6 +320,29 @@ async function editPlayer(playerId) {
             <input type="number" class="form-input" id="editIntelligence" min="0" max="100" value="${player.intelligence || 0}">
         </div>
         <div class="form-group">
+            <label class="form-label">Gênero</label>
+            <select class="form-input" id="editGender">
+                <option value="male" ${player.gender === 'male' ? 'selected' : ''}>Masculino</option>
+                <option value="female" ${player.gender === 'female' ? 'selected' : ''}>Feminino</option>
+                <option value="non-binary" ${player.gender === 'non-binary' ? 'selected' : ''}>Não-binário</option>
+                <option value="other" ${player.gender === 'other' ? 'selected' : ''}>Outro</option>
+            </select>
+        </div>
+        <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Ocupação</label>
+            <select class="form-input" id="editOccupation">
+                ${Object.keys(CAREERS).map(k => `<option value="${k}" ${player.occupation === k ? 'selected' : ''}>${CAREERS[k].label}</option>`).join('')}
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Fitness (0-100)</label>
+            <input type="number" class="form-input" id="editFitness" min="0" max="100" value="${player.fitness || 0}">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Social (0-100)</label>
+            <input type="number" class="form-input" id="editSocial" min="0" max="100" value="${player.social || 0}">
+        </div>
+        <div class="form-group">
             <label class="form-label">Status</label>
             <select class="form-input" id="editAlive">
                 <option value="true" ${player.alive ? 'selected' : ''}>Vivo</option>
@@ -349,6 +372,11 @@ async function savePlayerEdit(playerId) {
     const intelligence = parseInt(document.getElementById('editIntelligence').value);
     const alive = document.getElementById('editAlive').value === 'true';
 
+    const fitness = parseInt(document.getElementById('editFitness').value);
+    const social = parseInt(document.getElementById('editSocial').value);
+    const gender = document.getElementById('editGender').value;
+    const occupation = document.getElementById('editOccupation').value;
+
     showLoading('Salvando...');
 
     try {
@@ -359,6 +387,10 @@ async function savePlayerEdit(playerId) {
             health,
             happiness,
             intelligence,
+            fitness,
+            social,
+            gender,
+            occupation,
             alive,
             lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -367,8 +399,8 @@ async function savePlayerEdit(playerId) {
         if (age !== player.age) {
             const now = new Date(Date.now() + serverTimeOffset);
             const yearInMs = (1000 * 60 * 60 * 24) / (gameSettings.timeSpeed || 1);
-            // Buffer de 10% do ano para evitar micro-conflitos de arredondamento
-            const offsetMs = (age * yearInMs) + (yearInMs * 0.1);
+            // Buffer de 5% do ano para garantir que o Math.floor resulte na idade correta
+            const offsetMs = (age * yearInMs) + (yearInMs * 0.05);
             const newBirthDate = new Date(now.getTime() - offsetMs);
             updates.birthDate = newBirthDate.toISOString();
         }
@@ -1096,9 +1128,7 @@ async function applyModifyStats() {
     if (newAge !== player.age) {
         const now = new Date(Date.now() + serverTimeOffset);
         const yearInMs = (1000 * 60 * 60 * 24) / (gameSettings.timeSpeed || 1);
-        // Adicionamos um pequeno buffer (10% do ano) para evitar que o client 
-        // calcule uma idade menor devido a arredondamentos.
-        const offsetMs = (newAge * yearInMs) + (yearInMs * 0.1);
+        const offsetMs = (newAge * yearInMs) + (yearInMs * 0.05);
         const newBirthDate = new Date(now.getTime() - offsetMs);
         stats.birthDate = newBirthDate.toISOString();
     }
