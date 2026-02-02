@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - LifeVerse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;600;800;900&family=Syne:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+    <div class="grain"></div>
+
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="adminLogin">
+            <div class="login-wrapper">
+                <div class="brand">
+                    <h1 class="brand-title">⚡ GOD MODE ⚡</h1>
+                    <p class="brand-tagline">Painel de Administração</p>
+                </div>
+
+                <div class="login-box">
+                    <div class="form-group">
+                        <label class="form-label">Email Admin</label>
+                        <input type="email" class="form-input" id="adminEmail" placeholder="admin@lifeverse.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Senha</label>
+                        <input type="password" class="form-input" id="adminPassword" placeholder="••••••••">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="adminLogin()">Entrar como Admin</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel">
+            <div class="admin-header">
+                <div class="header-brand">⚡ LifeVerse Admin</div>
+                <div class="header-info">
+                    <span id="adminUser"></span>
+                    <button class="btn-logout" onclick="adminLogout()">Sair</button>
+                </div>
+            </div>
+
+            <div class="admin-content">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="sidebar-title">Controles Divinos</div>
+
+                    <button class="sidebar-btn active" data-section="overview">
+                        📊 Visão Geral
+                    </button>
+                    <button class="sidebar-btn" data-section="players">
+                        👥 Jogadores
+                    </button>
+                    <button class="sidebar-btn" data-section="families">
+                        👨‍👩‍👧‍👦 Famílias
+                    </button>
+                    <button class="sidebar-btn" data-section="economy">
+                        💰 Economia
+                    </button>
+                    <button class="sidebar-btn" data-section="events">
+                        ⚡ Eventos
+                    </button>
+                    <button class="sidebar-btn" data-section="stats">
+                        📈 Estatísticas
+                    </button>
+                    <button class="sidebar-btn" data-section="godtools">
+                        🔨 Ferramentas Divinas
+                    </button>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-panel">
+                    <!-- Overview Section -->
+                    <div class="panel-section active" id="section-overview">
+                        <h1 class="section-title">Visão Geral do Universo</h1>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-value" id="totalPlayers">0</div>
+                                <div class="stat-label">Jogadores Totais</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💚</div>
+                                <div class="stat-value" id="alivePlayers">0</div>
+                                <div class="stat-label">Vivos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💀</div>
+                                <div class="stat-value" id="deadPlayers">0</div>
+                                <div class="stat-label">Falecidos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💰</div>
+                                <div class="stat-value" id="totalMoney">€0</div>
+                                <div class="stat-label">Economia Total</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">👨‍👩‍👧‍👦</div>
+                                <div class="stat-value" id="totalFamilies">0</div>
+                                <div class="stat-label">Famílias</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💑</div>
+                                <div class="stat-value" id="totalCouples">0</div>
+                                <div class="stat-label">Casais</div>
+                            </div>
+                        </div>
+
+                        <div class="content-card">
+                            <h2>Atividade Recente</h2>
+                            <div id="recentActivity"></div>
+                        </div>
+                    </div>
+
+                    <!-- Players Section -->
+                    <div class="panel-section" id="section-players">
+                        <h1 class="section-title">Gerenciar Jogadores</h1>
+
+                        <div class="search-bar">
+                            <input type="text" class="form-input" id="playerSearch" placeholder="🔍 Buscar jogador...">
+                        </div>
+
+                        <div class="content-card">
+                            <div class="table-container" id="playersTable"></div>
+                        </div>
+                    </div>
+
+                    <!-- Families Section -->
+                    <div class="panel-section" id="section-families">
+                        <h1 class="section-title">Gerenciar Famílias</h1>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="createFamily()">➕ Criar Nova Família</button>
+                            <button class="btn btn-secondary" onclick="linkPlayers()">🔗 Linkar Jogadores</button>
+                        </div>
+
+                        <div class="content-card">
+                            <h2>Famílias Existentes</h2>
+                            <div id="familiesList"></div>
+                        </div>
+                    </div>
+
+                    <!-- Economy Section -->
+                    <div class="panel-section" id="section-economy">
+                        <h1 class="section-title">Controle Econômico</h1>
+
+                        <div class="content-card">
+                            <h2>Ações Econômicas</h2>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" onclick="globalMoneyAdjust()">💰 Ajuste Global de
+                                    Dinheiro</button>
+                                <button class="btn btn-secondary" onclick="giveMoneyToPlayer()">💸 Dar Dinheiro a
+                                    Jogador</button>
+                                <button class="btn btn-secondary" onclick="resetEconomy()">🔄 Resetar Economia</button>
+                            </div>
+                        </div>
+
+                        <div class="content-card">
+                            <h2>Distribuição de Riqueza</h2>
+                            <canvas id="wealthChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Events Section -->
+                    <div class="panel-section" id="section-events">
+                        <h1 class="section-title">Eventos Divinos</h1>
+
+                        <div class="content-card">
+                            <h2>Criar Evento Global</h2>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Evento</label>
+                                <select class="form-input" id="eventType">
+                                    <option value="positive">✅ Positivo (aumenta felicidade)</option>
+                                    <option value="negative">⚠️ Negativo (desafio)</option>
+                                    <option value="critical">🔥 Crítico (grave)</option>
+                                    <option value="economic">💰 Econômico</option>
+                                    <option value="health">❤️ Saúde</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Descrição do Evento</label>
+                                <textarea class="form-input" id="eventDesc" rows="3"
+                                    placeholder="Ex: Uma pandemia global afetou todos os jogadores"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Impacto</label>
+                                <input type="range" id="eventImpact" min="-50" max="50" value="0">
+                                <span id="eventImpactValue">0</span>
+                            </div>
+                            <button class="btn btn-primary" onclick="triggerGlobalEvent()">⚡ Lançar Evento
+                                Global</button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Section -->
+                    <div class="panel-section" id="section-stats">
+                        <h1 class="section-title">Estatísticas do Universo</h1>
+
+                        <div class="content-card">
+                            <h2>Distribuição por Idade</h2>
+                            <canvas id="ageChart"></canvas>
+                        </div>
+
+                        <div class="content-card">
+                            <h2>Carreiras Mais Populares</h2>
+                            <canvas id="careerChart"></canvas>
+                        </div>
+
+                        <div class="content-card">
+                            <h2>Média de Estatísticas</h2>
+                            <div id="avgStats"></div>
+                        </div>
+                    </div>
+
+                    <!-- God Tools Section -->
+                    <div class="panel-section" id="section-godtools">
+                        <h1 class="section-title">🔨 Ferramentas Divinas</h1>
+
+                        <div class="warning-box">
+                            ⚠️ <strong>ATENÇÃO:</strong> Estas ferramentas têm poder absoluto sobre o jogo. Use com
+                            responsabilidade.
+                        </div>
+
+                        <div class="god-tools-categories">
+                            <!-- ✨ Soul Manipulation -->
+                            <div class="god-category">
+                                <h2 class="category-header">✨ Manipulação de Almas</h2>
+                                <div class="god-tools-grid">
+                                    <div class="tool-card tool-soul">
+                                        <h3>📊 Modificar Stats</h3>
+                                        <p>Alterar stats e idade de qualquer jogador</p>
+                                        <button class="btn btn-primary" onclick="modifyStats()">Modificar</button>
+                                    </div>
+                                    <div class="tool-card tool-soul">
+                                        <h3>💚 Controle de Vida</h3>
+                                        <p>Reviver ou assassinar qualquer jogador</p>
+                                        <button class="btn btn-primary" onclick="lifeDeathControl()">Controlar</button>
+                                    </div>
+                                    <div class="tool-card tool-soul">
+                                        <h3>🌍 Teletransportar</h3>
+                                        <p>Mudar localização instantaneamente</p>
+                                        <button class="btn btn-primary"
+                                            onclick="teleportPlayer()">Teletransportar</button>
+                                    </div>
+                                    <div class="tool-card tool-soul">
+                                        <h3>🎁 Conquistas</h3>
+                                        <p>Conceder méritos divinos</p>
+                                        <button class="btn btn-primary" onclick="giveAchievement()">Dar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 📜 Destiny & Order -->
+                            <div class="god-category">
+                                <h2 class="category-header">📜 Destino & Ordem</h2>
+                                <div class="god-tools-grid">
+                                    <div class="tool-card tool-destiny">
+                                        <h3>🎓 Educação & Carreira</h3>
+                                        <p>Mudar o rumo profissional e académico</p>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn btn-primary" onclick="changeCareer()">Alterar</button>
+                                            <button class="btn btn-primary" title="Avançar Etapa"
+                                                onclick="skipEducation()">✨ Skip</button>
+                                        </div>
+                                    </div>
+                                    <div class="tool-card tool-destiny">
+                                        <h3>💑 Relacionamentos</h3>
+                                        <p>Forçar casamentos ou divórcios</p>
+                                        <button class="btn btn-primary" onclick="forceRelationship()">Forçar</button>
+                                    </div>
+                                    <div class="tool-card tool-destiny">
+                                        <h3>👶 Criar Filhos</h3>
+                                        <p>Adicionar descendência a casais</p>
+                                        <button class="btn btn-primary" onclick="createChild()">Criar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 🌀 Fabric of Reality -->
+                            <div class="god-category">
+                                <h2 class="category-header">🌀 Tecido da Realidade</h2>
+                                <div class="god-tools-grid">
+                                    <div class="tool-card tool-reality">
+                                        <h3>⏰ Fluxo do Tempo</h3>
+                                        <p>Acelerar ou parar o tempo do mundo</p>
+                                        <button class="btn btn-primary" onclick="adjustTimeSpeed()">Ajustar
+                                            Tempo</button>
+                                    </div>
+                                    <div class="tool-card tool-reality">
+                                        <h3>📢 Voz Divina</h3>
+                                        <p>Broadcast para todos os mortais</p>
+                                        <button class="btn btn-primary" onclick="broadcastMessage()">Enviar</button>
+                                    </div>
+                                    <div class="tool-card tool-reality">
+                                        <h3>⚡ Evento Mundial</h3>
+                                        <p>Garantir que todos sintam o seu poder</p>
+                                        <button class="btn btn-primary" onclick="switchTab('events')">Criar
+                                            Evento</button>
+                                    </div>
+                                    <div class="tool-card tool-reality">
+                                        <h3>📜 Registos Astrais</h3>
+                                        <p>Visualizar logs de todas as ações</p>
+                                        <button class="btn btn-primary" onclick="viewLogs()">Ver Logs</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ⚖️ Final Judgment -->
+                            <div class="god-category category-danger">
+                                <h2 class="category-header">⚖️ Juízo Final</h2>
+                                <div class="god-tools-grid">
+                                    <div class="tool-card tool-judgment">
+                                        <h3>🗑️ Deletar Mortal</h3>
+                                        <p>Remover permanentemente um jogador</p>
+                                        <button class="btn btn-danger" onclick="deletePlayer()">Deletar</button>
+                                    </div>
+                                    <div class="tool-card tool-judgment">
+                                        <h3>🔄 Reset Total</h3>
+                                        <p>Destruir o universo e começar de novo</p>
+                                        <button class="btn btn-danger" onclick="resetGame()">Reset Universal</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-buttons" id="modalButtons"></div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Carregando...</div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

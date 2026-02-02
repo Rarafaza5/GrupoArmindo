@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeVerse - Viva Sua Única Vida Real</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;600;800;900&family=Syne:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+    <div class="grain"></div>
+
+    <div class="container">
+        <!-- LOGIN SCREEN -->
+        <div id="loginScreen">
+            <div class="login-wrapper">
+                <div class="brand">
+                    <h1 class="brand-title">LifeVerse</h1>
+                    <p class="brand-tagline">Viva sua única vida real</p>
+                </div>
+
+                <div class="login-box">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="loginEmail" placeholder="seu@email.com"
+                            autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Senha</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="••••••••"
+                            autocomplete="current-password">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="login()">Entrar no Universo</button>
+                    <button class="btn btn-secondary" onclick="showRegister()">Criar Nova Vida</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen">
+            <div class="game-header">
+                <div class="header-brand">LifeVerse</div>
+
+                <div class="global-time">
+                    <div class="time-label">Tempo Global</div>
+                    <div class="time-display" id="globalTime">00:00:00</div>
+                    <div class="date-display" id="globalDate"></div>
+                </div>
+
+                <div class="header-user">
+                    <span class="user-name" id="userName"></span>
+                    <button class="btn-logout" onclick="logout()">Sair</button>
+                </div>
+            </div>
+
+            <div class="game-layout">
+                <!-- LEFT PANEL -->
+                <div class="panel" id="panel-stats">
+                    <div class="character-avatar" id="charAvatar">👤</div>
+                    <h2 class="character-name" id="charName">Carregando...</h2>
+                    <div class="character-age" id="charAge">0 anos</div>
+                    <div class="life-stage-badge" id="lifeStage">Bebê</div>
+
+                    <div class="stat-section">
+                        <div class="stat-section-title">Estatísticas Vitais</div>
+
+                        <div class="stat-item">
+                            <div class="stat-header">
+                                <span class="stat-name">❤️ Saúde</span>
+                                <span class="stat-value" id="healthValue">100</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar-fill health" id="healthBar" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-header">
+                                <span class="stat-name">😊 Felicidade</span>
+                                <span class="stat-value" id="happinessValue">100</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar-fill happiness" id="happinessBar" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-header">
+                                <span class="stat-name">🧠 Inteligência</span>
+                                <span class="stat-value" id="intelligenceValue">50</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar-fill intelligence" id="intelligenceBar" style="width: 50%"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-header">
+                                <span class="stat-name">👥 Social</span>
+                                <span class="stat-value" id="socialValue">50</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar-fill social" id="socialBar" style="width: 50%"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-header">
+                                <span class="stat-name">💪 Fitness</span>
+                                <span class="stat-value" id="fitnessValue">50</span>
+                            </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-bar-fill fitness" id="fitnessBar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="money-card">
+                        <div class="money-amount" id="moneyAmount">€0</div>
+                        <div class="money-label">Patrimônio</div>
+                    </div>
+                </div>
+
+                <!-- CENTER -->
+                <div class="main-content" id="panel-main">
+                    <div class="content-card">
+                        <h2 class="content-card-title">Perfil</h2>
+
+                        <div class="info-grid">
+                            <div class="info-box">
+                                <div class="info-label">Ocupação</div>
+                                <div class="info-value" id="occupation">Nenhuma</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-label">Educação</div>
+                                <div class="info-value" id="education">Nenhuma</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-label">Estado Civil</div>
+                                <div class="info-value" id="maritalStatus">Solteiro(a)</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="info-label">Localização</div>
+                                <div class="info-value" id="location">Portugal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="tabs">
+                            <button class="tab active" data-tab="actions">Ações</button>
+                            <button class="tab" data-tab="relationships">Relacionamentos</button>
+                            <button class="tab" data-tab="career">Carreira</button>
+                            <button class="tab" data-tab="family">Família</button>
+                            <button class="tab" data-tab="assets">Patrimônio</button>
+                            <button class="tab" data-tab="social">Social</button>
+                        </div>
+
+                        <div class="tab-content active" id="tab-actions">
+                            <div class="action-grid" id="actionsGrid"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-relationships">
+                            <div class="player-list" id="relationshipsList"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-career">
+                            <div class="action-grid" id="careerGrid"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-family">
+                            <div class="player-list" id="familyList"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-assets">
+                            <div class="action-grid" id="assetsGrid"></div>
+                        </div>
+
+                        <div class="tab-content" id="tab-social">
+                            <div class="search-container" style="margin-bottom: 1.5rem;">
+                                <input type="text" id="playerSearchInput" class="form-input"
+                                    placeholder="Pesquisar jogadores..." oninput="handlePlayerSearch(this.value)">
+                            </div>
+
+                            <div id="friendsListSection">
+                                <h3 style="margin-bottom: 1rem;">Seus Amigos</h3>
+                                <div class="player-list" id="friendsList"></div>
+                            </div>
+
+                            <div id="searchResultsSection" style="margin-top: 2rem;">
+                                <h3 style="margin-bottom: 1rem;">Encontrar Pessoas</h3>
+                                <div class="player-list" id="socialList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL -->
+                <div class="panel" id="panel-events">
+                    <h2 class="panel-title">Eventos da Vida</h2>
+                    <div class="activity-feed" id="activityFeed"></div>
+                </div>
+            </div>
+
+            <!-- MOBILE NAVIGATION -->
+            <div class="bottom-nav">
+                <button class="nav-item active" onclick="switchMobileTab('stats')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Perfil</div>
+                </button>
+                <button class="nav-item" onclick="switchMobileTab('main')">
+                    <div class="nav-icon">⚡</div>
+                    <div class="nav-label">Ações</div>
+                </button>
+                <button class="nav-item" onclick="switchMobileTab('events')">
+                    <div class="nav-icon">📜</div>
+                    <div class="nav-label">Eventos</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-buttons" id="modalButtons"></div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Carregando...</div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <script src="game.js"></script>
+</body>
+
+</html>
