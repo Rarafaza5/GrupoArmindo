@@ -1,4 +1,6 @@
 // ============================================
+// © 2026 Grupo Armindo. Todos os direitos reservados.
+// ============================================
 // FIREBASE CONFIGURATION
 // ============================================
 const firebaseConfig = {
