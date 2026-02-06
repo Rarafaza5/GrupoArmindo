@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOCA Admin: Portal do Profeta</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+
+<body>
+
+  <header class="container" style="text-align: center; margin-top: 3rem;">
+    <h1 class="glow-text">Portal do Profeta</h1>
+    <p style="color: var(--text-secondary);">Digite a vontade de Joca.</p>
+  </header>
+
+  <main class="container" style="max-width: 600px;">
+    <div class="glass-panel">
+      <h2 style="margin-bottom: 1.5rem; color: var(--joca-orange);">Novo Mandamento</h2>
+      <form id="add-commandment-form">
+        <input type="hidden" id="doc-id"> <!-- Hidden ID for Editing -->
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Ordem (#)</label>
+          <input type="number" id="order-input" placeholder="Ex: 1" required>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Mandamento Sagrado</label>
+          <textarea id="text-input" rows="4" placeholder="Ex: Não aspirarás a cauda do gato..." required></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" id="submit-btn" class="btn btn-primary" style="flex: 1; text-align: center;">
+            ⚡ Enviar para a Nuvem
+          </button>
+          <button type="button" id="cancel-btn" class="btn"
+            style="display: none; border-color: #e74c3c; color: #e74c3c;">
+            Cancelar
+          </button>
+        </div>
+      </form>
+      <div id="status-msg" style="margin-top: 1rem; text-align: center; min-height: 20px;"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href="index.html" class="btn">Voltar para a Luz (Home)</a>
+    </div>
+
+    <!-- Management List -->
+    <div style="margin-top: 3rem;">
+      <h3 style="margin-bottom: 1rem; color: var(--text-secondary); text-align: center;">Gerenciar Escrituras</h3>
+      <div id="admin-list" style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Items will be injected here -->
+        <div class="glass-panel" style="text-align: center; padding: 1rem;">
+          <div class="loader" style="width: 20px; height: 20px; border-width: 2px;"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+
+</html>

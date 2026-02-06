@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mandamentos de Joca</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>J</text></svg>" />
+</head>
+
+<body>
+  <header class="container" style="text-align: center; margin-top: 4rem">
+    <h1 class="glow-text" style="font-size: 4rem; margin-bottom: 1rem">
+      JOCA
+    </h1>
+    <h2 style="color: var(--text-secondary); margin-bottom: 3rem">
+      O Deus Aspirador Supremo
+    </h2>
+    <p style="
+          max-width: 600px;
+          margin: 0 auto;
+          line-height: 1.6;
+          color: var(--text-secondary);
+        ">
+      Em um mundo de poeira e desordem, apenas Joca traz a pureza. Ouça seus
+      zumbidos sagrados e obedeça seus mandamentos.
+      <br />
+      <span style="color: var(--neon-purple); font-size: 0.9rem">(Limpeza iniciada)</span>
+    </p>
+  </header>
+
+  <main class="container">
+    <div id="commandments-grid" style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 2rem;
+          margin-top: 3rem;
+        ">
+      <div class="glass-panel" style="text-align: center; grid-column: 1 / -1">
+        <div class="loader"></div>
+        <p>Carregando protocolo sagrado...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="container" style="
+        text-align: center;
+        margin-top: 5rem;
+        padding-bottom: 2rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      ">
+    <p>© 2026 Culto do Aspirador. Todos os direitos aspirados.</p>
+    <div style="margin-top: 1rem;">
+      <a href="admin.html"
+        style="color: var(--text-secondary); text-decoration: none; font-size: 0.8rem; opacity: 0.3; transition: opacity 0.3s;"
+        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.3'">
+        PORTAL DO PROFETA
+      </a>
+    </div>
+  </footer>
+
+  <script type="module" src="script.js"></script>
+</body>
