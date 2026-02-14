@@ -80,20 +80,20 @@ const CMS = (function () {
     ];
 
     const initialTeam = [
-        { name: "Rafael Diogo", role: "Presidente do Grupo Armindo", icon: "👑", badges: ["Fundador"], style: { colSpan: 4 } },
-        { name: "Jorge Figueira", role: "Vice-Presidente do Grupo Armindo", icon: "⚜️", badges: ["Liderança"], style: { colSpan: 4 } },
-        { name: "Ana Ferreira", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Xavier Silva", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "André Gonçalves", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Camile Hasse", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Haku Fortunato", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Melissa Figueiredo", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Mila Loureiro", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Eduardo Pessoa", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Nico Guedes", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Afonso Martins", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Cecília Fernández", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 4 } },
-        { name: "Eya Daghfous", role: "Membro do Grupo", icon: "⭐", badges: [], style: { colSpan: 8 } }
+        { name: "Rafael Diogo", role: "Presidente", icon: "👑", badges: [], style: { colSpan: 4 } },
+        { name: "Jorge Figueira", role: "Vice-Presidente", icon: "⚜️", badges: ["Liderança"], style: { colSpan: 4 } },
+        { name: "Ana Ferreira", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Xavier Silva", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "André Gonçalves", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Camile Hasse", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Haku Fortunato", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Melissa Figueiredo", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Mila Loureiro", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Eduardo Pessoa", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Nico Guedes", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Afonso Martins", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Cecília Fernández", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 4 } },
+        { name: "Eya Daghfous", role: "Membro", icon: "⭐", badges: [], style: { colSpan: 8 } }
     ];
 
     // =========================================
@@ -220,19 +220,15 @@ const CMS = (function () {
         // Sort Logic: Importance (Role) > Alphabetical (Name)
         const ROLE_RANK = {
             'presidente': 1,
-            'vice': 2,
-            'fundador': 3,
-            'membro': 4,
-            'colaborador': 5
+            'vice-presidente': 2,
+            'membro': 3
         };
 
         const getRank = (role = '') => {
             const r = role.toLowerCase();
             if (r.includes('presidente') && !r.includes('vice')) return 1;
             if (r.includes('vice')) return 2;
-            if (r.includes('fundador')) return 3;
-            if (r.includes('membro')) return 4;
-            if (r.includes('colaborador')) return 5;
+            if (r.includes('membro')) return 3;
             return 10;
         };
 

@@ -8,10 +8,8 @@ const HubAdmin = (function () {
 
     const ROLE_EMOJIS = {
         'Presidente': '👑',
-        'Vice Presidente': '⚜️',
-        'Fundador': '🚩',
-        'Membro': '⭐',
-        'Colaborador': '🤝'
+        'Vice-Presidente': '⚜️',
+        'Membro': '⭐'
     };
 
     // =========================================
