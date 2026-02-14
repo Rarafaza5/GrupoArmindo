@@ -225,6 +225,66 @@ body {
     left: 100%;
 }
 
+.btn-loading {
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 50%;
+    left: 50%;
+    margin-top: -12px;
+    margin-left: -12px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Password Toggle */
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+/* Character Selection Feedback */
+.trait-option.selected {
+    border-color: var(--accent);
+    background: rgba(255, 51, 102, 0.1);
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.2);
+    transform: translateY(-5px);
+}
+
 .btn-primary {
     background: var(--accent);
     color: white;
@@ -247,6 +307,29 @@ body {
     border-color: var(--secondary);
     background: rgba(255, 255, 255, 0.05);
 }
+
+.btn-google {
+    background: white;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    border: none;
+}
+
+.btn-google:hover {
+    background: #f1f1f1;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+.btn-google svg {
+    width: 20px;
+    height: 20px;
+}
+
 
 /* GAME SCREEN */
 #gameScreen {
@@ -2003,21 +2086,21 @@ body {
         margin-top: 0.5rem;
     }
 }
- . a p p - f o o t e r   { 
-         p a d d i n g :   2 r e m ; 
-         t e x t - a l i g n :   c e n t e r ; 
-         c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 4 ) ; 
-         f o n t - s i z e :   0 . 9 r e m ; 
-         l e t t e r - s p a c i n g :   0 . 0 5 e m ; 
-         b o r d e r - t o p :   2 p x   s o l i d   v a r ( - - b o r d e r ) ; 
-         m a r g i n - t o p :   4 r e m ; 
-         p o s i t i o n :   r e l a t i v e ; 
-         z - i n d e x :   2 ; 
-         b a c k g r o u n d :   r g b a ( 1 0 ,   1 0 ,   1 0 ,   0 . 5 ) ; 
-         b a c k d r o p - f i l t e r :   b l u r ( 1 0 p x ) ; 
- } 
- 
- . a p p - f o o t e r   p   { 
-         m a r g i n :   0 ; 
- }  
- 
+
+.app-footer {
+    padding: 2rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    border-top: 2px solid var(--border);
+    margin-top: 4rem;
+    position: relative;
+    z-index: 2;
+    background: rgba(10, 10, 10, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.app-footer p {
+    margin: 0;
+}

@@ -1,336 +1,111 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
+
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8653418731294447"
-     crossorigin="anonymous"></script>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Hub do Grupo Armindo</title>
-  <!-- Favicon - substitua 'armindo.png' pelo caminho correto do seu ícone -->
-  <link rel="icon" type="image/png" href="armindo.png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Membros — Grupo Armindo</title>
+  <meta name="description" content="Conheça a equipa e os membros do Grupo Armindo.">
+  <link rel="icon" href="/armindo.png">
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Premium Core -->
+  <link rel="stylesheet" href="assets/css/hub-premium.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <!-- Armindo Ecosystem Scripts -->
+  <script src="assets/js/armindo-account.js"></script>
+  <script src="assets/js/hub-auth.js"></script>
+  <script src="assets/js/hub-cms.js"></script>
+
   <style>
-    /* Reset & Tipografia */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Poppins', sans-serif; color: #fff; overflow-x: hidden; }
-    a { color: inherit; text-decoration: none; }
-
-    /* Gradiente de Fundo Animado */
-    html, body {
-      height: 100%;
-      background: linear-gradient(135deg, #6a11cb, #2575fc, #6a11cb, #2575fc);
-      background-size: 400% 400%;
-      animation: gradientBG 10s ease infinite;
-    }
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Header Navegação */
-    header {
-      position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.6);
-      padding: 15px 0; z-index: 100;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-    }
-    nav {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 20px;
-    }
-    .logo-header { width: 180px; animation: logoPulse 3s cubic-bezier(0.22,1,0.36,1) infinite; }
-    nav a {
-      margin-left: 20px; font-weight: bold;
-      transition: transform 0.3s;
-    }
-    nav a:hover { transform: scale(1.1); }
-
-    @keyframes logoPulse {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    /* Seções */
-    section { padding: 120px 20px 60px; max-width: 1200px; margin: 0 auto; }
-
-    section h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+    .page-header {
+      padding: 180px 24px 80px;
       text-align: center;
-      text-shadow: 0 0 10px rgba(0,0,0,0.5);
+      position: relative;
     }
-    section p { max-width: 800px; margin: 0 auto 2rem; line-height: 1.6; }
-
-    /* Cartões de Projeto / Companhia */
-    .grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 2rem;
-    }
-    .card {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(8px);
-      border-radius: 15px;
-      padding: 1.5rem;
-      width: 300px; /* Levemente mais largo para acomodar o logo */
-      transition: transform 0.3s, box-shadow 0.3s;
-      display: flex;
-      flex-direction: column;
-    }
-    .card:hover {
-      transform: translateY(-5px) scale(1.03);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem; /* Espaço entre logo e título */
-      margin-bottom: 0.75rem;
-    }
-    .card-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .card h3 {
-      margin-bottom: 0;
-      font-size: 1.1rem;
-    }
-    .card p {
-      margin-bottom: 1.5rem; /* Mais espaço para o botão */
-      font-size: 0.95rem;
-      line-height: 1.4;
-      flex-grow: 1; /* Faz o parágrafo crescer e empurra o botão para baixo */
-    }
-    .card button {
-      background: #fff;
-      color: #2575fc;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 50px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      margin-top: auto; /* Alinha o botão na parte inferior */
-    }
-    .card button:hover {
-      background: #e0e0e0;
-      transform: scale(1.05);
-    }
-    .card button:disabled {
-        cursor: not-allowed;
-        background: #ccc;
-        color: #888;
-    }
-
-    /* Espaço para Anúncios */
-    .ad-container {
-        max-width: 970px;
-        min-height: 90px;
-        margin: 40px auto;
-        background: rgba(0,0,0,0.2);
-        border: 2px dashed rgba(255,255,255,0.3);
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: rgba(0,0,0,0.6);
-      font-size: 0.9rem;
-      margin-top: 40px;
-    }
-    footer a:hover { text-decoration: underline; }
   </style>
 </head>
+
 <body>
 
-  <!-- Navegação Superior -->
-  <header>
-    <nav>
-      <!-- Logotipo agora é um link para a página inicial -->
-      <a href="index.html">
-        <img src="logo-grupo-armindo.png" alt="Grupo Armindo" class="logo-header" onerror="this.onerror=null;this.src='https://placehold.co/180x50?text=Logo';">
-      </a>
-      <div>
-        <a href="membros.html">Membros</a>
-        <a href="https://calendar.google.com/calendar/embed?src=6991aeb9cae9950f54a9728027c9b939d09b9e9189def409a9129598191293fe%40group.calendar.google.com&ctz=Europe%2FLisbon">Calendário</a>
-        <a href="https://discord.gg/2ZFBQAPsDk">Contacto</a>
-      </div>
-    </nav>
+  <!-- AURORA BACKGROUND -->
+  <div class="aurora-bg">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+  </div>
+  <div class="noise-overlay"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <a href="/" class="brand">
+      <img src="/logo-grupo-armindo.png" alt="GA Logo" onerror="this.src='/assets/logo_grupoarmindo_trasparente.png'">
+
+    </a>
+
+    <div class="nav-links">
+      <a href="/" class="nav-link">Início</a>
+      <a href="/armindonews" class="nav-link">Notícias</a>
+      <a href="/life-verse" class="nav-link">LifeVerse</a>
+      <a href="/sobre.html" class="nav-link">Sobre</a>
+      <a href="/contato.html" class="nav-link">Contato</a>
+    </div>
+
+    <button class="mobile-toggle" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="page-header container">
+    <!-- 3D Elements for Consistency -->
+    <div class="hero-3d-elements">
+      <div class="float-element float-3" style="top: 10%; right: 10%;"></div>
+      <div class="float-element float-1" style="top: 50%; left: 5%; width: 50px; height: 50px;"></div>
+    </div>
+
+    <div style="position: relative; z-index: 2;">
+      <div class="badge reveal active">EQUIPA</div>
+      <h1 class="hero-title reveal active" style="font-size: clamp(3rem, 8vw, 5rem); margin-bottom: 24px;">Nossos
+        Membros
+      </h1>
+      <p class="reveal active" style="color: var(--text-muted); font-size: 1.25rem; max-width: 600px; margin: 0 auto;">
+        As pessoas que dão vida à visão do Grupo Armindo.
+      </p>
+    </div>
   </header>
 
-  
-
-  <!-- Projetos em Destaque -->
-  <section id="projetos">
-    <h2>Membros:</h2>
-    <div class="grid">
-      <!-- Calendário -->
-      
-      <!-- Eurovisão 2026 -->
-      <div class="card">
-        <div class="card-header">
-        <h3>Rafael Diogo 👑</h3>
-        </div>
-        <p><strong>Presidente do Grupo Armindo</strong></p>
-  
-      
+  <main class="container" style="padding-bottom: 120px;">
+    <div id="cms-team-container">
+      <!-- Populated by hub-cms.js -->
+      <div class="bento-card col-span-12"
+        style="height: 300px; display: flex; align-items: center; justify-content: center; opacity: 0.5;">
+        A carregar equipa...
       </div>
-
-      <div class="card">
-        <div class="card-header">
-        <h3>Jorge Figueira 🌟</h3>
-        </div>
-        <p><strong>Vice-Presidente do Grupo Armindo</strong></p>
- 
-      
-      </div>
-      
-
-
-
-<div class="card">
-        <div class="card-header">
-        <h3>Ana Ferreira ⭐</h3>
-        </div>
-    
-      
-      </div>
-
-
-<div class="card">
-        <div class="card-header">
-        <h3>Xavier Silva ⭐</h3>
-        </div>
-    
-      
-      </div>
-
-<div class="card">
-        <div class="card-header">
-        <h3>André Gonçalves ⭐</h3>
-        </div>
-       
-      
-      </div>
-
-
-
-<div class="card">
-        <div class="card-header">
-        <h3>Camile Hasse ⭐</h3>
-        </div>
-       
-      
-      </div>
-
-<div class="card">
-        <div class="card-header">
-        <h3>Haku Fortunato ⭐</h3>
-        </div>
-       
-      
-      </div>
-
-<div class="card">
-        <div class="card-header">
-        <h3>Melissa Figueiredo ⭐</h3>
-        </div>
-        
-      
-      </div>
-      <div class="card">
-        <div class="card-header">
-        <h3>Mila Loureiro</h3>
-        </div>
-        
-      
-      </div>
-
-<div class="card">
-        <div class="card-header">
-        <h3>Eduardo Pessoa</h3>
-        </div>
-     
-      
-      </div>
-
-
-
-<div class="card">
-        <div class="card-header">
-        <h3>Nico Guedes</h3>
-        </div>
-     
-      
-      </div>
-<div class="card">
-        <div class="card-header">
-        <h3>Afonso Martins</h3>
-        </div>
-        
-      </div>
-
-
-<div class="card">
-        <div class="card-header">
-        <h3>Cecília Fernández</h3>
-        </div>
-        
-      </div>
-
-
-
-
-<div class="card">
-        <div class="card-header">
-        <h3>Eya Daghfous</h3>
-        </div>
-        
-    
-      
-      </div>
-
-
     </div>
-    
-  </section>
+  </main>
 
-  <!-- Espaço para Anúncio 2 -->
-  <div class="ad-container" style="min-height: 250px;">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8653418731294447"
-     crossorigin="anonymous"></script>
-<!-- Membros1 -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:1000px;height:250px"
-     data-ad-client="ca-pub-8653418731294447"
-     data-ad-slot="5872493339"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-  </div>
-
-  <!-- Companhias / Parcerias -->
-  
-  <!-- Contato -->
-  
-  <!-- Rodapé -->
-  <footer>
-    <p>&copy; 2025 Grupo Armindo | Todos os direitos reservados.</p>
-    <p><a href="https://grupoarmindo.site/Diretrizes%20do%20Grupo%20Armindo.pdf" target="_blank">Termos e Condições</a></p>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container" style="text-align: center;">
+      <p class="copyright">&copy; 2026 Grupo Armindo. Todos os direitos reservados.</p>
+    </div>
   </footer>
 
+  <!-- INTERACTION SCRIPTS -->
+  <script src="assets/js/hub-interactions.js"></script>
+
 </body>
+
 </html>

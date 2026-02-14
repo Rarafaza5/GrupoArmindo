@@ -1,89 +1,230 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Contato — Grupo Armindo</title>
-  <meta name="description" content="Página de contacto do Grupo Armindo — formulário de contacto, email e links para redes." />
-  <link rel="canonical" href="https://grupoarmindo.site/contato.html" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="description" content="Entre em contacto com o Grupo Armindo.">
+  <link rel="icon" href="/armindo.png">
+
+  <link rel="stylesheet" href="assets/css/hub-premium.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <!-- Armindo Ecosystem Scripts -->
+  <script src="assets/js/armindo-account.js"></script>
+  <script src="assets/js/hub-auth.js"></script>
+
+  <!-- Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8PFEZDY4RX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-8PFEZDY4RX', { 'anonymize_ip': true });
+  </script>
 
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;text-decoration: white;}
-    body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#6a11cb,#2575fc);color:#fff;min-height:100vh}
-    .container{max-width:900px;margin:0 auto;padding:22px}
-    header{position:sticky;top:0;background:rgba(0,0,0,0.55);padding:12px;border-bottom:1px solid rgba(255, 254, 254, 0.04)}
-    form{background:rgba(253, 253, 253, 0.04);padding:18px;border-radius:12px}
-    label{display:block;margin-top:12px;font-weight:600}
-    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255, 255, 255, 0.06);background:transparent;color:#fff}
-    button{margin-top:12px;padding:10px 14px;border-radius:8px;border:0;background:#fff;color:#2575fc;font-weight:700;cursor:pointer}
-    .note{color:rgba(255,255,255,0.85);font-size:0.95rem}
-    footer{padding:18px;text-align:center;margin-top:18px;background:rgba(0,0,0,0.4)}
+    /* Specific Form Styles */
+    .form-card {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .status-msg {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: var(--accent-primary);
+      text-align: center;
+      min-height: 24px;
+    }
   </style>
 </head>
+
 <body>
-  <header>
-    <div class="container" style="display:flex;justify-content:space-between;align-items:center">
-      <a href="/" style="color:#fff;font-weight:700">← Início</a>
-      <div><strong>Contato</strong></div>
+
+  <!-- AURORA BACKGROUND -->
+  <div class="aurora-bg">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+  </div>
+  <div class="noise-overlay"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <a href="/" class="brand">
+      <img src="/logo-grupo-armindo.png" alt="Grupo Armindo Logo"
+        onerror="this.src='/assets/logo_grupoarmindo_trasparente.png'">
+      <span>Grupo Armindo</span>
+    </a>
+
+    <div class="nav-links">
+      <a href="/" class="nav-link">Início</a>
+      <a href="/armindonews" class="nav-link">Notícias</a>
+      <a href="/life-verse" class="nav-link">LifeVerse</a>
+      <a href="/sobre.html" class="nav-link">Sobre</a>
+      <a href="/contato.html" class="nav-link active">Contato</a>
     </div>
+
+    <button class="mobile-toggle" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="container section" style="padding-bottom: 20px; text-align: center;">
+    <div class="badge reveal active">Fale Conosco</div>
+    <h1 class="reveal active">Vamos Conversar</h1>
+    <p class="hero-desc reveal active" style="margin-top: 24px;">
+      Tem uma ideia, proposta ou dúvida? Estamos à distância de um clique.
+    </p>
   </header>
 
+  <!-- FORM SECTION -->
   <main class="container">
-    <h1>Fala connosco</h1>
-    <p class="note">Envia a tua mensagem — para respostas mais rápidas podes contactar pelo Discord.</p>
+    <div class="glass-panel form-card reveal">
+      <form id="contactForm" onsubmit="return handleSubmit(event)">
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" placeholder="Seu nome" required minlength="2">
+        </div>
 
-    <!-- Formulário com fallback mailto. Recomenda-se configurar um endpoint no servidor ou serviço Formspree/Netlify -->
-    <form id="contactForm" onsubmit="return handleSubmit(event)" aria-label="Formulário de contato">
-      <label for="nome">Nome</label>
-      <input id="nome" name="nome" required minlength="2" placeholder="Ex.: António" />
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+        </div>
 
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" required placeholder="nome@exemplo.com" />
+        <div class="form-group">
+          <label for="assunto">Assunto</label>
+          <input type="text" id="assunto" name="assunto" placeholder="Ex: Proposta de Parceria" required>
+        </div>
 
-      <label for="assunto">Assunto</label>
-      <input id="assunto" name="assunto" required placeholder="Ex.: Proposta de colaboração" />
+        <div class="form-group">
+          <label for="mensagem">Mensagem</label>
+          <textarea id="mensagem" name="mensagem" rows="5" placeholder="Sua mensagem..." required></textarea>
+        </div>
 
-      <label for="mensagem">Mensagem</label>
-      <textarea id="mensagem" name="mensagem" rows="6" required placeholder="Escreve aqui a tua mensagem..."></textarea>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Enviar Mensagem</button>
+        <div id="status" class="status-msg"></div>
+      </form>
 
-      <button type="submit">Enviar Mensagem</button>
-      <p id="status" class="note" aria-live="polite"></p>
-    </form>
-
-    <section style="margin-top:16px;background:rgba(255,255,255,0.03);padding:12px;border-radius:10px">
-      <h3>Outros contactos</h3>
-      <ul>
-        <p>Discord: <a href="https://discord.gg/2ZFBQAPsDk" target="_blank" style="text-decoration: white;" rel="noopener">Servidor do Grupo Armindo</a></p>
-        <p>Email: <a href="mailto:contacto@grupoarmindo.site" style="text-decoration: white;">contacto@grupoarmindo.site</a></p>
-        <p>Calendário público: <a href="https://calendar.google.com/calendar/embed?src=6991aeb9cae9950f54a9728027c9b939d09b9e9189def409a9129598191293fe%40group.calendar.google.com&ctz=Europe%2FLisbon" target="_blank" style="text-decoration: white;" rel="noopener">Eventos</a></p>
-      </ul>
-    </section>
+      <div
+        style="margin-top: 32px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+        <p style="color: var(--text-muted); margin-bottom: 16px;">Outras formas de contato</p>
+        <div style="display: flex; gap: 16px; justify-content: center;">
+          <a href="https://discord.gg/2ZFBQAPsDk" target="_blank" class="btn btn-glass"
+            style="padding: 10px 20px; font-size: 0.9rem;">
+            Discord
+          </a>
+          <a href="mailto:contacto@grupoarmindo.site" class="btn btn-glass"
+            style="padding: 10px 20px; font-size: 0.9rem;">
+            Email
+          </a>
+        </div>
+      </div>
+    </div>
   </main>
 
-  <footer>
-    <div>&copy; 2025 Grupo Armindo — <a href="/privacidade.html">Política de Privacidade</a></div>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h2>Grupo Armindo</h2>
+          <p>Criatividade, Comunidade e Inovação.</p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Explorar</h3>
+          <a href="/">Início</a>
+          <a href="/armindonews">Notícias</a>
+        </div>
+
+        <div class="footer-col">
+          <h3>Comunidade</h3>
+          <a href="/membros.html">Membros</a>
+          <a href="https://discord.gg/2ZFBQAPsDk" target="_blank">Discord</a>
+        </div>
+
+        <div class="footer-col">
+          <h3>Legal</h3>
+          <a href="/privacidade.html">Privacidade</a>
+          <a href="/termos.html">Termos</a>
+        </div>
+      </div>
+      <div class="copyright">
+        &copy; 2026 Grupo Armindo — Todos os direitos reservados.
+      </div>
+    </div>
   </footer>
 
+  <!-- INTERACTION SCRIPTS -->
+  <script src="assets/js/hub-interactions.js"></script>
+
   <script>
-    function handleSubmit(e){
+    function handleSubmit(e) {
       e.preventDefault();
       const nome = document.getElementById('nome').value.trim();
       const email = document.getElementById('email').value.trim();
       const assunto = document.getElementById('assunto').value.trim();
       const mensagem = document.getElementById('mensagem').value.trim();
       const status = document.getElementById('status');
-      if(!nome || !email || !assunto || !mensagem){
-        status.textContent = 'Preenche todos os campos, por favor.';
+
+      if (!nome || !email || !assunto || !mensagem) {
+        status.textContent = 'Preencha todos os campos, por favor.';
         return false;
       }
-      // Mailto fallback (limitado). Para produção, configurar endpoint.
+
+      // Mailto fallback
       const subject = encodeURIComponent(`[Contato Site] ${assunto}`);
       const body = encodeURIComponent(`Nome: ${nome}\nEmail: ${email}\n\n${mensagem}`);
       window.location.href = `mailto:contacto@grupoarmindo.site?subject=${subject}&body=${body}`;
-      status.textContent = 'A abrir cliente de email...';
+
+      status.textContent = 'A abrir o seu cliente de email...';
       return false;
     }
   </script>
+
 </body>
+
 </html>

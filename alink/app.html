@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALink | Grupo Armindo</title>
+    <meta name="description" content="ALink - A rede social do Grupo Armindo">
+    <meta name="theme-color" content="#6366f1">
+    <link rel="icon" href="ALink.png" type="image/png">
+    <link rel="apple-touch-icon" href="ALink.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo"><img src="ALink.png" alt="ALink"></div>
+            <div class="loading-text">ALink</div>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Sidebar (Desktop) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon"><img src="ALink.png" alt="ALink"></div>
+                    <span class="logo-text">ALink</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="feed">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                        <polyline points="9,22 9,12 15,12 15,22" />
+                    </svg>
+                    <span>Feed</span>
+                </a>
+                <a href="#" class="nav-item" data-view="explore">
+                    <span class="nav-icon">🧭</span>
+                    <span>Explorar</span>
+                </a>
+                <a href="#" class="nav-item" id="navLeaderboard" onclick="showLeaderboard()">
+                    <span class="nav-icon">🏆</span>
+                    <span>Ranking Global</span>
+                </a>
+                <a href="#" class="nav-item" data-view="messages">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                    <span>Mensagens</span>
+                    <span class="nav-badge" id="msgBadge" style="display: none;">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="notifications">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 01-3.46 0" />
+                    </svg>
+                    <span>Notificações</span>
+                    <span class="nav-badge" id="notifBadge" style="display: none;">0</span>
+                </a>
+                <a href="#" class="nav-item" data-view="groups">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                        <path d="M16 3.13a4 4 0 010 7.75" />
+                    </svg>
+                    <span>Grupos</span>
+                </a>
+                <a href="#" class="nav-item" data-view="games">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="6" width="20" height="12" rx="2" />
+                        <circle cx="8" cy="12" r="2" />
+                        <path d="M18 9v6M15 12h6" />
+                    </svg>
+                    <span>Jogos</span>
+                </a>
+                <a href="#" class="nav-item" data-view="profile">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span>Perfil</span>
+                </a>
+                <a href="#" class="nav-item admin-only" data-view="admin" style="display: none;">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span>Admin</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-new-post" onclick="openNewPost()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Novo Post
+                </button>
+
+                <div class="user-card" id="userCard">
+                    <div class="user-avatar-wrapper">
+                        <div class="user-avatar" id="userAvatar"></div>
+                        <div class="user-level" id="userLevelBadge">Lvl 1</div>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name" id="userName">Carregando...</span>
+                        <div class="xp-bar-container">
+                            <div class="xp-bar-fill" id="xpProgress" style="width: 0%"></div>
+                        </div>
+                        <span class="user-streak" id="userStreak">🔥 0 dias</span>
+                    </div>
+                    <button class="btn-icon" id="themeToggle" onclick="toggleTheme(event)" title="Alternar Tema">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5" />
+                            <path
+                                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="logout()" title="Sair">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                            <polyline points="16,17 21,12 16,7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Feed View -->
+            <div id="feedView" class="view active">
+                <div class="view-header">
+                    <h1>Feed</h1>
+                    <div class="streak-display" id="streakDisplay">
+                        <span class="streak-fire">🔥</span>
+                        <span class="streak-count" id="streakCount">0</span>
+                    </div>
+                </div>
+
+                <!-- Create Post -->
+                <div class="create-post-card">
+                    <div class="create-post-avatar" id="createPostAvatar"></div>
+                    <input type="text" class="create-post-input" placeholder="O que estás a pensar?"
+                        onclick="openNewPost()">
+                    <div class="create-post-actions">
+                        <button class="create-post-btn" onclick="openNewPost()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <path d="M21 15l-5-5L5 21" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div id="postsFeed" class="posts-feed">
+                    <!-- Posts will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Group Detail View -->
+            <div id="groupDetailView" class="view">
+                <div class="view-header">
+                    <button class="btn-icon" onclick="switchView('groups')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="header-info">
+                        <h1 id="groupDetailName">Nome do Grupo</h1>
+                        <span id="groupDetailStats" class="text-tertiary text-xs">0 membros</span>
+                    </div>
+                    <div id="groupDetailActions">
+                        <!-- Join/Leave button will be here -->
+                    </div>
+                </div>
+                <div class="view-body">
+                    <div class="group-hero shadow-premium">
+                        <div id="groupDetailIcon" class="group-hero-icon">👥</div>
+                        <p id="groupDetailDesc" class="group-hero-desc">Carregando descrição...</p>
+                    </div>
+
+                    <div class="group-content-tabs">
+                        <button class="nav-tab active" data-tab="posts">Posts</button>
+                        <button class="nav-tab" data-tab="members">Membros</button>
+                    </div>
+
+                    <div id="groupTabPosts" class="tab-content active">
+                        <div id="groupPostsFeed" class="feed-container">
+                            <!-- Group posts will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div id="groupTabMembers" class="tab-content">
+                        <div id="groupMembersList" class="members-list">
+                            <!-- Member list will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin View -->
+            <div id="adminView" class="view">
+                <div class="view-header">
+                    <h1>Painel de Administração</h1>
+                </div>
+                <div class="view-body">
+                    <div class="admin-grid">
+                        <div class="admin-card stats-card shadow-premium">
+                            <h3>Visão Geral</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Users</span>
+                                    <span id="adminTotalUsers" class="stat-value">-</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Posts</span>
+                                    <span id="adminTotalPosts" class="stat-value">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-card list-card shadow-premium">
+                            <h3>Gestão de Conteúdo</h3>
+                            <div class="admin-tabs">
+                                <button class="admin-tab-btn active" data-admin-view="users">Utilizadores</button>
+                                <button class="admin-tab-btn" data-admin-view="posts">Posts</button>
+                            </div>
+                            <div id="adminListContainer" class="admin-list-container">
+                                <!-- Users or Posts list will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explore View (World Hub) -->
+            <div id="exploreView" class="view">
+                <div class="view-header">
+                    <h1>Explorar o Mundo</h1>
+                </div>
+
+                <!-- Mobile Ticker & Streak -->
+                <div class="mobile-only-world-stats" style="margin-bottom: var(--spacing-6);">
+                    <div class="sidebar-card" style="margin-bottom: var(--spacing-4);">
+                        <h3 style="font-size: var(--text-sm); margin-bottom: var(--spacing-3);">🔥 Streak Atual</h3>
+                        <div id="mobileStreak" class="streak-mini">
+                            <span class="streak-number">0 dias</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-card">
+                        <h3 style="font-size: var(--text-sm); margin-bottom: var(--spacing-3);">🌍 Atividade Global</h3>
+                        <div id="mobileActivityTicker" class="activity-ticker">
+                            <!-- Ticker content injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Access Hub (Mobile Parity) -->
+                <div class="mobile-only-grid"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-6);">
+                    <button class="hub-btn" onclick="showLeaderboard()">
+                        <span class="hub-icon">🏆</span>
+                        <span class="hub-label">Ranking</span>
+                    </button>
+                    <button class="hub-btn" onclick="switchView('notifications')">
+                        <span class="hub-icon">🔔</span>
+                        <span class="hub-label">Notificações</span>
+                        <span class="nav-badge" id="mobileNotifBadge" style="display: none;">0</span>
+                    </button>
+                    <button class="hub-btn" onclick="switchView('games')">
+                        <span class="hub-icon">🎮</span>
+                        <span class="hub-label">Jogos</span>
+                    </button>
+                    <button class="hub-btn" onclick="switchView('messages')">
+                        <span class="hub-icon">💬</span>
+                        <span class="hub-label">Mensagens</span>
+                        <span class="nav-badge" id="mobileMsgBadge" style="display: none;">0</span>
+                    </button>
+                    <button class="hub-btn" onclick="toggleTheme()">
+                        <span class="hub-icon">🌓</span>
+                        <span class="hub-label">Tema</span>
+                    </button>
+                </div>
+
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Pesquisar utilizadores ou grupos...">
+                </div>
+                <div class="section">
+                    <h2 class="section-title">💎 Sugeridos para ti</h2>
+                    <div id="suggestedUsers" class="suggested-users">
+                        <!-- Suggested users -->
+                    </div>
+                </div>
+                <div class="section">
+                    <h2 class="section-title">🔥 Tendências Atuais</h2>
+                    <div id="trendingPosts" class="posts-feed">
+                        <!-- Trending posts -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages View -->
+            <div id="messagesView" class="view">
+                <div class="view-header">
+                    <h1>Mensagens</h1>
+                    <button class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="emoji-helper"
+                    style="display: flex; gap: var(--spacing-2); margin-top: var(--spacing-2); flex-wrap: wrap; padding: 4px;">
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🔥')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🔥</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🙌')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🙌</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🚀')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🚀</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('💎')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">💎</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('✨')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">✨</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🤖')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🤖</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🎉')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🎉</span>
+                </div>
+                <div class="create-post-image-preview" id="imagePreview">
+                    <button class="remove-image" onclick="removeImage()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="conversationsList" class="conversations-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <h3>Sem mensagens</h3>
+                        <p>Começa uma conversa com alguém!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications View -->
+            <div id="notificationsView" class="view">
+                <div class="view-header">
+                    <h1>Notificações</h1>
+                </div>
+                <div id="notificationsList" class="notifications-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">🔔</div>
+                        <h3>Tudo em dia</h3>
+                        <p>Não tens notificações novas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups View -->
+            <div id="groupsView" class="view">
+                <div class="view-header">
+                    <h1>Grupos</h1>
+                    <button class="btn-primary" onclick="openCreateGroup()">Criar Grupo</button>
+                </div>
+                <div class="section">
+                    <h2 class="section-title">Os teus grupos</h2>
+                    <div id="myGroups" class="groups-grid">
+                        <div class="empty-state">
+                            <div class="empty-icon">👥</div>
+                            <h3>Sem grupos</h3>
+                            <p>Junta-te ou cria um grupo!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h2 class="section-title">Descobrir grupos</h2>
+                    <div id="discoverGroups" class="groups-grid">
+                        <!-- Discover groups -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Games View -->
+            <div id="gamesView" class="view">
+                <div class="view-header">
+                    <h1>Jogos</h1>
+                </div>
+                <div class="games-grid">
+                    <div class="game-card" onclick="startDailyQuiz()">
+                        <div class="game-icon">🎯</div>
+                        <h3>Quiz Diário</h3>
+                        <p>Testa os teus conhecimentos!</p>
+                        <span class="game-status" id="quizStatus">Disponível</span>
+                    </div>
+                    <div class="game-card" onclick="startBuddyMatch()">
+                        <div class="game-icon">🤝</div>
+                        <h3>Buddy Match</h3>
+                        <p>Encontra alguém como tu</p>
+                        <span class="game-status" id="buddyStatus">1 match disponível</span>
+                    </div>
+                    <div class="game-card" onclick="startDailyChallenge()">
+                        <div class="game-icon">🎲</div>
+                        <h3>Desafio Diário</h3>
+                        <p>Completa missões e ganha XP</p>
+                        <span class="game-status" id="challengeStatus">3 tarefas</span>
+                    </div>
+                    <div class="game-card" onclick="startWordBattle()">
+                        <div class="game-icon">⚔️</div>
+                        <h3>Batalha de Palavras</h3>
+                        <p>Resolve o anagrama!</p>
+                        <span class="game-status" id="wordBattleStatus">Disponível</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile View -->
+            <div id="profileView" class="view">
+                <div class="profile-header">
+                    <div class="profile-banner-wrapper">
+                        <div class="profile-banner" id="profileBanner"></div>
+                        <div class="banner-edit-overlay" onclick="triggerBannerUpload()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                </path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-avatar-wrapper">
+                            <div class="profile-avatar" id="profileAvatar"></div>
+                            <div class="avatar-edit-overlay" onclick="triggerAvatarUpload()" title="Alterar Avatar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                    </path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="profile-details-card" id="profileDetailsHub">
+                            <div class="profile-details">
+                                <h1 id="profileName">Nome</h1>
+                                <p class="profile-username" id="profileUsername">@username</p>
+                                <p class="profile-bio" id="profileBio">Bio aqui...</p>
+                            </div>
+
+                            <div class="profile-metrics-row">
+                                <div class="metric-item">
+                                    <span class="metric-value" id="profilePostsCount">0</span>
+                                    <span class="metric-label">Posts</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-value" id="profileFollowers">0</span>
+                                    <span class="metric-label">Seguidores</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-value" id="profileLevel">1</span>
+                                    <span class="metric-label">Nível</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-value" id="profileStreak">0</span>
+                                    <span class="metric-label">Streak</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-actions">
+                                <button id="profileEditBtn" class="btn-glass" onclick="editProfile()">Editar
+                                    Perfil</button>
+                                <button id="profileFollowBtn" class="btn-primary" style="display: none;">Seguir</button>
+                                <button id="profileMessageBtn" class="btn-glass" style="display: none;"
+                                    onclick="messageUser()">Mensagem</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="profile-tabs-wrapper">
+                        <div class="profile-tabs">
+                            <button class="profile-tab active" data-tab="posts">Posts</button>
+                            <button class="profile-tab" data-tab="media">Média</button>
+                            <button class="profile-tab" data-tab="likes">Likes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="profileContent" class="profile-tab-content-wrapper">
+                    <div id="profileTabPosts" class="profile-tab-content active">
+                        <div id="userPosts" class="posts-feed"></div>
+                    </div>
+                    <div id="profileTabLikes" class="profile-tab-content" style="display: none;">
+                        <div id="userLikes" class="posts-feed"></div>
+                    </div>
+                    <div id="profileTabMedia" class="profile-tab-content" style="display: none;">
+                        <div id="userMedia" class="posts-feed"
+                            style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;"></div>
+                    </div>
+                    <div id="profileTabSettings" class="profile-tab-content" style="display: none;">
+                        <div class="settings-card shadow-premium"
+                            style="background: var(--surface-secondary); padding: var(--spacing-6); border-radius: var(--radius-xl); margin-top: var(--spacing-4);">
+                            <h3 style="margin-bottom: var(--spacing-4);">Definições de Conta</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: var(--spacing-6);">Gere as tuas
+                                preferências e dados da conta ALink.</p>
+
+                            <div class="setting-item"
+                                style="padding: var(--spacing-4) 0; border-top: 1px solid var(--border-subtle);">
+                                <div style="color: var(--error-500); font-weight: 600; margin-bottom: 4px;">Zona de
+                                    Perigo
+                                </div>
+                                <p
+                                    style="font-size: var(--text-sm); color: var(--text-tertiary); margin-bottom: var(--spacing-4);">
+                                    Apagar a tua conta é permanente e remove todos os teus dados.</p>
+                                <button class="btn-secondary"
+                                    style="color: var(--error-500); border-color: var(--error-500);"
+                                    onclick="deleteAccount()">Apagar Conta Permanentemente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar (Desktop) -->
+        <aside class="right-sidebar">
+            <div class="sidebar-card">
+                <h3>🔥 Streak Diário</h3>
+                <div class="streak-big" id="streakBig">
+                    <span class="streak-number">0</span>
+                    <span class="streak-label">dias</span>
+                </div>
+                <p class="streak-tip">Volta amanhã para manter a streak!</p>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Atividade no Mundo</h3>
+                <div id="activityTicker" class="activity-ticker">
+                    <!-- Ticker content injected here -->
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>💎 Quem seguir</h3>
+                <div id="whoToFollow" class="who-to-follow">
+                    <!-- Suggestions -->
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>📊 Trending</h3>
+                <div id="trending" class="trending-list">
+                    <!-- Trending topics -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Bottom Nav (Enhanced Mobile Parity) -->
+    <nav class="bottom-nav">
+        <a href="#" class="bottom-nav-item active" data-view="feed" title="Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+        </a>
+        <a href="#" class="bottom-nav-item" data-view="explore" title="Mundo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+        </a>
+        <a href="#" class="bottom-nav-item new-post" onclick="openNewPost()" title="Postar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+        </a>
+        <a href="#" class="bottom-nav-item" data-view="groups" title="Grupos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+        </a>
+        <a href="#" class="bottom-nav-item" data-view="profile" title="Perfil">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+        </a>
+    </nav>
+
+    <!-- New Post Modal -->
+    <div class="modal-overlay" id="newPostModal">
+        <div class="modal modal-large">
+            <div class="modal-header">
+                <h3>Novo Post</h3>
+                <button class="modal-close" onclick="closeNewPost()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="new-post-content">
+                <div class="new-post-user">
+                    <div class="new-post-avatar" id="newPostAvatar"></div>
+                    <span class="new-post-name" id="newPostName">Tu</span>
+                </div>
+                <textarea id="postContent" placeholder="O que estás a pensar?" rows="4"></textarea>
+                <div class="new-post-preview" id="postPreview" style="display: none;">
+                    <img id="previewImage" src="" alt="Preview">
+                    <button class="remove-preview" onclick="removeImage()">×</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="new-post-tools">
+                    <label class="tool-btn" for="postImage">
+                        <input type="file" id="postImage" accept="image/*" style="display: none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <path d="M21 15l-5-5L5 21" />
+                        </svg>
+                    </label>
+                    <button class="tool-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <line x1="9" y1="9" x2="9.01" y2="9" />
+                            <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="emoji-helper"
+                    style="display: flex; gap: var(--spacing-2); margin-top: var(--spacing-2); flex-wrap: wrap; padding: 0 var(--spacing-4);">
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🔥')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🔥</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🙌')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🙌</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🚀')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🚀</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('💎')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">💎</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('✨')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">✨</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🤖')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🤖</span>
+                    <span
+                        style="cursor: pointer; padding: 4px; border-radius: 4px; background: var(--surface-secondary); transition: transform 0.2s;"
+                        onclick="insertEmoji('🎉')" onmouseover="this.style.transform='scale(1.2)'"
+                        onmouseout="this.style.transform='scale(1)'">🎉</span>
+                </div>
+                <button class="btn-primary" onclick="publishPost()">Publicar</button>
+            </div>
+        </div>
+    </div>
+    <!-- Comments Modal -->
+    <div class="modal-overlay" id="commentsModal">
+        <div class="modal modal-large">
+            <div class="modal-header">
+                <h3>Comentários</h3>
+                <button class="modal-close" onclick="closeComments()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="comments-content">
+                <div id="commentsList" class="comments-list">
+                    <!-- Comments will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="comment-input-area">
+                    <div class="current-user-avatar" id="commentUserAvatar"></div>
+                    <input type="text" id="commentInput" placeholder="Escreve um comentário..." class="comment-input">
+                    <button class="btn-icon-primary" onclick="postComment()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Editar Perfil</h3>
+                <button class="modal-close" onclick="closeEditProfile()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: var(--spacing-6);">
+                <div style="display: flex; justify-content: center; margin-bottom: var(--spacing-6);">
+                    <div class="profile-avatar" id="editAvatarPreview"
+                        style="width: 100px; height: 100px; cursor: pointer;"></div>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--spacing-4);">
+                    <label
+                        style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-medium);">Nome
+                        de Exibição</label>
+                    <input type="text" id="editName" class="create-post-input"
+                        style="width: 100%; border-radius: var(--radius-lg);">
+                </div>
+                <div class="form-group" style="margin-bottom: var(--spacing-4);">
+                    <label
+                        style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-medium);">Bio</label>
+                    <textarea id="editBio" class="create-post-input" rows="3"
+                        style="width: 100%; border-radius: var(--radius-lg); resize: none;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-medium);">URL
+                        do Avatar</label>
+                    <input type="text" id="editAvatar" class="create-post-input"
+                        style="width: 100%; border-radius: var(--radius-lg);" placeholder="https://...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeEditProfile()"
+                    style="margin-right: var(--spacing-2);">Cancelar</button>
+                <button class="btn-primary" onclick="saveProfile()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div class="modal-overlay" id="createGroupModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Criar Novo Grupo</h3>
+                <button class="modal-close" onclick="closeCreateGroup()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: var(--spacing-6);">
+                <div class="form-group" style="margin-bottom: var(--spacing-4);">
+                    <label
+                        style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-medium);">Nome
+                        do Grupo</label>
+                    <input type="text" id="groupName" class="create-post-input"
+                        style="width: 100%; border-radius: var(--radius-lg);">
+                </div>
+                <div class="form-group" style="margin-bottom: var(--spacing-4);">
+                    <label
+                        style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-medium);">Descrição</label>
+                    <textarea id="groupDesc" class="create-post-input" rows="3"
+                        style="width: 100%; border-radius: var(--radius-lg); resize: none;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label
+                        style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-medium);">Ícone
+                        (Emoji)</label>
+                    <input type="text" id="groupIcon" class="create-post-input"
+                        style="width: 100%; border-radius: var(--radius-lg);" placeholder="🌟" maxlength="2">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeCreateGroup()"
+                    style="margin-right: var(--spacing-2);">Cancelar</button>
+                <button class="btn-primary" onclick="createGroup()">Criar Grupo</button>
+            </div>
+        </div>
+    </div>
+    <!-- Chat Modal -->
+    <div class="modal-overlay" id="chatModal">
+        <div class="modal modal-large" style="height: 80vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+                    <div class="comment-avatar" id="chatUserAvatar"></div>
+                    <div>
+                        <h3 id="chatUserName" style="margin: 0;">Nome</h3>
+                        <span id="chatUserStatus"
+                            style="font-size: var(--text-xs); color: var(--success-500);">Online</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeChat()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-messages" id="chatMessages"
+                style="flex: 1; overflow-y: auto; padding: var(--spacing-4); display: flex; flex-direction: column; gap: var(--spacing-2);">
+                <!-- Messages go here -->
+            </div>
+            <div class="modal-footer" style="margin-top: auto;">
+                <div class="comment-input-area">
+                    <input type="text" id="chatInput" placeholder="Escreve uma mensagem..." class="comment-input"
+                        onkeypress="handleChatKey(event)">
+                    <button class="btn-icon-primary" onclick="sendMessage()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Quiz Modal -->
+    <div class="modal-overlay" id="quizModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🎯 Quiz Diário</h3>
+                <button class="modal-close" onclick="closeQuiz()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: var(--spacing-6);">
+                <div id="quizQuestion" class="quiz-question"></div>
+                <input type="text" id="quizAnswer" class="create-post-input" placeholder="A tua resposta..."
+                    style="width: 100%; border-radius: var(--radius-lg); margin-top: var(--spacing-4);"
+                    autocomplete="off">
+                <div id="quizFeedback" class="quiz-feedback" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeQuiz()">Fechar</button>
+                <button class="btn-primary" id="quizSubmitBtn" onclick="submitQuizAnswer()">Responder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buddy Match Modal -->
+    <div class="modal-overlay" id="buddyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🤝 Buddy Match</h3>
+                <button class="modal-close" onclick="closeBuddy()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: var(--spacing-6);">
+                <div id="buddyLoading" class="buddy-loading" style="text-align: center; padding: var(--spacing-8);">
+                    <div style="font-size: 3rem; animation: pulse 1.5s infinite;">🔍</div>
+                    <p style="margin-top: var(--spacing-4); color: var(--text-secondary);">A procurar o teu buddy...</p>
+                </div>
+                <div id="buddyResult" class="buddy-result" style="display: none;">
+                    <div class="buddy-card">
+                        <div id="buddyAvatar" class="buddy-avatar"></div>
+                        <h3 id="buddyName" class="buddy-name"></h3>
+                        <p id="buddyUsername" class="buddy-username"></p>
+                        <p id="buddyBio" class="buddy-bio"></p>
+                        <div class="buddy-actions">
+                            <button class="btn-primary" id="buddyFollowBtn">Seguir</button>
+                            <button class="btn-secondary" id="buddyProfileBtn">Ver Perfil</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="buddyEmpty" style="display: none; text-align: center; padding: var(--spacing-8);">
+                    <div style="font-size: 3rem;">😔</div>
+                    <p style="margin-top: var(--spacing-4); color: var(--text-secondary);">Sem buddies disponíveis de
+                        momento.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Challenge Modal -->
+    <div class="modal-overlay" id="challengeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🎲 Desafio Diário</h3>
+                <button class="modal-close" onclick="closeChallenge()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: var(--spacing-6);">
+                <p style="color: var(--text-secondary); margin-bottom: var(--spacing-4);">Completa todas as tarefas para
+                    ganhar <strong>150 XP</strong> bónus!</p>
+                <div id="challengeTasks" class="challenge-tasks"></div>
+                <div id="challengeReward" class="challenge-reward" style="display: none;">
+                    <div style="font-size: 3rem;">🎉</div>
+                    <p style="font-weight: var(--font-bold); margin-top: var(--spacing-2);">Parabéns! Todas as tarefas
+                        completas!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeChallenge()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word Battle Modal -->
+    <div class="modal-overlay" id="wordBattleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>⚔️ Batalha de Palavras</h3>
+                <button class="modal-close" onclick="closeWordBattle()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: var(--spacing-6);">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--spacing-4);">
+                    Descodifica a palavra o mais rápido possível!</p>
+                <div id="wordScramble" class="quiz-question"
+                    style="font-size: 2rem; letter-spacing: 4px; text-transform: uppercase;"></div>
+                <input type="text" id="wordAnswer" class="create-post-input" placeholder="A palavra é..."
+                    style="width: 100%; border-radius: var(--radius-lg); margin-top: var(--spacing-4);"
+                    autocomplete="off">
+                <div id="wordFeedback" class="quiz-feedback" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeWordBattle()">Fechar</button>
+                <button class="btn-primary" id="wordSubmitBtn" onclick="submitWordAnswer()">Verificar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden File Inputs -->
+    <input type="file" id="postImage" accept="image/*" style="display: none;">
+    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+    <input type="file" id="bannerUpload" accept="image/*" style="display: none;">
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Global Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🏆 Ranking Global</h3>
+                <button class="modal-close" onclick="closeLeaderboard()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: var(--spacing-6); max-height: 70vh; overflow-y: auto;"
+                id="leaderboardList">
+                <!-- Leaderboard items injected here -->
+            </div>
+            <div class="modal-footer">
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin: 0;">O ranking é baseado no XP
+                    total acumulado.</p>
+                <button class="btn-primary" onclick="closeLeaderboard()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Conta Grupo Armindo SDK -->
+    <script src="assets/js/armindo-account.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>

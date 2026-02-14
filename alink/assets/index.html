@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Banco de Dados Grupo Armindo</title>
+  <meta name="description" content="Banco de Dados Grupo Armindo" />
+  <style>
+    :root{
+      --bg:#0b0b10; /* fundo escuro elegante */
+      --card:#12121a;
+      --muted:#a0a3ad;
+      --text:#f4f5f8;
+      --brand:#C9A227; /* toque 'VIP' dourado */
+      --brand-2: #9E7C1F;
+      --accent:#2b2f3a;
+      --ok:#2ecc71;
+      --danger:#e74c3c;
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text); background: radial-gradient(1200px 600px at 20% -10%, #1a1a24 0, transparent 60%),
+               radial-gradient(800px 500px at 120% 10%, #14141d 0, transparent 60%), var(--bg);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:32px 20px 80px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg,var(--brand),var(--brand-2)); display:grid; place-items:center; color:#111; font-weight:800}
+    h1{margin:0; font-size:clamp(24px,3vw,34px)}
+    .muted{color:var(--muted)}
+
+    .toolbar{display:grid; gap:12px; grid-template-columns: 1fr;}
+    @media(min-width:760px){
+      .toolbar{grid-template-columns: 1fr auto auto}
+    }
+
+    .search{
+      position:relative;
+    }
+    .search input{
+      width:100%; padding:14px 44px 14px 44px; border-radius:999px; background:#0f1016; color:var(--text); border:1px solid #22232d; outline:none; transition:.2s border-color, .2s box-shadow;
+      box-shadow: inset 0 0 0 1px rgba(201,162,39,.15), 0 6px 18px rgba(0,0,0,.25);
+    }
+    .search input:focus{border-color:var(--brand); box-shadow:0 0 0 3px rgba(201,162,39,.2)}
+    .search .icon{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.7}
+    .search .clear{position:absolute; right:10px; top:50%; transform:translateY(-50%); background:transparent; border:0; color:var(--muted); cursor:pointer; font-size:18px}
+
+    .btn, button, select{
+      appearance:none; border:1px solid #232530; background:linear-gradient(180deg,#171824,#13131c); color:var(--text); padding:12px 14px; border-radius:12px; cursor:pointer; transition:.15s transform, .2s box-shadow, .2s border-color; font-weight:600
+    }
+    .btn:hover, button:hover, select:hover{border-color:#2d3040}
+    .btn:active, button:active{transform:translateY(1px)}
+    .btn.primary{background:linear-gradient(180deg, #c9a227, #8f6f18); border-color:#99761b; color:#111}
+
+    .filters{display:flex; gap:10px; align-items:center}
+    .chip{border:1px solid #2a2d3a; padding:8px 12px; border-radius:999px; background:#12131c; cursor:pointer; user-select:none}
+    .chip.active{border-color:var(--brand); box-shadow:0 0 0 2px rgba(201,162,39,.25)}
+
+    .grid{display:grid; grid-template-columns: 1fr; gap:14px; margin-top:18px}
+    @media(min-width:700px){.grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1000px){.grid{grid-template-columns:1fr 1fr 1fr}}
+
+    .card{background:linear-gradient(180deg,#12121a,#0e0f15); border:1px solid #1e2030; border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:12px; min-height:140px}
+    .row{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .title{font-weight:700; font-size:1rem}
+    .badge{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; font-size:.8rem; border-radius:999px; background:#151726; border:1px solid #23253a; color:#cbd0dc}
+    .badge small{opacity:.8}
+    .tags{display:flex; gap:8px; flex-wrap:wrap}
+    .tag{font-size:.75rem; color:#cbd0dc; background:#141623; border:1px solid #23253a; padding:4px 10px; border-radius:999px}
+    .desc{color:#cbd0dc; opacity:.9}
+    .actions{display:flex; gap:10px; flex-wrap:wrap}
+    .ghost{background:transparent; border:1px dashed #2a2d3a}
+    .empty{display:none; text-align:center; padding:40px 12px; color:var(--muted)}
+
+    .footer{margin-top:32px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+    .count{color:var(--muted)}
+    .link{color:var(--brand); text-decoration:none}
+
+    /* accessible focus styles */
+    a:focus, button:focus, .chip:focus, select:focus{outline: 2px solid rgba(201,162,39,.6); outline-offset: 2px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">PK</div>
+        <div>
+          <h1>Banco de Dados Grupo Armindo</h1>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="exportCsv" class="btn ghost" title="Exportar lista como CSV">Exportar CSV</button>
+      </div>
+    </header>
+
+    <section class="toolbar" aria-label="Ferramentas de busca e filtros">
+      <div class="search">
+        <span class="icon" aria-hidden="true">🔎</span>
+        <input id="q" type="search" placeholder="Pesquisar por nome, tipo ou tags…" autocomplete="off" aria-label="Pesquisar arquivos" />
+        <button class="clear" id="clearSearch" title="Limpar busca">✕</button>
+      </div>
+      <div class="filters" role="group" aria-label="Filtrar por tipo">
+        <span class="muted" style="margin-right:6px">Tipo:</span>
+        <button class="chip" data-type="all" aria-pressed="true">Tudo</button>
+        <button class="chip" data-type="logo">Logo</button>
+        <button class="chip" data-type="pdf">PDF</button>
+        <button class="chip" data-type="imagem">Imagem</button>
+        <button class="chip" data-type="video">Vídeo</button>
+        <button class="chip" data-type="fonte">Fonte</button>
+        <button class="chip" data-type="áudio">Áudio</button>
+      </div>
+      <div class="filters">
+        <label class="muted" for="sort">Ordenar:</label>
+        <select id="sort" aria-label="Ordenar lista">
+          <option value="name-asc">Nome (A–Z)</option>
+          <option value="name-desc">Nome (Z–A)</option>
+          <option value="size-desc">Tamanho (maior)</option>
+          <option value="size-asc">Tamanho (menor)</option>
+          <option value="date-desc">Mais recente</option>
+          <option value="date-asc">Mais antigo</option>
+        </select>
+      </div>
+    </section>
+
+    <div id="grid" class="grid" role="list" aria-live="polite"></div>
+    <div id="empty" class="empty">Sem resultados. Ajuste a busca ou os filtros.</div>
+
+    <div class="footer">
+      <div class="count" id="count"></div>
+      <div class="muted">Dica: clique em “Copiar link” para compartilhar um item específico.</div>
+    </div>
+  </div>
+
+  <template id="cardTpl">
+    <article class="card" role="listitem">
+      <div class="row">
+        <div class="title" data-el="title"></div>
+        <span class="badge" data-el="meta"></span>
+      </div>
+      <div class="desc" data-el="desc"></div>
+      <div class="tags" data-el="tags"></div>
+      <div class="actions">
+        <a class="btn" data-el="download" target="_blank" rel="noopener">Download</a>
+        <button class="btn" data-el="copy">Copiar link</button>
+      </div>
+    </article>
+  </template>
+
+  <script>
+    // ======= Dados de exemplo (substitua pelos seus links reais) =======
+    const ASSETS = [
+      { id:"logo-png",   name:"Armindo", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/logo_armindo_trasparente.png",   tags:["marca","transparente"], desc:"Logo oficial com fundo transparente", date:"2025-02-10" },
+      { id:"logo-png",   name:"Grupo Armindo", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/logo_grupoarmindo_colorida.png",   tags:["marca","transparente"], desc:"Logo oficial com fundo colorido", date:"2025-02-10" },
+      { id:"logo-png",   name:"Armindo", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/logo_armindo_colorido.png",   tags:["marca","transparente"], desc:"Logo oficial com fundo colorido", date:"2025-02-10" },
+      { id:"logo-png",   name:"Grupo Armindo", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/logo_grupoarmindo_trasparente.png",   tags:["marca","transparente"], desc:"Logo oficial com fundo transparente", date:"2025-02-10" },
+      { id:"logo-png",   name:"Armindo Awards", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/logo_armindoawards_trasparente.png",   tags:["marca","transparente"], desc:"Logo oficial com fundo transparente", date:"2025-02-10" },
+{ id:"photos", name:"Fundo do Grupo Armindo", type:"imagem", ext:".png", url:"https://grupoarmindo.site/assets/fundo_armindo.png", tags:["media","galeria","alta"], desc:"Fundo do GrupoArmindo", date:"2025-02-10" },
+{ id:"font",       name:"Fonte da logo", type:"fonte",  ext:".ttf",  url:"https://grupoarmindo.site/assets/MODERNA_.TTF", tags:["tipografia","licença"], desc:"Fonte: Moderna", date:"2025-02-10" },
+{ id:"font",       name:"Fonte Geral", type:"fonte",  ext:".zip",  url:"https://grupoarmindo.site/assets/Montserrat.zip", tags:["tipografia","licença"], desc:"Fonte: Montserrat", date:"2025-02-10" },
+ { id:"intro",      name:"Intro Grupo Armindo",  type:"video",  ext:".mp4", url:"https://grupoarmindo.site/assets/intro_grupoarmindo_preta.mp4", tags:["clipes","social"], desc:"Intro do Grupo Armindo Preta", date:"2025-08-21" },
+ { id:"intro",      name:"Intro Grupo Armindo",  type:"video",  ext:".mp4", url:"https://grupoarmindo.site/assets/intro_grupoarmindo_branca.mp4", tags:["clipes","social"], desc:"Intro do Grupo Armindo Branca", date:"2025-08-21" },
+  { id:"intro",      name:"Uma produção Grupo Armindo",  type:"video",  ext:".mp4", url:"https://grupoarmindo.site/assets/producao.mp4", tags:["clipes","social"], desc:"Intro do Grupo Armindo Preta", date:"2025-08-21" },
+    { id:"regulamento",     name:"Regulamento", type:"pdf",    ext:".pdf", url:"https://grupoarmindo.site/assets/regulamento_AA24.pdf", tags:["identidade","cores","uso"], desc:"Armindo Awards 2024", date:"2025-1-1" },
+     { id:"regulamento",     name:"Resultados Publicos do Inquérito25", type:"pdf",    ext:".pdf", url:"https://grupoarmindo.site/assets/rinquerito25.pdf", tags:["identidade","cores","uso"], desc:"Relatório dos resultados publicados do inquérito25", date:"2025-1-1" },
+     { id:"regulamento",     name:"Termos e Condições, Politicas de Privacidade e Regulamento", type:"pdf",    ext:".pdf", url:"https://grupoarmindo.site/assets/TC_PP_E_EE25.pdf", tags:["identidade","cores","uso"], desc:"Eurovisão Eleitoral 2025", date:"2025-5-16" },
+      { id:"regulamento",     name:"Categorias e Nomeados", type:"pdf",    ext:".pdf", url:"https://grupoarmindo.site/assets/CT_AA24.pdf", tags:["identidade","cores","uso"], desc:"Armindo Awards 2024", date:"2025-1-1" },
+       { id:"regulamento",     name:"Diretrizes", type:"pdf",    ext:".pdf", url:"https://grupoarmindo.site/assets/Diretrizes.pdf", tags:["identidade","cores","uso"], desc:"Diretrizes Gerais Grupo Armindo", date:"2025-1-1" },
+    { id:"alinhamento",     name:"Alinhamento EE25", type:"pdf",    ext:".pdf", url:"https://grupoarmindo.site/assets/alinhamento_EE25.pdf", tags:["identidade","cores","uso"], desc:"Alinhamento da Eurovisão Eleitoral 2025", date:"2025-5-16" },
+
+
+ { id:"video",      name:"Video Inicial EE",  type:"video",  ext:".mp4", url:"https://grupoarmindo.site/assets/Videoinicialhb.mp4", tags:["clipes","social"], desc:"Video Inicial da Eurovisão Eleitoral 2025", date:"2025-05-16" },
+ { id:"video",      name:"Recap EE",  type:"video",  ext:".mp4", url:"https://grupoarmindo.site/assets/Recap_EE25.mp4", tags:["clipes","social"], desc:"Recap da final Eurovisão Eleitoral 2025", date:"2025-05-16" },
+ { id:"logo-png",   name:"EE25 (Favicon)", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/logo_pequena_EE25.png",   tags:["marca","transparente"], desc:"Favicon Eurovisão Eleitoral 25", date:"2025-05-16" },
+ { id:"logo-png",   name:"EE25 (Completo)", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/logo_full_EE25.png",   tags:["marca","transparente"], desc:"Logo Completa Eurovisão Eleitoral 25", date:"2025-05-16" },
+ { id:"video",      name:"Clip Musical EE25",  type:"video",  ext:".mp4", url:"https://grupoarmindo.site/assets/Deixem o Luís trabalhar.mp4", tags:["clipes","social"], desc:"'Deixem o Luis trabalhar'", date:"2025-05-16" },
+
+         { id:"audio",      name:"Musica Entrada EE25", type:"áudio",  ext:".mp3", url:"https://grupoarmindo.site/assets/musica_entrada_EE25.MP3", tags:["trilha","spot"], desc:"Musica Inicial da Eurovisão Eleitoral 2025", date:"2025-05-16" },
+   { id:"audio",      name:"Musica 'Vencedor' EE25", type:"áudio",  ext:".mp3", url:"https://grupoarmindo.site/assets/musica_vencedor_EE25.MP3", tags:["trilha","spot"], desc:"Musica 'Vencedor' da Eurovisão Eleitoral 2025", date:"2025-05-16" },
+   { id:"font",       name:"Página Inicial EE25", type:"fonte",  ext:".html",  url:"https://grupoarmindo.site/assets/pagina_inicial_ee25.html", tags:["tipografia","licença"], desc:"Pagina Index da Eurovisão Eleitoral 2025", date:"2025-05-16" },
+   { id:"font",       name:"Página de Votação EE25", type:"fonte",  ext:".zip",  url:"https://grupoarmindo.site/assets/votacao_EE25.zip", tags:["tipografia","licença"], desc:"Pagina de Votação da Eurovisão Eleitoral 2025 (Source Code)", date:"2025-05-16" },
+   { id:"font",       name:"Página de Inscrição EE25", type:"fonte",  ext:".zip",  url:"https://grupoarmindo.site/assets/inscricao_EE25.zip", tags:["tipografia","licença"], desc:"Pagina de Inscrição da Eurovisão Eleitoral 2025 (Source Code)", date:"2025-05-16" },
+  { id:"font",       name:"Slides dos Partidos EE25", type:"fonte",  ext:".zip",  url:"https://grupoarmindo.site/assets/SlideShow_Partidos_EE25.zip", tags:["tipografia","licença"], desc:"Slideshow de todos os partidos da Eurovisão Eleitoral 2025", date:"2025-05-16" },
+ { id:"video",      name:"NameTags EE25",  type:"video",  ext:".zip", url:"https://grupoarmindo.site/assets/NameTags_EE25.zip", tags:["clipes","social"], desc:"Todas as NameTags da Eurovisão Eleitoral", date:"2025-05-16" },
+{ id:"font",       name:"Carta Aberta", type:"fonte",  ext:".html",  url:"https://grupoarmindo.site/assets/carta_aberta_melissa.html", tags:["tipografia","licença"], desc:"Carta Aberta para a entrada da Melissa", date:"2025-05-31" },
+  { id:"logo-png",   name:"Armindo News (Favicon)", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/an.png",   tags:["marca","transparente"], desc:"Favicon Quadrado da Armindo News", date:"2025-06-11" },
+  { id:"logo-png",   name:"Eurovisão 2026 (Favicon)", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/esc26logopequeno.png",   tags:["marca","transparente"], desc:"Favicon Quadrado da Eurovisão 2026 (Feito antes da revelação da arte)", date:"2025-06-11" },
+  { id:"logo-png",   name:"Armindo Cast (Favicon)", type:"logo",   ext:".png",  url:"https://grupoarmindo.site/assets/armindocast.png",   tags:["marca","transparente"], desc:"Favicon Quadrado do Armindo Cast", date:"2025-06-11" },
+
+   
+        ];
+
+    // ======= Utilidades =======
+    const $ = (sel, el=document) => el.querySelector(sel);
+    const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
+    const norm = s => s.toString().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+    const fmtBytes = (n=0)=>{
+      if(n<1024) return n+" B"; const u=['KB','MB','GB','TB']; let i=-1; do{ n/=1024; i++; } while(n>=1024 && i<u.length-1); return n.toFixed(n>=10?0:1)+' '+u[i];
+    }
+    const parseDate = d => new Date(d);
+
+    // ======= Estado =======
+    let state = {
+      q: '',
+      type: 'all',
+      sort: 'name-asc'
+    };
+
+    // ======= Render =======
+    const grid = $('#grid');
+    const empty = $('#empty');
+    const count = $('#count');
+
+    function render(){
+      const q = norm(state.q);
+      const list = ASSETS.filter(item=>{
+        const hitText = norm(item.name + ' ' + item.type + ' ' + item.tags.join(' '));
+        const okQ = !q || hitText.includes(q);
+        const okT = state.type==='all' || item.type===state.type;
+        return okQ && okT;
+      }).sort((a,b)=>{
+        switch(state.sort){
+          case 'name-asc': return a.name.localeCompare(b.name);
+          case 'name-desc': return b.name.localeCompare(a.name);
+          case 'size-asc': return a.size - b.size;
+          case 'size-desc': return b.size - a.size;
+          case 'date-asc': return parseDate(a.date) - parseDate(b.date);
+          case 'date-desc': return parseDate(b.date) - parseDate(a.date);
+          default: return 0;
+        }
+      });
+
+      grid.innerHTML='';
+      list.forEach(item=> grid.appendChild(card(item)) );
+      const any = list.length>0;
+      empty.style.display = any? 'none':'block';
+      count.textContent = any? `${list.length} item(ns) visível(is)` : 'Nenhum item visível';
+    }
+
+    function card(item){
+      const t = document.getElementById('cardTpl');
+      const node = t.content.cloneNode(true);
+      node.querySelector('[data-el="title"]').textContent = item.name;
+      node.querySelector('[data-el="meta"]').innerHTML = `${item.type.toUpperCase()} · <small>${item.ext}</small> · ${fmtBytes(item.size)}`;
+      node.querySelector('[data-el="desc"]').textContent = item.desc || '';
+      const tagsEl = node.querySelector('[data-el="tags"]');
+      (item.tags||[]).forEach(tag=>{
+        const span = document.createElement('span'); span.className='tag'; span.textContent = '#'+tag; tagsEl.appendChild(span);
+      });
+      const a = node.querySelector('[data-el="download"]'); a.href = item.url; a.download = '';
+      const btnCopy = node.querySelector('[data-el="copy"]');
+      btnCopy.addEventListener('click', async()=>{
+        try{ await navigator.clipboard.writeText(item.url); toast('Link copiado!'); }
+        catch{ toast('Não foi possível copiar', true); }
+      });
+      return node;
+    }
+
+    // ======= Interações =======
+    const input = document.getElementById('q');
+    const clearBtn = document.getElementById('clearSearch');
+    input.addEventListener('input', e=>{ state.q = e.target.value; render(); persist(); });
+    clearBtn.addEventListener('click', ()=>{ input.value=''; state.q=''; render(); persist(); input.focus(); });
+
+    $$('.chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        $$('.chip').forEach(c=>{ c.classList.remove('active'); c.setAttribute('aria-pressed','false'); });
+        chip.classList.add('active'); chip.setAttribute('aria-pressed','true');
+        state.type = chip.dataset.type; render(); persist();
+      });
+    });
+
+    const sortSel = document.getElementById('sort');
+    sortSel.addEventListener('change', ()=>{ state.sort = sortSel.value; render(); persist(); });
+
+    // Exportar CSV da lista filtrada
+    document.getElementById('exportCsv').addEventListener('click', ()=>{
+      const q = norm(state.q);
+      const filtered = ASSETS.filter(item=>{
+        const hit = norm(item.name + ' ' + item.type + ' ' + item.tags.join(' '));
+        const okQ = !q || hit.includes(q);
+        const okT = state.type==='all' || item.type===state.type;
+        return okQ && okT;
+      });
+      const rows = [ ['id','name','type','ext','size','date','url','tags'], ...filtered.map(i=>[i.id,i.name,i.type,i.ext,i.size,i.date,i.url,(i.tags||[]).join('|')]) ];
+      const csv = rows.map(r=> r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',') ).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='press-kit.csv'; a.click(); URL.revokeObjectURL(a.href);
+    });
+
+    // ======= Preferências no URL + localStorage =======
+    function persist(){
+      localStorage.setItem('presskit-state', JSON.stringify(state));
+      const p = new URLSearchParams();
+      if(state.q) p.set('q', state.q);
+      if(state.type && state.type!=='all') p.set('type', state.type);
+      if(state.sort && state.sort!=='name-asc') p.set('sort', state.sort);
+      history.replaceState(null,'', `${location.pathname}?${p.toString()}`);
+    }
+    function restore(){
+      const saved = localStorage.getItem('presskit-state');
+      const url = new URLSearchParams(location.search);
+      try{ if(saved){ state = Object.assign(state, JSON.parse(saved)); } }catch{}
+      if(url.get('q')) state.q = url.get('q');
+      if(url.get('type')) state.type = url.get('type');
+      if(url.get('sort')) state.sort = url.get('sort');
+      input.value = state.q || '';
+      // ativar chip
+      const active = $(`.chip[data-type="${state.type}"]`) || $(`.chip[data-type="all"]`);
+      if(active){ active.click(); active.classList.add('active'); active.setAttribute('aria-pressed','true'); }
+      sortSel.value = state.sort;
+    }
+
+    // ======= Toast minimalista =======
+    function toast(text, error=false){
+      const t = document.createElement('div');
+      t.textContent = text;
+      t.style.position='fixed'; t.style.left='50%'; t.style.bottom='24px'; t.style.transform='translateX(-50%)';
+      t.style.background = error? 'linear-gradient(180deg,#3b1111,#220b0b)': 'linear-gradient(180deg,#162a1d,#0f1d12)';
+      t.style.border = '1px solid ' + (error? '#3a1a1a':'#1f3324');
+      t.style.color='#e8f6ec'; t.style.padding='10px 14px'; t.style.borderRadius='10px'; t.style.boxShadow='var(--shadow)'; t.style.zIndex='9999';
+      document.body.appendChild(t); setTimeout(()=>t.remove(), 1800);
+    }
+
+    // ======= Inicialização =======
+    restore();
+    render();
+
+    // Nota: "Baixar zip (fictício)" é apenas um placeholder, substitua por um link real caso tenha um pacote .zip geral.
+  </script>
+</body>
+</html>

@@ -1,51 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Política de Privacidade — Grupo Armindo</title>
-  <meta name="description" content="Política de Privacidade do Grupo Armindo — como recolhemos, usamos e protegemos dados."/>
-  <link rel="canonical" href="https://grupoarmindo.site/privacidade.html" />
-  <style>body{font-family:Arial,Helvetica,sans-serif;background:#0c1220;color:#fff;margin:0;padding:20px}.container{max-width:900px;margin:0 auto}</style>
+  <meta name="description" content="Política de Privacidade do Grupo Armindo.">
+  <link rel="icon" href="/armindo.png">
+
+  <!-- Premium Styles -->
+  <link rel="stylesheet" href="assets/css/hub-premium.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <!-- Armindo Ecosystem Scripts -->
+  <script src="assets/js/armindo-account.js"></script>
+  <script src="assets/js/hub-auth.js"></script>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Política de Privacidade</h1>
-    <p>Última actualização: <strong>20 de Setembro de 2025</strong></p>
 
-    <section>
-      <h2>1. Introdução</h2>
-      <p>O Grupo Armindo respeita a tua privacidade. Esta política explica que dados recolhemos, para que os usamos e como podes contactar-nos.</p>
-    </section>
-
-    <section>
-      <h2>2. Dados que recolhemos</h2>
-      <p>Recolhemos dados fornecidos voluntariamente (p.ex. e-mail em formulários) e dados técnicos automaticamente (p.ex. cookies, logs). Usamos o Google Analytics para análise agregada.</p>
-    </section>
-
-    <section>
-      <h2>3. Uso dos dados</h2>
-      <p>Os dados são usados para operar o site, responder a contactos, analisar tráfego e personalizar conteúdos. Não vendemos dados pessoais a terceiros.</p>
-    </section>
-
-    <section>
-      <h2>4. Cookies e anúncios</h2>
-      <p>Utilizamos cookies próprios e de terceiros (p.ex. Google Analytics, Google AdSense). O Google pode usar cookies para personalizar anúncios. Para gerir preferências do Google Ads consulta as ferramentas de controlo de anúncios do Google.</p>
-    </section>
-
-    <section>
-      <h2>5. Segurança</h2>
-      <p>Implementamos medidas técnicas razoáveis para proteger os dados. No entanto, nenhum sistema é infalível. Em caso de incidente sério seguiremos as obrigações legais aplicáveis.</p>
-    </section>
-
-    <section>
-      <h2>6. Contacto</h2>
-      <p>Para questões sobre privacidade escreve para <a href="mailto:armindo.news@grupoarmindo.site">armindo.news@grupoarmindo.site</a>.</p>
-    </section>
-
-    <p>Ao usar o site concordas com esta política e <a href="https://grupoarmindo.site/Diretrizes%20do%20Grupo%20Armindo.pdf">Diretrizes</a>. Reservamo-nos o direito de atualizar este documento.</p>
-
-    <p><a href="/">Voltar ao início</a></p>
+  <!-- AURORA BACKGROUND -->
+  <div class="aurora-bg">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
   </div>
+  <div class="noise-overlay"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <a href="/" class="brand">
+      <img src="/logo-grupo-armindo.png" alt="Grupo Armindo Logo"
+        onerror="this.src='/assets/logo_grupoarmindo_trasparente.png'">
+
+    </a>
+
+    <div class="nav-links">
+      <a href="/" class="nav-link">Início</a>
+      <a href="/armindonews" class="nav-link">Notícias</a>
+      <a href="/life-verse" class="nav-link">LifeVerse</a>
+      <a href="/sobre.html" class="nav-link">Sobre</a>
+      <a href="/contato.html" class="nav-link">Contato</a>
+    </div>
+
+    <button class="mobile-toggle" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu">
+    <a href="/">Início</a>
+    <a href="/armindonews">Armindo News</a>
+    <a href="/life-verse">LifeVerse</a>
+    <a href="/sobre.html">Sobre</a>
+    <a href="/contato.html">Contato</a>
+    <a href="/membros.html">Membros</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="container section" style="padding-bottom: 20px; text-align: center; position: relative;">
+    <!-- 3D Elements -->
+    <div class="hero-3d-elements">
+      <div class="float-element float-3" style="top: 15%; right: 15%; opacity: 0.3;"></div>
+    </div>
+
+    <div style="position: relative; z-index: 2;">
+      <div class="badge reveal active">Legal</div>
+      <h1 class="reveal active">Política de Privacidade</h1>
+      <p class="hero-desc reveal active" style="margin-top: 24px;">
+        Última atualização: 20 de Setembro de 2025
+      </p>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="container">
+    <div class="glass-panel reveal"
+      style="max-width: 900px; margin: 0 auto; color: var(--text-muted); line-height: 1.8; padding: 40px;">
+
+      <section style="margin-bottom: 32px;">
+        <h2 style="color: white; margin-bottom: 16px;">1. Introdução</h2>
+        <p>O Grupo Armindo respeita a tua privacidade. Esta política explica que dados recolhemos, para que os usamos e
+          como podes contactar-nos.</p>
+      </section>
+
+      <section style="margin-bottom: 32px;">
+        <h2 style="color: white; margin-bottom: 16px;">2. Dados que recolhemos</h2>
+        <p>Recolhemos dados fornecidos voluntariamente (p.ex. e-mail em formulários) e dados técnicos automaticamente
+          (p.ex. cookies, logs). Usamos o Google Analytics para análise agregada.</p>
+      </section>
+
+      <section style="margin-bottom: 32px;">
+        <h2 style="color: white; margin-bottom: 16px;">3. Uso dos dados</h2>
+        <p>Os dados são usados para operar o site, responder a contactos, analisar tráfego e personalizar conteúdos. Não
+          vendemos dados pessoais a terceiros.</p>
+      </section>
+
+      <section style="margin-bottom: 32px;">
+        <h2 style="color: white; margin-bottom: 16px;">4. Cookies e anúncios</h2>
+        <p>Utilizamos cookies próprios e de terceiros (p.ex. Google Analytics, Google AdSense). O Google pode usar
+          cookies para personalizar anúncios. Para gerir preferências do Google Ads consulta as ferramentas de controlo
+          de anúncios do Google.</p>
+      </section>
+
+      <section style="margin-bottom: 32px;">
+        <h2 style="color: white; margin-bottom: 16px;">5. Segurança</h2>
+        <p>Implementamos medidas técnicas razoáveis para proteger os dados. No entanto, nenhum sistema é infalível. Em
+          caso de incidente sério seguiremos as obrigações legais aplicáveis.</p>
+      </section>
+
+      <section>
+        <h2 style="color: white; margin-bottom: 16px;">6. Contacto</h2>
+        <p>Para questões sobre privacidade escreve para <a href="mailto:armindo.news@grupoarmindo.site"
+            style="color: var(--accent-secondary); text-decoration: none; font-weight: 500;">armindo.news@grupoarmindo.site</a>.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h2>Grupo Armindo</h2>
+          <p>Criatividade, Comunidade e Inovação.</p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Explorar</h3>
+          <a href="/">Início</a>
+          <a href="/armindonews">Notícias</a>
+        </div>
+
+        <div class="footer-col">
+          <h3>Legal</h3>
+          <a href="/privacidade.html">Privacidade</a>
+          <a href="/termos.html">Termos</a>
+        </div>
+
+        <div class="footer-col">
+          <h3>Comunidade</h3>
+          <a href="https://discord.gg/2ZFBQAPsDk" target="_blank">Discord</a>
+        </div>
+      </div>
+      <div class="copyright">
+        &copy; 2026 Grupo Armindo — Todos os direitos reservados.
+      </div>
+    </div>
+  </footer>
+
+  <!-- INTERACTION SCRIPTS -->
+  <script src="assets/js/hub-interactions.js"></script>
+
 </body>
+
 </html>

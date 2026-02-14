@@ -1,70 +1,191 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sobre Nós — Grupo Armindo</title>
-  <meta name="description" content="Conhece a missão, visão e a equipa do Grupo Armindo — projectos, valores e como colaborar." />
-  <link rel="canonical" href="https://grupoarmindo.site/sobre.html" />
-  <link rel="icon" href="/armindo.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#6a11cb,#2575fc);color:#fff;min-height:100vh}
-    header{position:sticky;top:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
-    .container{max-width:1000px;margin:0 auto;padding:18px}
-    main{padding:28px 0}
-    .card{background:rgba(255,255,255,0.05);padding:16px;border-radius:12px;margin-top:14px}
-    a{color:#fff;text-decoration:underline}
-    footer{padding:18px;text-align:center;margin-top:22px;background:rgba(0,0,0,0.4)}
-  </style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sobre Nós — Grupo Armindo</title>
+  <meta name="description"
+    content="Conhece a missão, visão e a equipa do Grupo Armindo — projectos, valores e como colaborar.">
+  <link rel="icon" href="/armindo.png">
+
+  <link rel="stylesheet" href="assets/css/hub-premium.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <!-- Armindo Ecosystem Scripts -->
+  <script src="assets/js/armindo-account.js"></script>
+  <script src="assets/js/hub-auth.js"></script>
+
+  <!-- Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8PFEZDY4RX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-8PFEZDY4RX', { 'anonymize_ip': true });
+  </script>
 </head>
+
 <body>
-  <header>
-    <div class="container" style="display:flex;justify-content:space-between;align-items:center">
-      <a href="/" style="color:#fff;font-weight:700">← Voltar ao Início</a>
-      <img src="/logo-grupo-armindo.png" alt="Logo Grupo Armindo" loading="lazy" onerror="this.onerror=null;this.src='/assets/logo_grupoarmindo_trasparente.png'">
-       
+
+  <!-- AURORA BACKGROUND -->
+  <div class="aurora-bg">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+  </div>
+  <div class="noise-overlay"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <a href="/" class="brand">
+      <img src="/logo-grupo-armindo.png" alt="Grupo Armindo Logo"
+        onerror="this.src='/assets/logo_grupoarmindo_trasparente.png'">
+
+    </a>
+
+    <div class="nav-links">
+      <a href="/" class="nav-link">Início</a>
+      <a href="/armindonews" class="nav-link">Notícias</a>
+      <a href="/life-verse" class="nav-link">LifeVerse</a>
+      <a href="/sobre.html" class="nav-link active">Sobre</a>
+      <a href="/contato.html" class="nav-link">Contato</a>
+    </div>
+
+    <button class="mobile-toggle" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- HEADER TITLE -->
+  <header class="container section" style="padding-bottom: 40px; text-align: center; position: relative;">
+    <!-- 3D Elements -->
+    <div class="hero-3d-elements">
+      <div class="float-element float-2" style="top: 20%; left: 20%; opacity: 0.5;"></div>
+    </div>
+
+    <div style="position: relative; z-index: 2;">
+      <div class="badge reveal active">Nossa História</div>
+      <h1 class="reveal active">Sobre o Coletivo</h1>
+      <p class="hero-desc reveal active" style="margin-top: 24px;">
+        Somos um hub criativo onde a tecnologia encontra a arte.
+        Fomentamos projetos que aproximem pessoas através de conteúdo cultural de qualidade.
+      </p>
     </div>
   </header>
 
-  <main class="container" role="main">
-    <h1>Sobre o Grupo Armindo</h1>
+  <!-- MAIN CONTENT (Bento Grid Layout) -->
+  <main class="container">
+    <div class="bento-grid reveal">
 
-    <section class="card" aria-labelledby="mission">
-      <h2 id="mission">Missão</h2>
-      <p>Fomentar projectos criativos que aproximem pessoas e produzam conteúdo cultural de qualidade — notícias, podcasts, eventos e experiências interativas online.</p>
-    </section>
+      <!-- Missão -->
+      <div class="bento-card col-span-6">
+        <div class="highlight-bg"></div>
+        <div class="card-icon">🎯</div>
+        <h2 class="card-title">Missão</h2>
+        <p class="card-desc">
+          Fomentar projectos criativos que aproximem pessoas e produzam conteúdo
+          cultural de qualidade — notícias, podcasts, eventos e experiências interativas online.
+        </p>
+      </div>
 
-    <section class="card" aria-labelledby="vision">
-      <h2 id="vision">Visão</h2>
-      <p>Ser um hub acessível e sustentável para criadores independentes onde comunidade e criatividade são o foco principal.</p>
-    </section>
+      <!-- Visão -->
+      <div class="bento-card col-span-6">
+        <div class="highlight-bg"></div>
+        <div class="card-icon">👁️</div>
+        <h2 class="card-title">Visão</h2>
+        <p class="card-desc">
+          Ser um hub acessível e sustentável para criadores independentes onde comunidade e
+          criatividade são o foco principal, longe de algoritmos predatórios.
+        </p>
+      </div>
 
-    <section class="card" aria-labelledby="team">
-      <h2 id="team">Equipa</h2>
-      <p>A equipa é composta por colaboradores voluntários e parceiros. Mantemos uma rede de editores, designers e moderadores que ajudam a produzir e manter os projectos.</p>
-      <p>Para conhecer os membros activos visita <a href="/membros.html">Membros</a>.</p>
-    </section>
+      <!-- Equipa -->
+      <div class="bento-card col-span-8">
+        <div class="highlight-bg"></div>
+        <div class="card-icon">👥</div>
+        <h2 class="card-title">Nossa Equipa</h2>
+        <p class="card-desc">
+          A equipa é composta por colaboradores voluntários e parceiros apaixonados pelo que fazem.
+          Mantemos uma rede de editores, designers e moderadores que ajudam a produzir
+          e manter os projectos vivos.
+        </p>
+        <div style="margin-top: 24px;">
+          <a href="/membros.html" class="btn btn-primary">Conhecer Membros</a>
+        </div>
+      </div>
 
-    <section class="card" aria-labelledby="how-to-collab">
-      <h2 id="how-to-collab">Como colaborar</h2>
-      <p>Se és criador, tens um projecto ou queres ajudar, envia uma proposta através da página de <a href="/contato.html">Contato</a>. Valorizamos propostas claras com objectivos, prazo e recursos necessários.</p>
-    </section>
+      <!-- Valores -->
+      <div class="bento-card col-span-4">
+        <div class="highlight-bg"></div>
+        <div class="card-icon">💎</div>
+        <h2 class="card-title">Valores</h2>
+        <ul class="card-desc" style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 12px;">✨ <strong>Originalidade</strong> verified</li>
+          <li style="margin-bottom: 12px;">🛡️ <strong>Inclusão</strong> & Segurança</li>
+          <li>🤝 <strong>Transparência</strong> Total</li>
+        </ul>
+      </div>
 
-    <section class="card" aria-labelledby="values">
-      <h2 id="values">Valores</h2>
-      <ul>
-        <p>Originalidade — conteúdo próprio e verificável.</p>
-        <p>Inclusão — espaços seguros para a comunidade.</p>
-        <p>Transparência — termos, políticas e contactos públicos.</p>
-      </ul>
-    </section>
+      <!-- Colaborar -->
+      <div class="bento-card col-span-12" style="text-align: center; align-items: center;">
+        <div class="highlight-bg"></div>
+        <h2>Quer colaborar conosco?</h2>
+        <p class="card-desc" style="max-width: 600px; margin: 16px 0;">
+          Se é criador, tem um projecto ou quer ajudar, envie uma proposta.
+          Valorizamos ideias claras com objetivos definidos.
+        </p>
+        <a href="/contato.html" class="btn btn-glass">Enviar Proposta</a>
+      </div>
+
+    </div>
   </main>
 
-  <footer>
-    <div>&copy; 2025 Grupo Armindo — <a href="/privacidade.html">Política de Privacidade</a> • <a href="/termos.html">Termos</a></div>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h2>Grupo Armindo</h2>
+          <p>Criatividade, Comunidade e Inovação.<br>Desde 2024.</p>
+        </div>
+
+        <div class="footer-col">
+          <h3>Explorar</h3>
+          <a href="/">Início</a>
+          <a href="/armindonews">Notícias</a>
+          <a href="/life-verse">LifeVerse</a>
+        </div>
+
+        <div class="footer-col">
+          <h3>Comunidade</h3>
+          <a href="/membros.html">Membros</a>
+          <a href="https://discord.gg/2ZFBQAPsDk" target="_blank">Discord</a>
+          <a href="/contato.html">Contato</a>
+        </div>
+
+        <div class="footer-col">
+          <h3>Legal</h3>
+          <a href="/privacidade.html">Privacidade</a>
+          <a href="/termos.html">Termos</a>
+          <a href="https://grupoarmindo.site/Diretrizes%20do%20Grupo%20Armindo.pdf">Diretrizes</a>
+        </div>
+      </div>
+      <div class="copyright">
+        &copy; 2026 Grupo Armindo — Todos os direitos reservados.
+      </div>
+    </div>
   </footer>
+
+  <!-- INTERACTION SCRIPTS -->
+  <script src="assets/js/hub-interactions.js"></script>
+
 </body>
+
 </html>

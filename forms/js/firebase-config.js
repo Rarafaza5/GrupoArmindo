@@ -1,10 +1,11 @@
 /* ============================================
    ARMINDO FORMS - Firebase Configuration
+   ============================================
+   Integrado com Conta Grupo Armindo
+   © 2026 Grupo Armindo. Todos os direitos reservados.
    ============================================ */
 
-// Import Firebase SDK (using CDN in HTML, this file contains config)
-// TODO: Replace with your Firebase project credentials
-
+// Firebase config (shared with Conta Grupo Armindo)
 const firebaseConfig = {
     apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
     authDomain: "aawards.firebaseapp.com",
@@ -19,6 +20,9 @@ const firebaseConfig = {
 // Initialize Firebase (will be called after SDK loads)
 let app, auth, db, storage;
 
+// Flag to track if unified account is available
+let _useUnifiedAccount = false;
+
 function initFirebase() {
     if (typeof firebase === 'undefined') {
         console.error('Firebase SDK not loaded');
@@ -26,29 +30,31 @@ function initFirebase() {
     }
 
     try {
-        if (!firebase.apps.length) {
-            app = firebase.initializeApp(firebaseConfig);
+        // Check if ArmindoAccount SDK is available
+        if (typeof ArmindoAccount !== 'undefined') {
+            _useUnifiedAccount = true;
+            ArmindoAccount.init();
+            auth = ArmindoAccount.getAuth();
+            db = ArmindoAccount.getFirestore();
+            console.log('✅ Firebase inicializado via Conta Grupo Armindo');
         } else {
-            app = firebase.app();
+            // Fallback: Initialize Firebase directly
+            if (!firebase.apps.length) {
+                app = firebase.initializeApp(firebaseConfig);
+            } else {
+                app = firebase.app();
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log('✅ Firebase initialized (standalone mode)');
         }
 
-        auth = firebase.auth();
-        db = firebase.firestore();
         if (firebase.storage) {
             storage = firebase.storage();
         }
 
-        // Enable offline persistence only if not already enabled
-        // Note: checking persistence state specifically is hard, but enablePersistence is safe to call before using db
-        // However, if db is already initialized, enablePersistence might fail if called too late.
-        // We only call it if we just initialized the app or if we want to ensure it's on.
-
-        // Only try to enable persistence if this is the first init or if we are aggressive
-        // Actually, enablePersistence must be called before any data access.
-        // If app was already initialized, persistence is likely already set or failed.
-        // So we skip persistence call if app was already existing to avoid "persistence enabled in first tab only" spam or errors
-
-        if (!firebase.apps.length) { // Only on fresh init
+        // Enable offline persistence (only on fresh init)
+        if (!firebase.apps.length) {
             db.enablePersistence({ synchronizeTabs: true })
                 .catch((err) => {
                     if (err.code === 'failed-precondition') {
@@ -59,11 +65,28 @@ function initFirebase() {
                 });
         }
 
-        console.log('✅ Firebase initialized successfully');
         return true;
     } catch (error) {
         console.error('❌ Firebase initialization error:', error);
         return false;
+    }
+}
+
+// Helper to ensure unified profile exists when user logs in
+async function _ensureUnifiedProfile(user) {
+    if (!_useUnifiedAccount || !user) return;
+
+    try {
+        // Check if project data exists for forms
+        const hasSetup = await ArmindoAccount.hasProjectSetup('forms');
+        if (!hasSetup) {
+            await ArmindoAccount.setProjectData('forms', {
+                registered: true
+            });
+            console.log('✅ Projeto Forms configurado na Conta Grupo Armindo');
+        }
+    } catch (error) {
+        console.warn('Aviso: Não foi possível configurar perfil unificado:', error);
     }
 }
 
@@ -232,38 +255,92 @@ const Database = {
 
 const Auth = {
     async signInWithGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const result = await auth.signInWithPopup(provider);
-        return result.user;
+        let user;
+
+        // Use unified account if available
+        if (_useUnifiedAccount) {
+            const result = await ArmindoAccount.signInWithGoogle();
+            if (!result.success) throw new Error(result.error);
+            user = result.user;
+        } else {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const result = await auth.signInWithPopup(provider);
+            user = result.user;
+        }
+
+        await _ensureUnifiedProfile(user);
+        return user;
     },
 
     async signInWithEmail(email, password) {
-        const result = await auth.signInWithEmailAndPassword(email, password);
-        return result.user;
+        let user;
+
+        if (_useUnifiedAccount) {
+            const result = await ArmindoAccount.signIn(email, password);
+            if (!result.success) throw new Error(result.error);
+            user = result.user;
+        } else {
+            const result = await auth.signInWithEmailAndPassword(email, password);
+            user = result.user;
+        }
+
+        await _ensureUnifiedProfile(user);
+        return user;
     },
 
     async signUpWithEmail(email, password, displayName) {
-        const result = await auth.createUserWithEmailAndPassword(email, password);
-        await result.user.updateProfile({ displayName });
-        return result.user;
+        let user;
+
+        if (_useUnifiedAccount) {
+            const result = await ArmindoAccount.signUp(email, password, displayName);
+            if (!result.success) throw new Error(result.error);
+            user = result.user;
+
+            // Set project data for Forms
+            await ArmindoAccount.setProjectData('forms', { registered: true });
+        } else {
+            const result = await auth.createUserWithEmailAndPassword(email, password);
+            await result.user.updateProfile({ displayName });
+            user = result.user;
+        }
+
+        return user;
     },
 
     async signOut() {
-        await auth.signOut();
+        if (_useUnifiedAccount) {
+            await ArmindoAccount.signOut();
+        } else {
+            await auth.signOut();
+        }
     },
 
     async sendPasswordReset(email) {
-        await auth.sendPasswordResetEmail(email);
+        if (_useUnifiedAccount) {
+            const result = await ArmindoAccount.sendPasswordReset(email);
+            if (!result.success) throw new Error(result.error);
+        } else {
+            await auth.sendPasswordResetEmail(email);
+        }
     },
 
     getCurrentUser() {
+        if (_useUnifiedAccount) {
+            return ArmindoAccount.getCurrentUser();
+        }
         return auth.currentUser;
     },
 
     onAuthStateChanged(callback) {
+        if (_useUnifiedAccount) {
+            return ArmindoAccount.onAuthStateChanged((user, profile) => {
+                callback(user);
+            });
+        }
         return auth.onAuthStateChanged(callback);
     }
 };
+
 
 // ============================================
 // Utility Functions

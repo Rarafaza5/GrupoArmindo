@@ -1,128 +1,82 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sucesso | Grupo Armindo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/armindo.png">
 
-    <style>
-        :root {
-            --primary-blue: #43004b;
-            --accent-gold: #9b09ea;
-            --text-gray: #4a4a4a;
-            --white: #ffffff;
-        }
+    <!-- Premium Styles -->
+    <link rel="stylesheet" href="assets/css/hub-premium.css">
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: var(--text-gray);
-        }
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-        .container {
-            text-align: center;
-            background: var(--white);
-            padding: 60px 40px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 90%;
-            border-top: 5px solid var(--accent-gold);
-        }
-
-        .logo {
-            margin-bottom: 30px;
-        }
-
-        .logo-img {
-            max-width: 220px;
-            height: auto;
-        }
-
-        .icon-check {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-blue);
-            color: var(--white);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 40px;
-            margin: 0 auto 20px;
-        }
-
-        h1 {
-            color: var(--primary-blue);
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-
-        p {
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background-color: var(--primary-blue);
-            color: var(--white);
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background 0.3s ease;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-gold);
-        }
-
-        .footer-note {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #999;
-        }
-    </style>
+    <!-- Armindo Ecosystem Scripts -->
+    <script src="assets/js/armindo-account.js"></script>
+    <script src="assets/js/hub-auth.js"></script>
 </head>
 
 <body>
 
-<div class="container">
-
-    <!-- LOGO -->
-    <div class="logo">
-        <img src="Grupo_armindo_logo_colorida_fundo_trasparente.png" alt="Grupo Armindo" class="logo-img">
+    <!-- AURORA BACKGROUND -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
     </div>
+    <div class="noise-overlay"></div>
 
-    <!-- ÍCONE -->
-    <div class="icon-check">✓</div>
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <img src="/logo-grupo-armindo.png" alt="Grupo Armindo Logo"
+                onerror="this.src='/assets/logo_grupoarmindo_trasparente.png'">
 
-    <!-- TEXTO -->
-    <h1>Obrigado pela participação!</h1>
+        </a>
 
-    <p>
-        Os seus dados foram submetidos com sucesso.
-        A nossa equipa irá analisar a sua submissão e se necessário entraremos em contacto brevemente.
-    </p>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Início</a>
+            <a href="/armindonews" class="nav-link">Notícias</a>
+            <a href="/life-verse" class="nav-link">LifeVerse</a>
+        </div>
+    </nav>
 
-    <!-- BOTÃO -->
-    <a href="https://grupoarmindo.site" class="btn">VOLTAR AO SITE PRINCIPAL</a>
+    <!-- CONTENT -->
+    <main class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
 
-    <!-- RODAPÉ -->
-    <div class="footer-note">
-        &copy; 2024 Grupo Armindo. Todos os direitos reservados.
-    </div>
+        <div class="glass-panel reveal active" style="text-align: center; max-width: 600px; padding: 60px;">
 
-</div>
+            <div style="font-size: 64px; margin-bottom: 24px;">✨</div>
+
+            <h1 class="hero-title" style="font-size: 2.5rem; margin-bottom: 16px;">Obrigado!</h1>
+
+            <p class="hero-desc">
+                Os seus dados foram submetidos com sucesso.
+                A nossa equipa irá analisar a sua submissão e se necessário entraremos em contacto brevemente.
+            </p>
+
+            <div style="margin-top: 40px;">
+                <a href="/" class="btn btn-primary">Voltar ao Início</a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="container" style="text-align: center;">
+            <p class="copyright">&copy; 2026 Grupo Armindo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTION SCRIPTS -->
+    <script src="assets/js/hub-interactions.js"></script>
 
 </body>
+
 </html>

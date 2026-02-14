@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin — Grupo Armindo</title>
+    <link rel="icon" href="/armindo.png">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Admin Styles -->
+    <link rel="stylesheet" href="assets/css/hub-admin-premium.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <!-- Core Scripts -->
+    <script src="assets/js/armindo-account.js"></script>
+</head>
+
+<body>
+    <!-- AURORA BACKGROUND -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+    </div>
+    <div class="noise-overlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <span style="color: var(--primary);">GA</span> Admin
+        </div>
+        <nav>
+            <div class="nav-item active" onclick="switchSection('dashboard')">🏠 Dashboard</div>
+            <div class="nav-item" onclick="switchSection('global')">⚙️ Configuração Global</div>
+            <div class="nav-item" onclick="switchSection('projects')">📂 Projetos Hub</div>
+            <div class="nav-item" onclick="switchSection('team')">👥 Membros / Equipa</div>
+        </nav>
+        <div style="margin-top: auto;">
+            <button class="btn btn-glass" onclick="location.href='/'" style="width: 100%;">Voltar ao Site</button>
+        </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="admin-content">
+        <!-- Dashboard Section -->
+        <section id="section-dashboard" class="admin-section">
+            <h1 style="margin-top: 0; font-size: 2.5rem; margin-bottom: 32px;">Bem-vindo, <span
+                    id="admin-name">...</span></h1>
+            <div class="bento-grid">
+                <div class="bento-card col-span-4"
+                    style="background: linear-gradient(135deg, rgba(129, 140, 248, 0.2), transparent);">
+                    <div>
+                        <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Controlo Total</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Gira todos os aspetos do Grupo Armindo a
+                            partir deste painel centralizado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Global Config Section -->
+        <section id="section-global" class="admin-section" style="display: none;">
+            <h1 style="margin-top: 0; margin-bottom: 32px;">Configuração Global</h1>
+            <div class="admin-card">
+                <form id="global-config-form">
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Motto do Site</label>
+                        <input type="text" id="motto-input" class="glass-input"
+                            style="width: 100%; box-sizing: border-box;" placeholder="Frase principal da hero section">
+                    </div>
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">News Ticker (Separar por
+                            vírgulas)</label>
+                        <textarea id="ticker-input" class="glass-input"
+                            style="width: 100%; height: 100px; box-sizing: border-box; resize: vertical;"
+                            placeholder="INOVAÇÃO, CULTURA, COMUNIDADE..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="section-projects" class="admin-section" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <h1 style="margin: 0;">Projetos Hub</h1>
+                <button class="btn btn-primary" onclick="openProjectModal()">+ Novo Projeto</button>
+            </div>
+            <div class="admin-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Título</th>
+                            <th>Badges</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projects-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section id="section-team" class="admin-section" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <h1 style="margin: 0;">Equipa / Membros</h1>
+                <button class="btn btn-primary" onclick="openMemberModal()">+ Novo Membro</button>
+            </div>
+            <div class="admin-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Emoji</th>
+                            <th>Nome</th>
+                            <th>Função</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="team-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL FOR PROJECT -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <h2 id="project-modal-title">Novo Projeto</h2>
+            <form id="project-form">
+                <input type="hidden" id="project-id">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label class="auth-label">Título</label>
+                        <input type="text" id="proj-title" class="glass-input"
+                            style="width: 100%; box-sizing: border-box;" required>
+                    </div>
+                    <div>
+                        <label class="auth-label">Icon (Emoji)</label>
+                        <input type="text" id="proj-icon" class="glass-input"
+                            style="width: 100%; box-sizing: border-box;" required>
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label class="auth-label">Descrição</label>
+                    <textarea id="proj-desc" class="glass-input" style="width: 100%; box-sizing: border-box;"
+                        required></textarea>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label class="auth-label">Link</label>
+                    <input type="text" id="proj-link" class="glass-input" style="width: 100%; box-sizing: border-box;"
+                        required>
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <label class="auth-label">Badges (Separar por vírgulas)</label>
+                    <input type="text" id="proj-badges" class="glass-input"
+                        style="width: 100%; box-sizing: border-box;">
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-glass" onclick="closeModal('projectModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Projeto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL FOR MEMBER -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <h2 id="member-modal-title">Novo Membro</h2>
+            <form id="member-form">
+                <input type="hidden" id="member-id">
+                <div style="margin-bottom: 16px;">
+                    <label class="auth-label">Nome Completo</label>
+                    <input type="text" id="mem-name" class="glass-input" style="width: 100%; box-sizing: border-box;"
+                        required>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label class="auth-label">Função / Role</label>
+                    <select id="mem-role" class="glass-input"
+                        style="width: 100%; box-sizing: border-box; background: #0f172a;" required>
+                        <option value="Presidente">Presidente</option>
+                        <option value="Vice Presidente">Vice Presidente</option>
+                        <option value="Fundador">Fundador</option>
+                        <option value="Membro" selected>Membro</option>
+                        <option value="Colaborador">Colaborador</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <label class="auth-label">Badges (Emoji/Texto curto, Opcional)</label>
+                    <input type="text" id="mem-badges" class="glass-input" style="width: 100%; box-sizing: border-box;"
+                        placeholder="Ex: 👑, Fundador">
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-glass" onclick="closeModal('memberModal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Membro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Logic -->
+    <script src="assets/js/hub-admin.js"></script>
+</body>
+
+</html>

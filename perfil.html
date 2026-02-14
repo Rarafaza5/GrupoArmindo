@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Meu Perfil — Grupo Armindo</title>
+    <link rel="icon" href="/armindo.png">
+
+    <!-- Premium Styles -->
+    <link rel="stylesheet" href="assets/css/hub-premium.css">
+
+    <!-- Scripts (Auth) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="assets/js/armindo-account.js"></script>
+    <script src="assets/js/hub-auth.js"></script>
+</head>
+
+<body>
+
+    <!-- AURORA BACKGROUND -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+    <div class="noise-overlay"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <img src="/logo-grupo-armindo.png" alt="Grupo Armindo Logo"
+                onerror="this.src='/assets/logo_grupoarmindo_trasparente.png'">
+        </a>
+
+        <div class="nav-links">
+            <!-- Populated by hub-auth.js -->
+        </div>
+
+        <button class="mobile-toggle" aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu">
+        <a href="/">Início</a>
+        <a href="/armindonews">Armindo News</a>
+        <a href="/life-verse">LifeVerse</a>
+        <a href="/perfil.html">Meu Perfil</a>
+    </div>
+
+    <!-- PROFILE HEADER -->
+    <header class="container section" style="padding-bottom: 20px; text-align: center; position: relative;">
+        <!-- 3D Elements -->
+        <div class="hero-3d-elements">
+            <div class="float-element float-1" style="top: 20%; left: 10%; width: 60px; height: 60px;"></div>
+            <div class="float-element float-2" style="bottom: 20%; right: 10%; width: 80px; height: 80px;"></div>
+        </div>
+
+        <div style="position: relative; z-index: 2;" class="reveal active">
+            <div id="profile-loading">
+                <div class="badge">Carregando perfil...</div>
+            </div>
+
+            <div id="profile-content" style="display: none;">
+                <img id="user-avatar" src="" alt="Avatar"
+                    style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.1); margin: 0 auto 24px; object-fit: cover; box-shadow: 0 0 30px rgba(79, 70, 229, 0.4);">
+                <h1 id="user-name">User Name</h1>
+                <p id="user-email" class="hero-desc" style="font-size: 1rem; margin-top: 8px; opacity: 0.7;">
+                    user@email.com
+                </p>
+
+                <button onclick="handleLogout()" class="btn btn-glass"
+                    style="margin-top: 24px; border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+                    Terminar Sessão
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- SERVICES DASHBOARD -->
+    <main class="container">
+        <h2 class="section-title reveal">Meus Serviços</h2>
+
+        <div class="bento-grid reveal">
+            <!-- ... (existing cards) ... -->
+        </div>
+
+        <div class="bento-grid reveal" style="margin-top: 24px;">
+            <!-- Settings/Account -->
+            <div class="bento-card col-span-12">
+                <div class="highlight-bg"></div>
+                <div class="card-icon">⚙️</div>
+                <div style="flex: 1;">
+                    <h3 class="card-title">Definições da Conta</h3>
+                    <p class="card-desc">Gerir dados pessoais, segurança e conexões.</p>
+
+                    <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+                        <button class="btn btn-glass" onclick="openSettingsModal()" style="font-size: 0.9rem;">
+                            Editar Perfil
+                        </button>
+                        <button class="btn btn-glass" onclick="openPasswordModal()" style="font-size: 0.9rem;">
+                            Mudar Senha
+                        </button>
+                        <button class="btn btn-glass" onclick="handleDeleteAccount()"
+                            style="font-size: 0.9rem; border-color: rgba(239, 68, 68, 0.3); color: #fca5a5;">
+                            Eliminar Conta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="auth-modal">
+        <div class="auth-panel">
+            <button class="auth-close" onclick="closeSettingsModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 class="brand-font" style="color: white; margin-bottom: 8px;">Editar Perfil</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Atualize a sua identidade digital</p>
+            </div>
+
+            <form id="settingsForm" onsubmit="handleSettingsSave(event)">
+                <div class="auth-form-group">
+                    <label class="auth-label">Nome de Exibição</label>
+                    <input type="text" class="auth-input" id="setDisplayName" required placeholder="Seu nome">
+                </div>
+                <div class="auth-form-group">
+                    <label class="auth-label">URL do Avatar</label>
+                    <input type="url" class="auth-input" id="setAvatarUrl" placeholder="https://exemplo.com/foto.jpg">
+                    <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 8px;">
+                        Deixe vazio para usar o padrão.
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Guardar
+                    Alterações</button>
+                <div id="settingsStatus"
+                    style="font-size: 0.85rem; margin-top: 12px; text-align: center; display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PASSWORD MODAL -->
+    <div id="passwordModal" class="auth-modal">
+        <div class="auth-panel">
+            <button class="auth-close" onclick="closePasswordModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 class="brand-font" style="color: white; margin-bottom: 8px;">Mudar Senha</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Sugerimos uma senha forte e única</p>
+            </div>
+
+            <form id="passwordForm" onsubmit="handlePasswordChange(event)">
+                <div class="auth-form-group">
+                    <label class="auth-label">Nova Senha</label>
+                    <input type="password" class="auth-input" id="newPassword" required
+                        placeholder="Mínimo 6 caracteres" minlength="6">
+                </div>
+                <div class="auth-form-group">
+                    <label class="auth-label">Confirmar Nova Senha</label>
+                    <input type="password" class="auth-input" id="confirmPassword" required
+                        placeholder="Repita a nova senha">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Atualizar
+                    Senha</button>
+                <div id="passwordStatus"
+                    style="font-size: 0.85rem; margin-top: 12px; text-align: center; display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="container" style="text-align: center;">
+            <p class="copyright">&copy; 2026 Grupo Armindo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof ArmindoAccount !== 'undefined') {
+                ArmindoAccount.init();
+                ArmindoAccount.onAuthStateChanged((user, profile) => {
+                    if (user) {
+                        showProfile(user, profile);
+                        checkServices(user);
+                    } else {
+                        setTimeout(() => {
+                            if (!ArmindoAccount.getCurrentUser()) {
+                                window.location.href = "/?login=true";
+                            }
+                        }, 1000);
+                    }
+                });
+            }
+        });
+
+        function showProfile(user, profile) {
+            document.getElementById('profile-loading').style.display = 'none';
+            document.getElementById('profile-content').style.display = 'block';
+
+            // Priority: Firestore Profile > Auth User > Fallback
+            const displayName = profile?.profile?.displayName || user.displayName || 'Utilizador';
+            const avatar = profile?.profile?.avatar || user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
+
+            document.getElementById('user-name').textContent = displayName;
+            document.getElementById('user-email').textContent = user.email;
+            document.getElementById('user-avatar').src = avatar;
+        }
+
+        // SETTINGS MODAL
+        window.openSettingsModal = () => {
+            const user = ArmindoAccount.getCurrentUser();
+            const profile = ArmindoAccount.getProfile();
+            if (!user) return;
+            document.getElementById('setDisplayName').value = profile?.profile?.displayName || user.displayName || '';
+            document.getElementById('setAvatarUrl').value = profile?.profile?.avatar || user.photoURL || '';
+            document.getElementById('settingsModal').classList.add('active');
+        };
+        window.closeSettingsModal = () => document.getElementById('settingsModal').classList.remove('active');
+
+        window.handleSettingsSave = async (e) => {
+            e.preventDefault();
+            const displayName = document.getElementById('setDisplayName').value;
+            const avatar = document.getElementById('setAvatarUrl').value;
+            const status = document.getElementById('settingsStatus');
+            status.style.display = 'block'; status.style.color = 'white'; status.textContent = 'A guardar...';
+            try {
+                const result = await ArmindoAccount.updateProfile({ displayName, avatar });
+                if (result.success) {
+                    status.style.color = '#34d399'; status.textContent = 'Perfil atualizado!';
+                    setTimeout(() => { closeSettingsModal(); status.style.display = 'none'; }, 1000);
+                } else {
+                    status.style.color = 'var(--accent-tertiary)'; status.textContent = result.error || 'Erro ao atualizar.';
+                }
+            } catch (err) { status.style.color = 'var(--accent-tertiary)'; status.textContent = 'Erro inesperado.'; }
+        };
+
+        // PASSWORD MODAL
+        window.openPasswordModal = () => {
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordModal').classList.add('active');
+        };
+        window.closePasswordModal = () => document.getElementById('passwordModal').classList.remove('active');
+
+        window.handlePasswordChange = async (e) => {
+            e.preventDefault();
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            const status = document.getElementById('passwordStatus');
+
+            if (newPass !== confirmPass) {
+                status.style.display = 'block'; status.style.color = 'var(--accent-tertiary)';
+                status.textContent = 'As senhas não coincidem.'; return;
+            }
+
+            status.style.display = 'block'; status.style.color = 'white'; status.textContent = 'A atualizar...';
+            try {
+                const result = await ArmindoAccount.changePassword(newPass);
+                if (result.success) {
+                    status.style.color = '#34d399'; status.textContent = 'Senha atualizada com sucesso!';
+                    setTimeout(() => { closePasswordModal(); status.style.display = 'none'; }, 1500);
+                } else {
+                    status.style.color = 'var(--accent-tertiary)'; status.textContent = result.error;
+                }
+            } catch (err) { status.style.color = 'var(--accent-tertiary)'; status.textContent = 'Erro ao mudar senha.'; }
+        };
+
+        // DELETE ACCOUNT
+        window.handleDeleteAccount = async () => {
+            if (confirm("⚠️ TEM A CERTEZA? Esta ação eliminará permanentemente a sua conta e todos os dados associados. Não pode ser desfeita.")) {
+                const secondConfirm = prompt("Para confirmar, escreva o seu email:");
+                const user = ArmindoAccount.getCurrentUser();
+
+                if (secondConfirm === user.email) {
+                    try {
+                        const result = await ArmindoAccount.deleteAccount();
+                        if (result.success) {
+                            alert("Conta eliminada com sucesso. Adeus!");
+                            window.location.href = "/";
+                        } else {
+                            alert("Erro ao eliminar: " + result.error);
+                        }
+                    } catch (e) { alert("Erro de sistema ao eliminar conta."); }
+                } else {
+                    alert("Email incorreto. Cancelado.");
+                }
+            }
+        };
+
+        async function checkServices(user) {
+            const db = firebase.firestore();
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const data = userDoc.data();
+                    if (data.characterName) {
+                        document.getElementById('lv-status').textContent = "Ativo: " + data.characterName;
+                        document.getElementById('lv-status').style.background = "rgba(16, 185, 129, 0.2)";
+                        document.getElementById('lv-status').style.color = "#34d399";
+                    }
+                }
+            } catch (e) {
+                console.log("Error checking services:", e);
+            }
+        }
+    </script>
+
+    <script src="assets/js/hub-interactions.js"></script>
+</body>
+
+</html>

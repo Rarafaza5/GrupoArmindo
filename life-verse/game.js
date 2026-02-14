@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // © 2026 Grupo Armindo. Todos os direitos reservados.
 // ============================================
 // FIREBASE CONFIGURATION
@@ -33,6 +33,7 @@ let gameSettings = {
     timeSpeed: 1 // Default: 1 real day = 1 game year
 };
 let serverTimeOffset = 0;
+let selectedGender = null; // Moved to globals
 
 // ============================================
 // GAME CONSTANTS - EXPANDIDO
@@ -315,41 +316,279 @@ const RANDOM_EVENTS = [
 ];
 
 // ============================================
-// AUTHENTICATION
+// AUTHENTICATION - Integrado com Conta Grupo Armindo
 // ============================================
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        currentUser = user;
-        await loadCharacter();
+
+// Flag para verificar se estamos usando conta unificada
+let _useArmindoAccount = false;
+
+// Inicializar autenticação
+function initAuth() {
+    // Show loading while checking session
+    showLoading('Verificando conta...');
+
+    // Check if ArmindoAccount SDK is available
+    if (typeof ArmindoAccount !== 'undefined') {
+        _useArmindoAccount = true;
+        ArmindoAccount.init();
+
+        ArmindoAccount.onAuthStateChanged(async (user, profile) => {
+            if (user) {
+                currentUser = user;
+                await handleUserLogin(user, profile);
+            } else {
+                // No session - show login screen
+                hideLoading();
+                currentUser = null;
+                currentCharacter = null;
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('gameScreen').style.display = 'none';
+            }
+        });
+
+        console.log('✅ LifeVerse usando Conta Grupo Armindo');
     } else {
-        currentUser = null;
-        currentCharacter = null;
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('gameScreen').style.display = 'none';
+        // Fallback: Use Firebase Auth directly
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadCharacter();
+            } else {
+                hideLoading();
+                currentUser = null;
+                currentCharacter = null;
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('gameScreen').style.display = 'none';
+            }
+        });
+        console.log('✅ LifeVerse em modo standalone');
     }
-});
+}
+
+// Handle user login - check if character exists or needs creation
+async function handleUserLogin(user, profile) {
+    showLoading('Verificando personagem...');
+
+    try {
+        // Check if character exists
+        const charDoc = await db.collection('characters').doc(user.uid).get();
+
+        if (charDoc.exists) {
+            // Character exists, load normally
+            await loadCharacter();
+        } else {
+            // No character - check for unified account
+            let userProfile = profile;
+
+            // If profile not passed, check Firestore directly
+            if (!userProfile && _useArmindoAccount) {
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        userProfile = userDoc.data();
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch user profile:', e);
+                }
+            }
+
+            if (userProfile) {
+                // User has unified account but no character - show character creation only
+                hideLoading();
+                const displayName = userProfile.profile?.displayName || user.displayName || '';
+                showCharacterCreation(displayName);
+            } else {
+                // No unified account found, prompt full registration
+                hideLoading();
+                showNotification('Personagem não encontrado. Crie um novo.', 'error');
+                showRegister();
+            }
+        }
+    } catch (error) {
+        hideLoading();
+        console.error('Error checking character:', error);
+        showNotification('Erro ao verificar personagem', 'error');
+    }
+}
+
+// Show character creation modal (for users with existing unified account)
+function showCharacterCreation(suggestedName) {
+    selectedGender = null; // Reset gender selection
+    showModal('Criar Personagem LifeVerse', `
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Já tens uma Conta Grupo Armindo! Vamos criar o teu personagem.</p>
+        <div class="form-group">
+            <label class="form-label">Nome do Personagem</label>
+            <input type="text" class="form-input" id="newCharName" placeholder="Seu nome" value="${suggestedName}">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Identidade de Gênero</label>
+            <div class="trait-grid">
+                <div class="trait-option" onclick="selectGender('male')" id="gender-male">
+                    <div class="trait-icon">👨</div>
+                    <div class="trait-name">Masculino</div>
+                </div>
+                <div class="trait-option" onclick="selectGender('female')" id="gender-female">
+                    <div class="trait-icon">👩</div>
+                    <div class="trait-name">Feminino</div>
+                </div>
+                <div class="trait-option" onclick="selectGender('non-binary')" id="gender-non-binary">
+                    <div class="trait-icon">🧑</div>
+                    <div class="trait-name">Não-Binário</div>
+                </div>
+                <div class="trait-option" onclick="selectGender('genderfluid')" id="gender-genderfluid">
+                    <div class="trait-icon">🌈</div>
+                    <div class="trait-name">Gênero Fluido</div>
+                </div>
+                <div class="trait-option" onclick="selectGender('transgender-male')" id="gender-transgender-male">
+                    <div class="trait-icon">🏳️‍⚧️</div>
+                    <div class="trait-name">Homem Trans</div>
+                </div>
+                <div class="trait-option" onclick="selectGender('transgender-female')" id="gender-transgender-female">
+                    <div class="trait-icon">🏳️‍⚧️</div>
+                    <div class="trait-name">Mulher Trans</div>
+                </div>
+                <div class="trait-option" onclick="selectGender('agender')" id="gender-agender">
+                    <div class="trait-icon">⚪</div>
+                    <div class="trait-name">Agênero</div>
+                </div>
+                <div class="trait-option" onclick="selectGender('other')" id="gender-other">
+                    <div class="trait-icon">✨</div>
+                    <div class="trait-name">Outro</div>
+                </div>
+            </div>
+        </div>
+    `, [
+        { text: 'Criar Personagem', class: 'btn btn-primary', onclick: 'createCharacterFromProfile()' },
+        { text: 'Cancelar', class: 'btn btn-secondary', onclick: 'closeModal()' }
+    ]);
+}
+
+// Create character for existing unified account user
+async function createCharacterFromProfile() {
+    console.log('🚀 Iniciando criação de personagem...');
+    const nameInput = document.getElementById('newCharName');
+    let name = '';
+
+    if (nameInput && nameInput.value) {
+        name = nameInput.value.trim();
+    }
+
+    console.log('📋 Validando dados:', {
+        name,
+        selectedGender,
+        currentUser: currentUser ? currentUser.uid : 'NULL'
+    });
+
+    if (!name || !selectedGender) {
+        console.warn('❌ Dados inválidos:', { name, selectedGender });
+        showNotification('Preencha o nome e selecione um gênero', 'error');
+        return;
+    }
+
+    if (!currentUser) {
+        console.error('❌ Erro crítico: currentUser é null!');
+        showNotification('Erro de sessão. Recarregue a página.', 'error');
+        return;
+    }
+
+    try {
+        console.log('🔒 Fechando modal...');
+        closeModal();
+
+        console.log('⏳ Mostrando loading...');
+        showLoading('Criando sua vida...');
+
+        await createCharacter(currentUser.uid, name, selectedGender);
+
+        // Mark lifeverse as configured in unified account
+        if (_useArmindoAccount) {
+            await ArmindoAccount.setProjectData('lifeverse', {
+                characterId: currentUser.uid,
+                characterName: name
+            });
+        }
+
+        hideLoading();
+        showNotification('Bem-vindo ao LifeVerse!', 'success');
+    } catch (error) {
+        console.error('Erro fatal ao criar personagem:', error);
+        hideLoading();
+        showNotification('Erro ao criar personagem: ' + error.message, 'error');
+    }
+}
+window.createCharacterFromProfile = createCharacterFromProfile;
 
 async function login() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
+    const emailInput = document.getElementById('loginEmail');
+    const passwordInput = document.getElementById('loginPassword');
+
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value : '';
 
     if (!email || !password) {
         showNotification('Preencha todos os campos', 'error');
         return;
     }
 
+    const btn = document.querySelector('#loginScreen .btn-primary');
+    if (btn.classList.contains('btn-loading')) return;
+
     showLoading('Entrando...');
+    btn.classList.add('btn-loading');
 
     try {
-        await auth.signInWithEmailAndPassword(email, password);
+        if (_useArmindoAccount) {
+            const result = await ArmindoAccount.signIn(email, password);
+            if (!result.success) throw new Error(result.error);
+        } else {
+            await auth.signInWithEmailAndPassword(email, password);
+        }
     } catch (error) {
+        btn.classList.remove('btn-loading');
         hideLoading();
-        showNotification('Erro: ' + getErrorMessage(error.code), 'error');
+        showNotification('Erro: ' + (error.message || getErrorMessage(error.code)), 'error');
     }
 }
 
+async function loginWithGoogle() {
+    showLoading('Conectando ao Google...');
+    try {
+        if (_useArmindoAccount) {
+            const result = await ArmindoAccount.signInWithGoogle('popup');
+
+            if (!result.success) {
+                // Se o popup for bloqueado ou houver erro de cross-origin/COOP, tenta redirect
+                // 'auth/popup-closed-by-user' é comum quando COOP bloqueia a comunicação
+                const fallbackCodes = [
+                    'auth/popup-blocked',
+                    'auth/cancelled-popup-request',
+                    'auth/popup-closed-by-user',
+                    'auth/network-request-failed'
+                ];
+
+                if (fallbackCodes.includes(result.code)) {
+                    showNotification('Modo popup restrito. Tentando redirecionamento...', 'info');
+                    await ArmindoAccount.signInWithGoogle('redirect');
+                    return;
+                }
+                throw new Error(result.error);
+            }
+
+            if (result.redirecting) return; // Aguardando redirecionamento
+        } else {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            await auth.signInWithPopup(provider);
+        }
+    } catch (error) {
+        hideLoading();
+        showNotification('Erro: ' + (error.message || getErrorMessage(error.code)), 'error');
+    }
+}
+
+
 function showRegister() {
     showModal('Criar Nova Vida', `
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Esta é a tua Conta Grupo Armindo - funciona em todos os projetos!</p>
         <div class="form-group">
             <label class="form-label">Nome do Personagem</label>
             <input type="text" class="form-input" id="regName" placeholder="Seu nome">
@@ -399,26 +638,52 @@ function showRegister() {
                 </div>
             </div>
         </div>
+
+        <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; color: rgba(255,255,255,0.3); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">
+            <div style="flex: 1; height: 1px; background: var(--border);"></div>
+            <span>ou</span>
+            <div style="flex: 1; height: 1px; background: var(--border);"></div>
+        </div>
+
+        <button class="btn btn-google" onclick="loginWithGoogle()" style="margin-top: 0">
+            <svg viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </svg>
+            Continuar com Google
+        </button>
     `, [
         { text: 'Criar Personagem', class: 'btn btn-primary', onclick: 'register()' },
         { text: 'Cancelar', class: 'btn btn-secondary', onclick: 'closeModal()' }
     ]);
 }
 
-let selectedGender = null;
+// selectedGender is now global
 
 function selectGender(gender) {
+    console.log('Gender selected:', gender);
     selectedGender = gender;
-    document.querySelectorAll('.trait-option').forEach(el => el.classList.remove('selected'));
-    document.getElementById(`gender-${gender}`).classList.add('selected');
+    // Update UI
+    document.querySelectorAll('.trait-option').forEach(opt => {
+        opt.classList.remove('selected');
+        if (opt.id === 'gender-' + gender) {
+            opt.classList.add('selected');
+        }
+    });
 }
 
 async function register() {
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
+    const nameInput = document.getElementById('regName');
+    const emailInput = document.getElementById('regEmail');
+    const passwordInput = document.getElementById('regPassword');
 
-    if (!name || !email || !password || !selectedGender) {
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value : '';
+
+    if (!name || !email || !password || (typeof selectedGender === 'undefined' || selectedGender === null)) {
         showNotification('Preencha todos os campos e selecione um gênero', 'error');
         return;
     }
@@ -428,23 +693,51 @@ async function register() {
         return;
     }
 
+    const modalBtn = document.querySelector('.modal-footer .btn-primary');
+    if (modalBtn && modalBtn.classList.contains('btn-loading')) return;
+
     closeModal();
     showLoading('Criando sua vida...');
+    if (modalBtn) modalBtn.classList.add('btn-loading');
 
     try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        await createCharacter(userCredential.user.uid, name, selectedGender);
+        let userId;
+
+        if (_useArmindoAccount) {
+            const result = await ArmindoAccount.signUp(email, password, name);
+            if (!result.success) throw new Error(result.error);
+            userId = result.user.uid;
+
+            // Set project data
+            await ArmindoAccount.setProjectData('lifeverse', {
+                characterId: userId,
+                characterName: name
+            });
+        } else {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            userId = userCredential.user.uid;
+        }
+
+        await createCharacter(userId, name, selectedGender);
         showNotification('Bem-vindo ao LifeVerse!', 'success');
     } catch (error) {
         hideLoading();
-        showNotification('Erro: ' + getErrorMessage(error.code), 'error');
+        showNotification('Erro: ' + (error.message || getErrorMessage(error.code)), 'error');
+    } finally {
+        if (modalBtn) modalBtn.classList.remove('btn-loading');
     }
 }
 
 async function logout() {
     if (confirm('Tem certeza que deseja sair?')) {
         stopGameLoop();
-        await auth.signOut();
+
+        if (_useArmindoAccount) {
+            await ArmindoAccount.signOut();
+        } else {
+            await auth.signOut();
+        }
+
         currentCharacter = null;
         currentUser = null;
     }
@@ -460,6 +753,9 @@ function getErrorMessage(code) {
     };
     return messages[code] || code;
 }
+
+// Initialize auth on page load
+document.addEventListener('DOMContentLoaded', initAuth);
 
 // ============================================
 // CHARACTER MANAGEMENT - MELHORADO
@@ -1515,8 +1811,8 @@ async function prideAction() {
     if (!canPerformAction('pride')) return;
 
     // Aumento de 30% em tudo (unidade ou percentual? o user disse "30%", assumirei multiplicador ou +30 pontos?)
-    // "aumenta tudo em 30%" - Geralmente significa +30 se for stats de 0-100 ou multiplicador. 
-    // Como os stats são 0-100, farei +30 pontos (ou 30% do total). 
+    // "aumenta tudo em 30%" - Geralmente significa +30 se for stats de 0-100 ou multiplicador.
+    // Como os stats são 0-100, farei +30 pontos (ou 30% do total).
     // Farei +30 pontos fixos para ser impactante.
 
     currentCharacter.health = Math.min(100, (currentCharacter.health || 100) + 30);
@@ -3344,6 +3640,30 @@ async function rejectRequest(requestId) {
 // ============================================
 // ADMIN / GOD MODE FUNCTIONS
 // ============================================
+// ============================================
+// CORE AUTHENTICATION LOGIC
+// ============================================
+
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const btn = input.nextElementSibling;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+        `;
+    } else {
+        input.type = 'password';
+        btn.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+        `;
+    }
+}
 // ============================================
 // SOCIAL INTERACTIONS
 // ============================================
