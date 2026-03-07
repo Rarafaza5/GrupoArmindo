@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidade — Festival da Canção 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #0a4a52; --teal2: #0d5c66; --teal3: #0f6b78;
+      --cyan: #00d4b8; --cyan2: #00bba1;
+      --white: #ffffff; --offwhite: #f0f7f8;
+      --text: #1a3a3f; --muted: #5a8a92;
+      --border: rgba(0,212,184,0.2);
+    }
+    body { background: var(--offwhite); color: var(--text); font-family: 'Source Sans 3', sans-serif; min-height: 100vh; }
+
+    .topbar { background: var(--teal); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .logo-festival { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--cyan); font-weight: 600; display: block; line-height: 1.2; }
+    .logo-name { font-size: 22px; font-weight: 700; color: var(--white); }
+    .logo-year { font-size: 22px; font-weight: 300; color: var(--cyan); }
+    .topbar-back { color: rgba(255,255,255,0.65); font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .15s; }
+    .topbar-back:hover { color: var(--white); }
+
+    .hero { background: linear-gradient(135deg, var(--teal) 0%, var(--teal3) 100%); padding: 44px 24px 40px; text-align: center; }
+    .hero-tag { display: inline-block; background: rgba(0,212,184,0.15); border: 1px solid rgba(0,212,184,0.3); color: var(--cyan); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; padding: 5px 14px; border-radius: 100px; margin-bottom: 18px; }
+    .hero h1 { font-size: 32px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .hero p { font-size: 14px; color: rgba(255,255,255,0.6); }
+
+    .gdpr-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(0,212,184,0.12); border: 1px solid rgba(0,212,184,0.25); color: var(--cyan); font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 100px; margin-top: 14px; letter-spacing: .06em; }
+
+    .content-wrap { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    .toc { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 22px 26px; margin-bottom: 44px; }
+    .toc-title { font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: var(--muted); font-weight: 600; margin-bottom: 14px; }
+    .toc ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; }
+    .toc li a { font-size: 13.5px; color: var(--teal2); text-decoration: none; display: flex; align-items: center; gap: 7px; transition: color .15s; }
+    .toc li a:hover { color: var(--cyan2); }
+    .toc li a::before { content: ''; display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); flex-shrink: 0; }
+
+    .rights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+    .right-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .right-card .right-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+    .right-card .right-title { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 3px; }
+    .right-card .right-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .section { margin-bottom: 44px; scroll-margin-top: 24px; }
+    .section-num { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--cyan2); font-weight: 700; margin-bottom: 6px; }
+    .section h2 { font-size: 22px; font-weight: 700; color: var(--teal); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid rgba(0,212,184,0.25); }
+    .section h3 { font-size: 16px; font-weight: 700; color: var(--teal2); margin: 20px 0 10px; }
+    .section p { font-size: 14.5px; color: var(--text); line-height: 1.75; margin-bottom: 12px; }
+    .section ul { margin: 8px 0 14px 0; padding: 0; list-style: none; }
+    .section ul li { font-size: 14.5px; color: var(--text); line-height: 1.7; padding: 5px 0 5px 22px; position: relative; border-bottom: 1px solid rgba(0,212,184,0.08); }
+    .section ul li::before { content: ''; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
+
+    .no-collect { background: rgba(0,212,184,0.06); border: 1px solid rgba(0,212,184,0.2); border-radius: 10px; padding: 16px 20px; margin: 12px 0; }
+    .no-collect p { margin: 0 0 6px; font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .1em; }
+    .no-collect ul li { font-size: 13.5px; border-bottom: none; }
+
+    .highlight-box { background: rgba(0,212,184,0.07); border-left: 3px solid var(--cyan); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0; font-size: 14px; color: var(--teal2); line-height: 1.65; }
+
+    .cnpd-box { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 16px 20px; margin: 16px 0; display: flex; gap: 14px; align-items: flex-start; }
+    .cnpd-box .icon { font-size: 22px; flex-shrink: 0; }
+    .cnpd-box p { font-size: 13.5px; color: var(--text); line-height: 1.6; margin: 0; }
+    .cnpd-box a { color: var(--cyan2); text-decoration: none; font-weight: 600; }
+
+    .date-stamp { text-align: center; padding: 28px 0 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; font-style: italic; }
+
+    footer { background: var(--teal); padding: 28px 24px; text-align: center; }
+    footer p { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.8; }
+    .footer-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 10px; flex-wrap: wrap; }
+    .footer-links a { font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none; transition: color .15s; }
+    .footer-links a:hover { color: var(--white); }
+
+    @media (max-width: 600px) {
+      .toc ul { grid-template-columns: 1fr; }
+      .rights-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <span class="logo-festival">Festival da</span>
+    <div><span class="logo-name">CANÇÃO</span> <span class="logo-year">2026</span></div>
+  </div>
+  <a class="topbar-back" href="index.html">← Voltar à votação</a>
+</div>
+
+<div class="hero">
+  <div class="hero-tag">Documento legal</div>
+  <h1>Política de Privacidade</h1>
+  <p>Versão 1.0 · Em vigor desde 7 de março de 2026</p>
+  <div class="gdpr-badge">🇪🇺 Conforme com o RGPD</div>
+</div>
+
+<div class="content-wrap">
+
+  <div class="toc">
+    <div class="toc-title">Índice</div>
+    <ul>
+      <li><a href="#s1">1. Responsável pelo Tratamento</a></li>
+      <li><a href="#s2">2. Dados Recolhidos</a></li>
+      <li><a href="#s3">3. Finalidade do Tratamento</a></li>
+      <li><a href="#s4">4. Base Legal</a></li>
+      <li><a href="#s5">5. Armazenamento</a></li>
+      <li><a href="#s6">6. Prazo de Conservação</a></li>
+      <li><a href="#s7">7. Partilha com Terceiros</a></li>
+      <li><a href="#s8">8. Direitos do Utilizador</a></li>
+      <li><a href="#s9">9. Cookies</a></li>
+      <li><a href="#s10">10. Segurança</a></li>
+      <li><a href="#s11">11. Menores de Idade</a></li>
+      <li><a href="#s12">12. Alterações</a></li>
+      <li><a href="#s13">13. Contacto</a></li>
+    </ul>
+  </div>
+
+  <div class="section" id="s1">
+    <div class="section-num">Artigo 1</div>
+    <h2>Responsável pelo Tratamento</h2>
+    <p>A presente Política de Privacidade aplica-se à plataforma de votação do <strong>Festival da Canção 2026</strong>. O responsável pelo tratamento dos dados pessoais é o organizador da presente votação.</p>
+    <p>Esta política foi elaborada em conformidade com o <strong>Regulamento (UE) 2016/679</strong> do Parlamento Europeu e do Conselho (RGPD) e com a legislação portuguesa aplicável.</p>
+  </div>
+
+  <div class="section" id="s2">
+    <div class="section-num">Artigo 2</div>
+    <h2>Dados Recolhidos</h2>
+    <h3>2.1 Dados recolhidos automaticamente</h3>
+    <p>Para garantir o funcionamento correto do sistema de votação e prevenir a duplicação de votos, o sistema gera e armazena:</p>
+    <ul>
+      <li>Um <strong>identificador anónimo do dispositivo</strong>, calculado a partir de informações técnicas do browser (user agent, resolução de ecrã, idioma, fuso horário e parâmetros de hardware) — este identificador não permite identificar diretamente o utilizador</li>
+      <li>O número do candidato votado</li>
+      <li>Data e hora do voto</li>
+    </ul>
+    <h3>2.2 Dados que não são recolhidos</h3>
+    <div class="no-collect">
+      <p>🚫 Esta plataforma não recolhe nem armazena:</p>
+      <ul>
+        <li>Nome, apelido ou qualquer identificação pessoal</li>
+        <li>Endereço de e-mail ou número de telefone</li>
+        <li>Endereço IP (não é registado nos servidores)</li>
+        <li>Localização geográfica</li>
+        <li>Dados de pagamento (a votação é gratuita)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="s3">
+    <div class="section-num">Artigo 3</div>
+    <h2>Finalidade do Tratamento</h2>
+    <p>Os dados recolhidos são utilizados exclusivamente para:</p>
+    <ul>
+      <li>Registar o voto do utilizador no sistema</li>
+      <li>Prevenir a duplicação de votos (cada utilizador/dispositivo pode votar apenas uma vez)</li>
+      <li>Apresentar resultados em tempo real da votação</li>
+    </ul>
+    <div class="highlight-box">Os dados <strong>não são utilizados</strong> para fins comerciais, publicitários, de marketing ou de qualquer outra natureza que não as finalidades acima descritas.</div>
+  </div>
+
+  <div class="section" id="s4">
+    <div class="section-num">Artigo 4</div>
+    <h2>Base Legal do Tratamento</h2>
+    <p>O tratamento dos dados tem como base legal:</p>
+    <ul>
+      <li><strong>Consentimento do utilizador</strong>, prestado através da participação voluntária na votação — art.º 6.º, n.º 1, alínea a) do RGPD</li>
+      <li><strong>Interesse legítimo</strong> dos organizadores em garantir a integridade do processo de votação — art.º 6.º, n.º 1, alínea f) do RGPD</li>
+    </ul>
+  </div>
+
+  <div class="section" id="s5">
+    <div class="section-num">Artigo 5</div>
+    <h2>Armazenamento dos Dados</h2>
+    <h3>5.1 Armazenamento local (Browser)</h3>
+    <p>O identificador do dispositivo e o registo de voto são armazenados no <strong>localStorage</strong> do browser do utilizador. Estes dados persistem no dispositivo até que o utilizador limpe os dados do browser.</p>
+    <h3>5.2 Armazenamento em nuvem (Firebase)</h3>
+    <p>Os registos de votação são armazenados na plataforma <strong>Firebase Realtime Database</strong>, fornecida pela Google LLC, nos servidores da União Europeia (região <em>europe-west1</em>). A Google LLC é um subcontratante que trata os dados em conformidade com o RGPD, ao abrigo das Cláusulas Contratuais Padrão aprovadas pela Comissão Europeia.</p>
+  </div>
+
+  <div class="section" id="s6">
+    <div class="section-num">Artigo 6</div>
+    <h2>Prazo de Conservação</h2>
+    <p>Os dados de votação são conservados pelo período mínimo necessário, <strong>não superior a 90 dias</strong> após o encerramento do Festival da Canção 2026, findo o qual serão eliminados definitivamente.</p>
+  </div>
+
+  <div class="section" id="s7">
+    <div class="section-num">Artigo 7</div>
+    <h2>Partilha de Dados com Terceiros</h2>
+    <p>Os dados recolhidos <strong>não são vendidos, cedidos ou partilhados</strong> com terceiros para fins comerciais. A única partilha de dados ocorre com:</p>
+    <ul>
+      <li><strong>Google LLC (Firebase)</strong> — como subcontratante para alojamento da base de dados, conforme descrito na secção 5.2</li>
+    </ul>
+    <p>Não são realizadas transferências de dados para países fora do Espaço Económico Europeu.</p>
+  </div>
+
+  <div class="section" id="s8">
+    <div class="section-num">Artigo 8</div>
+    <h2>Direitos do Utilizador</h2>
+    <p>Ao abrigo do RGPD, o utilizador tem os seguintes direitos:</p>
+    <div class="rights-grid">
+      <div class="right-card">
+        <span class="right-icon">📋</span>
+        <div class="right-title">Direito de Acesso</div>
+        <div class="right-desc">Obter confirmação sobre se os seus dados são tratados e aceder aos mesmos</div>
+      </div>
+      <div class="right-card">
+        <span class="right-icon">✏️</span>
+        <div class="right-title">Direito de Retificação</div>
+        <div class="right-desc">Corrigir dados inexatos ou incompletos</div>
+      </div>
+      <div class="right-card">
+        <span class="right-icon">🗑️</span>
+        <div class="right-title">Direito ao Apagamento</div>
+        <div class="right-desc">Solicitar a eliminação dos seus dados («direito a ser esquecido»)</div>
+      </div>
+      <div class="right-card">
+        <span class="right-icon">📦</span>
+        <div class="right-title">Direito à Portabilidade</div>
+        <div class="right-desc">Receber os seus dados num formato estruturado e legível por máquina</div>
+      </div>
+      <div class="right-card">
+        <span class="right-icon">🚫</span>
+        <div class="right-title">Direito de Oposição</div>
+        <div class="right-desc">Opor-se ao tratamento dos dados em determinadas circunstâncias</div>
+      </div>
+      <div class="right-card">
+        <span class="right-icon">↩️</span>
+        <div class="right-title">Retirar Consentimento</div>
+        <div class="right-desc">A qualquer momento, sem prejuízo da licitude do tratamento anterior</div>
+      </div>
+    </div>
+    <p>Para exercer qualquer destes direitos, contacte os organizadores através dos canais disponibilizados na plataforma. O pedido será respondido no prazo legal de <strong>30 dias</strong>.</p>
+    <div class="cnpd-box">
+      <div class="icon">🏛️</div>
+      <p>O utilizador tem ainda o direito de apresentar reclamação à <strong>Comissão Nacional de Proteção de Dados (CNPD)</strong>, a autoridade de controlo portuguesa em matéria de proteção de dados pessoais. Saiba mais em <a href="https://www.cnpd.pt" target="_blank">www.cnpd.pt</a>.</p>
+    </div>
+  </div>
+
+  <div class="section" id="s9">
+    <div class="section-num">Artigo 9</div>
+    <h2>Cookies e Tecnologias Semelhantes</h2>
+    <p>Esta plataforma <strong>não utiliza cookies</strong> de rastreamento nem tecnologias de monitorização do comportamento. O localStorage é utilizado exclusivamente para as finalidades de votação descritas nesta política.</p>
+  </div>
+
+  <div class="section" id="s10">
+    <div class="section-num">Artigo 10</div>
+    <h2>Segurança dos Dados</h2>
+    <p>São implementadas medidas técnicas e organizativas adequadas para proteger os dados contra acesso não autorizado, incluindo:</p>
+    <ul>
+      <li>Comunicações cifradas via <strong>HTTPS/TLS</strong></li>
+      <li>Regras de segurança na base de dados Firebase que impedem a leitura não autorizada dos registos de votantes</li>
+      <li>Identificadores anónimos que não permitem a identificação direta dos utilizadores</li>
+    </ul>
+  </div>
+
+  <div class="section" id="s11">
+    <div class="section-num">Artigo 11</div>
+    <h2>Menores de Idade</h2>
+    <p>Esta plataforma não recolhe intencionalmente dados de menores de <strong>16 anos</strong>. Caso um menor pretenda participar na votação, deverá obter o consentimento de um progenitor ou representante legal.</p>
+  </div>
+
+  <div class="section" id="s12">
+    <div class="section-num">Artigo 12</div>
+    <h2>Alterações à Política de Privacidade</h2>
+    <p>Esta Política de Privacidade pode ser atualizada periodicamente. Quaisquer alterações serão publicadas nesta página com indicação da data de revisão. Recomendamos a consulta periódica desta página.</p>
+  </div>
+
+  <div class="section" id="s13">
+    <div class="section-num">Artigo 13</div>
+    <h2>Contacto e Encarregado de Proteção de Dados</h2>
+    <p>Para questões relacionadas com privacidade e proteção de dados, contacte os organizadores através dos canais disponibilizados na plataforma. Nos termos do RGPD, foi designado um ponto de contacto para matérias de proteção de dados.</p>
+  </div>
+
+  <div class="date-stamp">Última atualização: 7 de março de 2026</div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Votação</a>
+    <a href="termos.html">Termos e Condições</a>
+    <a href="privacidade.html">Política de Privacidade</a>
+  </div>
+  <p>© Festival RTP da Canção 2026 · Grande Final: 7 de março · RTP 1</p>
+</footer>
+
+</body>
+</html>
