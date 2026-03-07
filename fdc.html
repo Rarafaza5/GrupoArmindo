@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Festival da Canção 2026 — Votação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07181f; --surface: #0d2730; --surface2: #112e39;
+      --accent: #00e5c0; --accent2: #ff5e62; --text: #e8f4f0;
+      --muted: #6a9ea8; --border: rgba(0,229,192,0.15); --card-bg: #0f2a33;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 60% 50% at 80% 10%, rgba(0,229,192,0.07) 0%, transparent 60%),
+                  radial-gradient(ellipse 40% 60% at 10% 80%, rgba(255,94,98,0.05) 0%, transparent 60%);
+    }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(7,24,31,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 clamp(1rem,5vw,3rem); }
+    .header-inner { max-width: 1200px; margin: 0 auto; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; flex-direction: column; line-height: 1; gap: 1px; }
+    .logo-festival { font-size: 9px; letter-spacing: .25em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+    .logo-name { font-family: 'Syne',sans-serif; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+    .logo-year { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .1em; }
+    .header-status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.3)} }
+    .hero { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: clamp(3rem,8vw,6rem) clamp(1rem,5vw,3rem) clamp(2rem,4vw,3rem); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 1.2rem; }
+    .hero-eyebrow::before { content:''; display:block; width:28px; height:1px; background:var(--accent); }
+    h1 { font-family: 'Syne',sans-serif; font-size: clamp(2.4rem,6vw,4.5rem); font-weight: 800; line-height: 1.05; letter-spacing: -.03em; color: #fff; margin-bottom: 1rem; }
+    h1 span { color: var(--accent); }
+    .hero-sub { font-size: clamp(.95rem,2vw,1.1rem); color: var(--muted); max-width: 520px; line-height: 1.6; font-weight: 300; }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
+    .vote-bar { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem,5vw,3rem) 2rem; }
+    .vote-bar-inner { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem 1.8rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    .vb-label { font-size: 12px; text-transform: uppercase; letter-spacing: .15em; color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .vb-track { flex: 1; min-width: 120px; height: 4px; background: rgba(0,229,192,.12); border-radius: 2px; overflow: hidden; }
+    .vb-fill { height: 100%; background: linear-gradient(90deg,var(--accent),#00b89a); border-radius: 2px; width: 0%; transition: width 1s cubic-bezier(.4,0,.2,1); }
+    .vb-count { font-family: 'Syne',sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .vb-total { font-size: 13px; color: var(--muted); }
+    .voted-banner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem,5vw,3rem) 2rem; display: none; }
+    .voted-banner.show { display: block; }
+    .voted-banner-inner { background: rgba(0,229,192,.07); border: 1px solid rgba(0,229,192,.3); border-radius: 16px; padding: 1.3rem 1.8rem; display: flex; align-items: center; gap: 1rem; }
+    .voted-banner-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .voted-banner-text { font-size: .95rem; color: var(--text); line-height: 1.5; }
+    .voted-banner-text strong { color: var(--accent); }
+    .grid-section { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem,5vw,3rem) 4rem; }
+    .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: .2em; color: var(--muted); margin-bottom: 1.5rem; font-weight: 600; }
+    .candidates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1.2rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; transition: transform .28s cubic-bezier(.4,0,.2,1), box-shadow .28s, border-color .28s; cursor: pointer; position: relative; }
+    .card:not(.voted-card):hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,.4), 0 0 0 1px rgba(0,229,192,.25); border-color: rgba(0,229,192,.35); }
+    .card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent), 0 20px 50px rgba(0,229,192,.15); }
+    .card.voted-card { opacity: .5; pointer-events: none; filter: grayscale(.4); }
+    .card.winner-card { opacity: 1 !important; filter: none !important; pointer-events: none; }
+    .card-img-wrap { position: relative; }
+    .card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: var(--surface2); }
+    .card-img-fallback { width: 100%; aspect-ratio: 1/1; background: var(--surface2); display: none; align-items: center; justify-content: center; font-size: 3.5rem; }
+    .card-num { position: absolute; top: 12px; left: 12px; background: rgba(7,24,31,.85); border: 1px solid var(--border); border-radius: 8px; padding: 3px 8px; font-family: 'Syne',sans-serif; font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: .05em; backdrop-filter: blur(8px); }
+    .winner-badge { position: absolute; top: 12px; right: 12px; background: var(--accent); color: var(--bg); border-radius: 8px; padding: 3px 9px; font-family: 'Syne',sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; display: none; }
+    .card.winner-card .winner-badge { display: block; }
+    .card-body { padding: 1rem 1.1rem 1.1rem; }
+    .card-artist { font-family: 'Syne',sans-serif; font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 3px; letter-spacing: -.01em; }
+    .card-song { font-size: .82rem; color: var(--accent); font-style: italic; margin-bottom: .9rem; }
+    .card-bar { height: 3px; background: rgba(0,229,192,.1); border-radius: 2px; margin-bottom: .55rem; overflow: hidden; }
+    .card-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 1.2s cubic-bezier(.4,0,.2,1) .3s; }
+    .card-votes-label { font-size: 11px; color: var(--muted); margin-bottom: .8rem; display: flex; align-items: center; justify-content: space-between; }
+    .card-pct { font-family: 'Syne',sans-serif; font-weight: 700; font-size: 12px; color: var(--accent); }
+    .btn-vote { width: 100%; padding: .65rem 1rem; background: transparent; border: 1.5px solid var(--accent); border-radius: 10px; color: var(--accent); font-family: 'Syne',sans-serif; font-size: .85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: background .2s, color .2s, transform .15s; }
+    .btn-vote:hover:not(:disabled) { background: var(--accent); color: var(--bg); transform: scale(1.02); }
+    .btn-vote:active:not(:disabled) { transform: scale(.98); }
+    .btn-vote:disabled { border-color: var(--muted); color: var(--muted); cursor: not-allowed; transform: none; background: transparent; }
+    .btn-vote.winner-btn { background: linear-gradient(135deg,var(--accent),#00b89a); color: var(--bg); border-color: var(--accent); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(7,24,31,.88); backdrop-filter: blur(14px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; max-width: 440px; width: 100%; overflow: hidden; transform: scale(.92) translateY(20px); transition: transform .35s cubic-bezier(.4,0,.2,1); }
+    .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+    .modal-img { width: 100%; height: 200px; object-fit: cover; display: block; background: var(--surface2); }
+    .modal-body { padding: 1.8rem 2rem 2rem; text-align: center; }
+    .modal h2 { font-family: 'Syne',sans-serif; font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: .3rem; }
+    .modal-song-label { color: var(--accent); font-style: italic; font-size: .95rem; margin-bottom: .9rem; display: block; }
+    .modal p { color: var(--muted); font-size: .9rem; line-height: 1.6; margin-bottom: 1.6rem; }
+    .modal-btns { display: flex; gap: .8rem; }
+    .btn-confirm { flex: 1; padding: .8rem 1rem; background: var(--accent); color: var(--bg); border: none; border-radius: 12px; font-family: 'Syne',sans-serif; font-size: .9rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: background .2s, transform .15s; }
+    .btn-confirm:hover { background: #00c9a7; transform: scale(1.02); }
+    .btn-cancel { flex: 1; padding: .8rem 1rem; background: transparent; color: var(--muted); border: 1.5px solid rgba(106,158,168,.3); border-radius: 12px; font-family: 'Syne',sans-serif; font-size: .9rem; font-weight: 600; cursor: pointer; transition: border-color .2s, color .2s; }
+    .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent); color: var(--bg); padding: .9rem 2rem; border-radius: 100px; font-family: 'Syne',sans-serif; font-size: .9rem; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 300; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.error { background: var(--accent2); color: #fff; }
+    .loading-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; transition: opacity .6s; }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(0,229,192,.2); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-logo { font-family: 'Syne',sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 2rem clamp(1rem,5vw,3rem); text-align: center; }
+    footer p { font-size: 12px; color: var(--muted); line-height: 1.8; }
+    footer a { color: var(--accent); text-decoration: none; }
+    @media (max-width: 600px) {
+      .candidates-grid { grid-template-columns: repeat(2, 1fr); gap: .75rem; }
+      .card-body { padding: .75rem; }
+      .card-artist { font-size: .85rem; }
+      .modal-img { height: 150px; }
+      .modal-body { padding: 1.3rem 1.3rem 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">Canção 2026</div>
+  <div class="spinner"></div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-festival">Festival da</span>
+      <span class="logo-name">CANÇÃO</span>
+      <span class="logo-year">2026</span>
+    </div>
+    <div class="header-status">
+      <div class="dot-live"></div>
+      <span>Votação aberta</span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">Votação oficial · Grande Final · 7 de março</div>
+  <h1>Vote no seu<br>favorito para a<br><span>Eurovisão</span></h1>
+  <p class="hero-sub">Escolha o artista que vai representar Portugal no <strong>Eurovision Song Contest 2026</strong> em Viena. Cada pessoa pode votar <strong>uma vez</strong>, gratuitamente.</p>
+</section>
+
+<div class="voted-banner" id="votedBanner">
+  <div class="voted-banner-inner">
+    <div class="voted-banner-icon">✅</div>
+    <div class="voted-banner-text">O seu voto foi registado em <strong id="votedForName">—</strong>. Obrigado pela sua participação!</div>
+  </div>
+</div>
+
+<div class="vote-bar">
+  <div class="vote-bar-inner">
+    <span class="vb-label">Votos totais</span>
+    <div class="vb-track"><div class="vb-fill" id="globalBar"></div></div>
+    <span class="vb-count" id="totalVotesDisplay">0</span>
+    <span class="vb-total">votos</span>
+  </div>
+</div>
+
+<section class="grid-section">
+  <div class="section-label">10 finalistas — Grande Final · 7 de março de 2026</div>
+  <div class="candidates-grid" id="candidatesGrid"></div>
+</section>
+
+<footer>
+  <p>Festival RTP da Canção 2026 &nbsp;·&nbsp; <a href="https://media.rtp.pt/festivaldacancao/" target="_blank">media.rtp.pt/festivaldacancao</a> &nbsp;·&nbsp; Final: 7 de março, RTP 1<br>
+  Votação gratuita · 1 voto por pessoa · Resultados em tempo real</p>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <img class="modal-img" id="modalImg" src="" alt="">
+    <div class="modal-body">
+      <h2 id="modalArtist">—</h2>
+      <span class="modal-song-label" id="modalSong">—</span>
+      <p>Confirma o seu voto? Este é o seu único voto e não pode ser alterado.</p>
+      <div class="modal-btns">
+        <button class="btn-cancel" id="btnCancel">Cancelar</button>
+        <button class="btn-confirm" id="btnConfirm">Confirmar voto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, runTransaction, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  // ════════════════════════════════════════════════════════════
+  //  ⚙️  CONFIGURE O SEU FIREBASE AQUI
+  //  1. Aceda a https://console.firebase.google.com
+  //  2. Crie um projeto → Realtime Database (modo teste)
+  //  3. Substitua os valores abaixo pelas suas credenciais
+  // ════════════════════════════════════════════════════════════
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_PROJETO.firebaseapp.com",
+    databaseURL: "https://SEU_PROJETO-default-rtdb.europe-west1.firebasedatabase.io",
+    projectId: "SEU_PROJETO",
+    storageBucket: "SEU_PROJETO.appspot.com",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId: "SEU_APP_ID"
+  };
+  // ════════════════════════════════════════════════════════════
+
+  // Candidatos reais — Final do Festival da Canção 2026 (RTP, 7 de março)
+  // Imagens: packshots oficiais de media.rtp.pt/festivaldacancao
+  const CANDIDATES = [
+    { id:1,  order:"01", artist:"Bandidos do Cante",      song:"Rosa",             img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/05_PACKSHOT_ID_2SEMI_FC2026-1-860x507.jpg", fb:"🎶" },
+    { id:2,  order:"02", artist:"João Ribeiro",           song:"Canção do Querer", img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/07_PACKSHOT_ID_2SEMI_FC2026-860x507.jpg",   fb:"🎸" },
+    { id:3,  order:"03", artist:"André Amaro",            song:"Dá-me a Tua Mão",  img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/04_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg",   fb:"🎹" },
+    { id:4,  order:"04", artist:"Gonçalo Gomes",          song:"Doce Ilusão",      img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/01_PACKSHOT_ID_2SEMI_FC2026-860x507.jpg",   fb:"🎤" },
+    { id:5,  order:"05", artist:"Marquise",               song:"Chuva",            img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/06_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg",   fb:"🥁" },
+    { id:6,  order:"06", artist:"EVAYA",                  song:"SPRINT",           img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/03_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg",   fb:"✨" },
+    { id:7,  order:"07", artist:"Sandrino",               song:"Disposto a Tudo",  img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/03_PACKSHOT_ID_2SEMI_FC2026-1-860x507.jpg", fb:"🎵" },
+    { id:8,  order:"08", artist:"Nunca Mates o Mandarim", song:"Fumo",             img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/02_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg",   fb:"🎼" },
+    { id:9,  order:"09", artist:"Silvana Peres",          song:"Não Tem Fim",      img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/02_PACKSHOT_ID_2SEMI_FC2026-860x507.jpg",   fb:"🌊" },
+    { id:10, order:"10", artist:"Dinis Mota",             song:"Jurei",            img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/01_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg",   fb:"🏆" }
+  ];
+
+  let app, db, votesData={}, totalVotes=0, hasVoted=false, votedForId=null, pendingId=null;
+
+  function getVoterKey() {
+    let k = localStorage.getItem('fdc2026_vid');
+    if (!k) {
+      const n=navigator,s=screen;
+      const raw=[n.userAgent,n.language,s.colorDepth,s.width,s.height,new Date().getTimezoneOffset(),n.hardwareConcurrency,n.deviceMemory||0].join('|');
+      let h=0; for(let i=0;i<raw.length;i++){h=((h<<5)-h)+raw.charCodeAt(i);h|=0;}
+      k=Math.abs(h).toString(36)+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      localStorage.setItem('fdc2026_vid',k);
+    }
+    return k;
+  }
+  const voterKey = getVoterKey();
+  const isDemo = () => firebaseConfig.apiKey === "SUA_API_KEY";
+
+  function renderGrid() {
+    const grid = document.getElementById('candidatesGrid');
+    grid.innerHTML = '';
+    CANDIDATES.forEach(c => {
+      const votes = votesData[c.id]||0;
+      const pct = totalVotes>0 ? Math.round((votes/totalVotes)*100) : 0;
+      const isWinner = hasVoted && votedForId==c.id;
+      const isOther  = hasVoted && votedForId!=c.id;
+      const card = document.createElement('div');
+      card.className = `card${isWinner?' winner-card selected':''}${isOther?' voted-card':''}`;
+      card.innerHTML = `
+        <div class="card-img-wrap">
+          <img class="card-img" src="${c.img}" alt="${c.artist}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="card-img-fallback">${c.fb}</div>
+          <div class="card-num">${c.order}</div>
+          <div class="winner-badge">✓ Meu voto</div>
+        </div>
+        <div class="card-body">
+          <div class="card-artist">${c.artist}</div>
+          <div class="card-song">«${c.song}»</div>
+          <div class="card-votes-label">
+            <span>${votes.toLocaleString('pt')} ${votes===1?'voto':'votos'}</span>
+            <span class="card-pct">${pct}%</span>
+          </div>
+          <div class="card-bar"><div class="card-bar-fill" data-pct="${pct}"></div></div>
+          <button class="btn-vote${isWinner?' winner-btn':''}" ${hasVoted?'disabled':''}>
+            ${isWinner?'✓ O seu voto':hasVoted?'Já votou':'Votar'}
+          </button>
+        </div>`;
+      if (!hasVoted) card.querySelector('.btn-vote').addEventListener('click', ()=>openModal(c));
+      grid.appendChild(card);
+    });
+    requestAnimationFrame(()=>{
+      document.querySelectorAll('.card-bar-fill').forEach(el=>el.style.width=el.dataset.pct+'%');
+    });
+  }
+
+  function updateTotals() {
+    totalVotes = Object.values(votesData).reduce((a,b)=>a+b,0);
+    document.getElementById('totalVotesDisplay').textContent = totalVotes.toLocaleString('pt');
+    document.getElementById('globalBar').style.width = Math.min(100,(totalVotes/500)*100)+'%';
+  }
+
+  function openModal(c) {
+    pendingId=c.id;
+    document.getElementById('modalArtist').textContent=c.artist;
+    document.getElementById('modalSong').textContent='«'+c.song+'»';
+    const img=document.getElementById('modalImg'); img.src=c.img; img.alt=c.artist;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); pendingId=null; }
+  document.getElementById('btnCancel').onclick=closeModal;
+  document.getElementById('modalOverlay').onclick=e=>{ if(e.target===document.getElementById('modalOverlay'))closeModal(); };
+  document.getElementById('btnConfirm').onclick=async()=>{ if(!pendingId)return; const id=pendingId; closeModal(); await submitVote(id); };
+
+  async function submitVote(cid) {
+    if(hasVoted)return;
+    if(isDemo()){
+      votesData[cid]=(votesData[cid]||0)+1;
+      hasVoted=true; votedForId=cid;
+      localStorage.setItem('fdc2026_voted',cid);
+      updateTotals(); renderGrid(); showVotedBanner(cid);
+      showToast('✓ Voto registado! (modo demo — configure o Firebase)');
+      return;
+    }
+    try {
+      const voterRef=ref(db,`voters/${voterKey}`);
+      const snap=await get(voterRef);
+      if(snap.exists()){
+        hasVoted=true; votedForId=snap.val();
+        localStorage.setItem('fdc2026_voted',votedForId);
+        updateTotals(); renderGrid(); showVotedBanner(votedForId);
+        showToast('ℹ️ Já tinha votado anteriormente.');
+        return;
+      }
+      await runTransaction(ref(db,`votes/${cid}`),cur=>(cur||0)+1);
+      await set(voterRef,cid);
+      hasVoted=true; votedForId=cid;
+      localStorage.setItem('fdc2026_voted',cid);
+      showVotedBanner(cid);
+      showToast('✓ Voto registado com sucesso!');
+    } catch(err){ console.error(err); showToast('❌ Erro ao registar voto.',true); }
+  }
+
+  function showVotedBanner(id){
+    const c=CANDIDATES.find(x=>x.id==id);
+    if(c){ document.getElementById('votedForName').textContent=`${c.artist} — «${c.song}»`; document.getElementById('votedBanner').classList.add('show'); }
+  }
+  function showToast(msg,isErr=false){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.toggle('error',isErr);
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4200);
+  }
+  function hideLoading(){
+    const o=document.getElementById('loadingOverlay');
+    o.classList.add('hidden'); setTimeout(()=>o.remove(),700);
+  }
+
+  async function init(){
+    const lv=localStorage.getItem('fdc2026_voted');
+    if(lv){hasVoted=true;votedForId=parseInt(lv);}
+
+    if(isDemo()){
+      votesData={1:147,2:203,3:89,4:132,5:76,6:318,7:94,8:121,9:185,10:244};
+      updateTotals(); renderGrid();
+      if(hasVoted)showVotedBanner(votedForId);
+      hideLoading(); return;
+    }
+    try {
+      app=initializeApp(firebaseConfig); db=getDatabase(app);
+      const snap=await get(ref(db,`voters/${voterKey}`));
+      if(snap.exists()){hasVoted=true;votedForId=snap.val();localStorage.setItem('fdc2026_voted',votedForId);}
+      onValue(ref(db,'votes'),snapshot=>{
+        const data=snapshot.val()||{};
+        CANDIDATES.forEach(c=>votesData[c.id]=data[c.id]||0);
+        updateTotals(); renderGrid();
+        if(hasVoted)showVotedBanner(votedForId);
+        hideLoading();
+      });
+    } catch(err){
+      console.error('Firebase:',err);
+      CANDIDATES.forEach(c=>votesData[c.id]=0);
+      updateTotals(); renderGrid(); hideLoading();
+    }
+  }
+  init();
+</script>
+</body>
+</html>
