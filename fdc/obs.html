@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>FDC 2026 — Resultados OBS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:   #072830;
+      --teal2:  #0a3d48;
+      --teal3:  #0d5260;
+      --cyan:   #00d4b8;
+      --cyan2:  #00f0d0;
+      --gold:   #f5c842;
+      --white:  #ffffff;
+      --muted:  rgba(255,255,255,0.45);
+      --dim:    rgba(255,255,255,0.15);
+    }
+
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: var(--teal);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+    }
+
+    /* ── BACKGROUND ── */
+    .bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,212,184,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 80% at -5% 50%, rgba(0,212,184,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 80% at 105% 50%, rgba(0,212,184,0.06) 0%, transparent 50%),
+        linear-gradient(180deg, #072830 0%, #041e24 100%);
+    }
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,184,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,184,0.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 60px 24px;
+      border-bottom: 1px solid rgba(0,212,184,0.15);
+      flex-shrink: 0;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .logo-block {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+    .logo-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--cyan); font-weight: 500; margin-bottom: 2px; }
+    .logo-main { font-family: 'Barlow Condensed', sans-serif; font-size: 42px; font-weight: 900; color: var(--white); letter-spacing: .02em; line-height: 1; }
+    .logo-year { font-family: 'Barlow Condensed', sans-serif; font-size: 42px; font-weight: 300; color: var(--cyan); margin-left: 10px; }
+
+    .divider-v { width: 1px; height: 52px; background: rgba(0,212,184,0.25); }
+
+    .header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 500; color: var(--white); letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .stat-block { text-align: right; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: var(--muted); font-weight: 500; margin-bottom: 2px; }
+    .stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 800; color: var(--cyan); line-height: 1; }
+    .stat-value.gold { color: var(--gold); }
+
+    .live-dot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,212,184,0.1);
+      border: 1px solid rgba(0,212,184,0.3);
+      border-radius: 100px;
+      padding: 8px 18px;
+    }
+    .live-dot-circle { width: 9px; height: 9px; border-radius: 50%; background: var(--cyan); animation: pulse 1.8s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(1.4)} }
+    .live-dot span { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); }
+
+    /* ── BODY ── */
+    .body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 60px 20px;
+      overflow: hidden;
+    }
+
+    /* ── BARS TABLE ── */
+    .bars-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 60px;
+      flex: 1;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      position: relative;
+    }
+    .bar-row.leader .bar-artist { color: var(--gold); }
+    .bar-row.leader .bar-fill { background: linear-gradient(90deg, #c49a10, var(--gold), #ffe680); }
+    .bar-row.leader .bar-pct { color: var(--gold); }
+
+    .bar-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      width: 34px;
+      flex-shrink: 0;
+      letter-spacing: .05em;
+    }
+
+    .bar-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      margin-right: 14px;
+      background: var(--teal2);
+    }
+    .bar-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .bar-info {
+      width: 210px;
+      flex-shrink: 0;
+      margin-right: 18px;
+    }
+    .bar-artist { font-family: 'Barlow Condensed', sans-serif; font-size: 19px; font-weight: 700; color: var(--white); line-height: 1.1; letter-spacing: .01em; }
+    .bar-song { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 1px; }
+
+    .bar-track-wrap { flex: 1; margin-right: 14px; }
+    .bar-track { height: 8px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal3), var(--cyan2));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 1.4s cubic-bezier(.4,0,.2,1) .2s;
+      position: relative;
+    }
+    .bar-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--white);
+      border-radius: 2px;
+      opacity: .5;
+    }
+
+    .bar-votes { width: 72px; text-align: right; flex-shrink: 0; }
+    .bar-count { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--white); line-height: 1; }
+    .bar-count-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+    .bar-pct { width: 58px; text-align: right; flex-shrink: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 800; color: var(--cyan); }
+
+    /* ── FOOTER BAR ── */
+    .footer-bar {
+      height: 44px;
+      border-top: 1px solid rgba(0,212,184,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 60px;
+      flex-shrink: 0;
+    }
+    .footer-bar p { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+    .footer-bar .updated { font-size: 12px; color: rgba(0,212,184,0.5); letter-spacing: .05em; }
+
+    /* ── LEADER CROWN ── */
+    .crown { font-size: 14px; margin-right: 4px; }
+
+    /* ── ERROR STATE ── */
+    .error-state { display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 12px; }
+    .error-state.show { display: flex; }
+    .error-state p { color: var(--muted); font-size: 16px; }
+
+    /* animate in rows */
+    .bar-row { opacity: 0; transform: translateX(-10px); transition: opacity .4s, transform .4s; }
+    .bar-row.visible { opacity: 1; transform: translateX(0); }
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="bg-grid"></div>
+
+<div class="page">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-block">
+        <span class="logo-sub">Festival da</span>
+        <div>
+          <span class="logo-main">CANÇÃO</span>
+          <span class="logo-year">2026</span>
+        </div>
+      </div>
+      <div class="divider-v"></div>
+      <div class="header-title">Resultados em tempo real</div>
+    </div>
+    <div class="header-right">
+      <div class="stat-block">
+        <div class="stat-label">Total de votos</div>
+        <div class="stat-value" id="obsTotal">0</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">A liderar</div>
+        <div class="stat-value gold" id="obsLeader">—</div>
+      </div>
+      <div class="live-dot">
+        <div class="live-dot-circle"></div>
+        <span>Ao vivo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+    <div class="bars-grid" id="barsGrid"></div>
+    <div class="error-state" id="errorState">
+      <p>⚠️ Firebase não configurado — edite o ficheiro e adicione as credenciais.</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <p>Festival RTP da Canção 2026 · Grande Final · 7 de março · RTP 1</p>
+    <span class="updated" id="updatedAt">A atualizar...</span>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  /* ════════════════════════════════════════════════════
+     ⚙️  MESMAS CREDENCIAIS DO index.html
+     ════════════════════════════════════════════════════ */
+  const firebaseConfig = {
+  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+  authDomain: "aawards.firebaseapp.com",
+  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+  projectId: "aawards",
+  storageBucket: "aawards.firebasestorage.app",
+  messagingSenderId: "839334918366",
+  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+  measurementId: "G-NLLMB9THVX"
+};
+  /* ════════════════════════════════════════════════════ */
+
+  const CANDIDATES = [
+    { id:1,  n:"01", artist:"Bandidos do Cante",      song:"Rosa",            img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/05_PACKSHOT_ID_2SEMI_FC2026-1-860x507.jpg" },
+    { id:2,  n:"02", artist:"João Ribeiro",           song:"Canção do Querer",img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/07_PACKSHOT_ID_2SEMI_FC2026-860x507.jpg" },
+    { id:3,  n:"03", artist:"André Amaro",            song:"Dá-me a Tua Mão", img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/04_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg" },
+    { id:4,  n:"04", artist:"Gonçalo Gomes",          song:"Doce Ilusão",     img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/01_PACKSHOT_ID_2SEMI_FC2026-860x507.jpg" },
+    { id:5,  n:"05", artist:"Marquise",               song:"Chuva",           img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/06_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg" },
+    { id:6,  n:"06", artist:"EVAYA",                  song:"SPRINT",          img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/03_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg" },
+    { id:7,  n:"07", artist:"Sandrino",               song:"Disposto a Tudo", img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/03_PACKSHOT_ID_2SEMI_FC2026-1-860x507.jpg" },
+    { id:8,  n:"08", artist:"Nunca Mates o Mandarim", song:"Fumo",            img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/02_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg" },
+    { id:9,  n:"09", artist:"Silvana Peres",          song:"Não Tem Fim",     img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/02_PACKSHOT_ID_2SEMI_FC2026-860x507.jpg" },
+    { id:10, n:"10", artist:"Dinis Mota",             song:"Jurei",           img:"https://media.rtp.pt/festivaldacancao/wp-content/uploads/sites/98/2026/02/01_PACKSHOT_ID_1SEMI_FC2026-860x507.jpg" }
+  ];
+
+  const isConfigured = () => firebaseConfig.apiKey !== "SUA_API_KEY";
+
+  let votesData = {};
+  CANDIDATES.forEach(c => votesData[c.id] = 0);
+
+  function render(data) {
+    const grid = document.getElementById('barsGrid');
+    const total = Object.values(data).reduce((a,b)=>a+b,0);
+    document.getElementById('obsTotal').textContent = total.toLocaleString('pt');
+
+    /* find leader */
+    let leaderId = null, leaderVotes = -1;
+    CANDIDATES.forEach(c => {
+      if ((data[c.id]||0) > leaderVotes) { leaderVotes = data[c.id]||0; leaderId = c.id; }
+    });
+    const leader = CANDIDATES.find(c => c.id === leaderId);
+    document.getElementById('obsLeader').textContent = leader ? leader.artist.split(' ')[0] : '—';
+
+    /* sort by votes descending for display? No — keep original order per RTP */
+    grid.innerHTML = '';
+    CANDIDATES.forEach((c, idx) => {
+      const votes = data[c.id] || 0;
+      const pct = total > 0 ? ((votes / total) * 100).toFixed(1) : '0.0';
+      const isLeader = c.id === leaderId && leaderVotes > 0;
+
+      const row = document.createElement('div');
+      row.className = `bar-row${isLeader ? ' leader' : ''}`;
+      row.innerHTML = `
+        <div class="bar-num">${c.n}</div>
+        <div class="bar-thumb"><img src="${c.img}" alt="${c.artist}" onerror="this.parentElement.innerHTML='🎤'"></div>
+        <div class="bar-info">
+          <div class="bar-artist">${isLeader ? '<span class="crown">👑</span>' : ''}${c.artist}</div>
+          <div class="bar-song">${c.song}</div>
+        </div>
+        <div class="bar-track-wrap">
+          <div class="bar-track"><div class="bar-fill" data-pct="${pct}"></div></div>
+        </div>
+        <div class="bar-votes">
+          <div class="bar-count">${votes.toLocaleString('pt')}</div>
+          <div class="bar-count-label">${votes===1?'voto':'votos'}</div>
+        </div>
+        <div class="bar-pct">${pct}%</div>
+      `;
+      grid.appendChild(row);
+
+      /* staggered entrance */
+      setTimeout(() => {
+        row.classList.add('visible');
+        setTimeout(() => {
+          const fill = row.querySelector('.bar-fill');
+          if (fill) fill.style.width = pct + '%';
+        }, 50);
+      }, idx * 60);
+    });
+
+    /* timestamp */
+    const now = new Date();
+    document.getElementById('updatedAt').textContent =
+      `Atualizado às ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+  }
+
+  function init() {
+    if (!isConfigured()) {
+      document.getElementById('errorState').classList.add('show');
+      render(votesData);
+      return;
+    }
+    try {
+      const app = initializeApp(firebaseConfig);
+      const db  = getDatabase(app);
+      onValue(ref(db, 'votes'), snapshot => {
+        const raw = snapshot.val() || {};
+        CANDIDATES.forEach(c => { votesData[c.id] = raw[c.id] || 0; });
+        render(votesData);
+      });
+    } catch(err) {
+      console.error(err);
+      document.getElementById('errorState').classList.add('show');
+      render(votesData);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
