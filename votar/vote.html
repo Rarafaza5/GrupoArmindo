@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Votação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // ===== SUBSTITUI AQUI COM A TUA CONFIG FIREBASE =====
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  // ====================================================
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let currentConfig = null;
+  let hasVoted = false;
+  let votingOpen = false;
+
+  const VOTE_KEY = "voted_session_" + window.location.hostname;
+
+  function getVotedId() {
+    return localStorage.getItem(VOTE_KEY);
+  }
+  function setVoted(candidateId) {
+    localStorage.setItem(VOTE_KEY, candidateId);
+  }
+
+  function applyTheme(theme) {
+    const root = document.documentElement;
+    if (!theme) return;
+    root.style.setProperty('--bg', theme.bg || '#0a0a0a');
+    root.style.setProperty('--surface', theme.surface || '#141414');
+    root.style.setProperty('--accent', theme.accent || '#c9a84c');
+    root.style.setProperty('--accent2', theme.accent2 || '#e8d5a3');
+    root.style.setProperty('--text', theme.text || '#f5f0e8');
+    root.style.setProperty('--text-muted', theme.textMuted || '#888');
+    root.style.setProperty('--card-bg', theme.cardBg || '#1a1a1a');
+    root.style.setProperty('--card-border', theme.cardBorder || '#2a2a2a');
+    root.style.setProperty('--font-display', theme.fontDisplay || "'Playfair Display', serif");
+    root.style.setProperty('--font-body', theme.fontBody || "'DM Sans', sans-serif");
+    root.style.setProperty('--radius', theme.radius || '12px');
+
+    if (theme.bgImage) {
+      document.body.style.backgroundImage = `url(${theme.bgImage})`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundAttachment = 'fixed';
+    } else {
+      document.body.style.backgroundImage = '';
+    }
+  }
+
+  function renderCandidates(candidates, votedId) {
+    const grid = document.getElementById('candidatesGrid');
+    if (!candidates || candidates.length === 0) {
+      grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:60px 0;">Sem candidatos disponíveis.</p>';
+      return;
+    }
+    grid.innerHTML = '';
+    candidates.forEach((c, i) => {
+      const isVoted = votedId === c.id;
+      const card = document.createElement('div');
+      card.className = 'candidate-card' + (isVoted ? ' voted' : '');
+      card.style.animationDelay = (i * 0.07) + 's';
+      card.innerHTML = `
+        <div class="candidate-number">${String(i+1).padStart(2,'0')}</div>
+        <div class="candidate-img-wrap">
+          ${c.photo ? `<img src="${c.photo}" alt="${c.name}" class="candidate-img"/>` : `<div class="candidate-img-placeholder"><span>${c.name.charAt(0)}</span></div>`}
+          ${isVoted ? '<div class="voted-badge"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>' : ''}
+        </div>
+        <div class="candidate-info">
+          <div class="candidate-name">${c.name}</div>
+          ${c.subtitle ? `<div class="candidate-subtitle">${c.subtitle}</div>` : ''}
+          ${c.description ? `<div class="candidate-desc">${c.description}</div>` : ''}
+        </div>
+        ${!votedId ? `<button class="vote-btn" data-id="${c.id}" data-name="${c.name}">
+          <span>Votar</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>` : (isVoted ? '<div class="voted-label">O teu voto</div>' : '<div class="not-voted-label">—</div>')}
+      `;
+      if (!votedId) {
+        card.querySelector('.vote-btn').addEventListener('click', () => castVote(c.id, c.name));
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  async function castVote(candidateId, candidateName) {
+    if (hasVoted || !votingOpen) return;
+    const modal = document.getElementById('confirmModal');
+    document.getElementById('confirmName').textContent = candidateName;
+    modal.classList.add('show');
+    document.getElementById('confirmYes').onclick = async () => {
+      modal.classList.remove('show');
+      hasVoted = true;
+      setVoted(candidateId);
+      const voteRef = ref(db, `votes/${candidateId}`);
+      const snap = await get(voteRef);
+      const current = snap.exists() ? snap.val() : 0;
+      await set(voteRef, current + 1);
+      reloadCandidates();
+      showThankYou(candidateName);
+    };
+    document.getElementById('confirmNo').onclick = () => modal.classList.remove('show');
+  }
+
+  function reloadCandidates() {
+    if (!currentConfig) return;
+    renderCandidates(currentConfig.candidates || [], getVotedId());
+  }
+
+  function showThankYou(name) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = `Votaste em "${name}"! Obrigado!`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  function updateStatus(isOpen) {
+    votingOpen = isOpen;
+    const statusEl = document.getElementById('votingStatus');
+    const statusDot = document.getElementById('statusDot');
+    if (isOpen) {
+      statusEl.textContent = 'Votação Aberta';
+      statusEl.className = 'status-badge open';
+      statusDot.className = 'status-dot open';
+    } else {
+      statusEl.textContent = 'Votação Fechada';
+      statusEl.className = 'status-badge closed';
+      statusDot.className = 'status-dot closed';
+    }
+    const grid = document.getElementById('candidatesGrid');
+    grid.className = isOpen ? 'candidates-grid' : 'candidates-grid voting-closed';
+  }
+
+  // Listen for config changes
+  onValue(ref(db, 'config'), (snap) => {
+    const data = snap.val();
+    if (!data) return;
+    currentConfig = data;
+
+    applyTheme(data.theme);
+
+    document.getElementById('eventTitle').textContent = data.title || 'Votação';
+    document.getElementById('eventSubtitle').textContent = data.subtitle || '';
+    document.getElementById('eventDescription').textContent = data.description || '';
+    document.title = data.title || 'Votação';
+
+    const voted = getVotedId();
+    renderCandidates(data.candidates || [], voted);
+    if (voted) hasVoted = true;
+
+    updateStatus(data.votingOpen || false);
+  });
+
+  document.getElementById('confirmModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('confirmModal')) {
+      document.getElementById('confirmModal').classList.remove('show');
+    }
+  });
+</script>
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --accent: #c9a84c;
+    --accent2: #e8d5a3;
+    --text: #f5f0e8;
+    --text-muted: #777;
+    --card-bg: #1a1a1a;
+    --card-border: #2a2a2a;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    transition: background 0.5s, color 0.5s;
+  }
+
+  .noise-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+
+  .page-wrap {
+    position: relative; z-index: 1;
+    max-width: 1200px; margin: 0 auto; padding: 0 24px 80px;
+  }
+
+  /* HEADER */
+  .site-header {
+    text-align: center;
+    padding: 60px 0 48px;
+    border-bottom: 1px solid var(--card-border);
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .header-deco {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; margin-bottom: 24px;
+  }
+  .header-deco-line {
+    height: 1px; width: 60px;
+    background: linear-gradient(90deg, transparent, var(--accent));
+  }
+  .header-deco-line.right {
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .header-deco-diamond {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    transform: rotate(45deg);
+  }
+
+  #eventTitle {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  #eventSubtitle {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  #eventDescription {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 500px; margin: 0 auto 24px;
+    line-height: 1.6;
+  }
+
+  .status-area {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #555;
+  }
+  .status-dot.open {
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade8088;
+    animation: pulse-dot 2s infinite;
+  }
+  .status-dot.closed { background: #ef4444; }
+  @keyframes pulse-dot {
+    0%,100% { box-shadow: 0 0 6px #4ade8066; }
+    50% { box-shadow: 0 0 14px #4ade80cc; }
+  }
+  .status-badge {
+    font-size: 0.8rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .status-badge.open { color: #4ade80; }
+  .status-badge.closed { color: #ef4444; }
+
+  /* GRID */
+  .candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+  }
+
+  .candidates-grid.voting-closed .vote-btn { display: none; }
+
+  .candidate-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    animation: fadeUp 0.5s both;
+    cursor: default;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .candidate-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .candidate-card.voted {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--card-bg) 85%, var(--accent) 15%);
+  }
+  .candidate-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .candidate-card:hover::before, .candidate-card.voted::before { opacity: 1; }
+
+  .candidate-number {
+    font-family: var(--font-display);
+    font-size: 0.75rem; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+
+  .candidate-img-wrap {
+    position: relative;
+    width: 100%; aspect-ratio: 1/1;
+    border-radius: calc(var(--radius) - 4px);
+    overflow: hidden;
+  }
+  .candidate-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+  }
+  .candidate-card:hover .candidate-img { transform: scale(1.04); }
+  .candidate-img-placeholder {
+    width: 100%; height: 100%;
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .candidate-img-placeholder span {
+    font-family: var(--font-display);
+    font-size: 3rem; font-weight: 900;
+    color: var(--accent); opacity: 0.4;
+  }
+
+  .voted-badge {
+    position: absolute; top: 10px; right: 10px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: #000;
+  }
+
+  .candidate-info { flex: 1; }
+  .candidate-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .candidate-subtitle {
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .candidate-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .vote-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+  }
+  .vote-btn:hover {
+    background: var(--accent);
+    color: #000;
+    transform: scale(1.02);
+  }
+  .vote-btn:active { transform: scale(0.98); }
+
+  .voted-label {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px;
+  }
+  .not-voted-label {
+    text-align: center;
+    color: var(--text-muted);
+    opacity: 0.3;
+    padding: 10px;
+  }
+
+  /* CLOSED OVERLAY */
+  .voting-closed-msg {
+    display: none;
+    text-align: center;
+    padding: 80px 0;
+    color: var(--text-muted);
+  }
+  .candidates-grid.voting-closed + .voting-closed-msg { display: block; }
+
+  /* CONFIRM MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 420px; width: 90%;
+    text-align: center;
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.92) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-box h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem; margin-bottom: 10px;
+    color: var(--text);
+  }
+  .modal-box p {
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .modal-box .confirm-name {
+    font-family: var(--font-display);
+    font-size: 1.2rem; font-weight: 700;
+    color: var(--accent);
+    display: block; margin: 12px 0 28px;
+  }
+  .modal-btns { display: flex; gap: 12px; }
+  .modal-btns button {
+    flex: 1; padding: 14px;
+    border-radius: 8px; border: none;
+    font-family: var(--font-body);
+    font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .modal-btns button:hover { opacity: 0.85; }
+  #confirmYes {
+    background: var(--accent);
+    color: #000;
+  }
+  #confirmNo {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--accent);
+    color: #000;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    z-index: 200;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* CLOSED STATE */
+  .closed-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+  .closed-state svg { color: var(--text-muted); margin-bottom: 20px; }
+  .closed-state h3 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .closed-state p { color: var(--text-muted); font-size: 0.9rem; }
+
+  @media (max-width: 600px) {
+    .candidates-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .candidate-card { padding: 16px; }
+    .site-header { padding: 40px 0 32px; }
+  }
+  @media (max-width: 400px) {
+    .candidates-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+<div class="page-wrap">
+  <header class="site-header">
+    <div class="header-deco">
+      <div class="header-deco-line"></div>
+      <div class="header-deco-diamond"></div>
+      <div class="header-deco-line right"></div>
+    </div>
+    <h1 id="eventTitle">A carregar...</h1>
+    <div id="eventSubtitle"></div>
+    <p id="eventDescription"></p>
+    <div class="status-area">
+      <div id="statusDot" class="status-dot"></div>
+      <span id="votingStatus" class="status-badge">—</span>
+    </div>
+  </header>
+
+  <div id="candidatesGrid" class="candidates-grid"></div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3>Confirmar Voto</h3>
+    <p>Tens a certeza que queres votar em</p>
+    <span class="confirm-name" id="confirmName"></span>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:24px;">O voto é definitivo e não pode ser alterado.</p>
+    <div class="modal-btns">
+      <button id="confirmNo">Cancelar</button>
+      <button id="confirmYes">Confirmar Voto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toastMsg"></span>
+</div>
+</body>
+</html>

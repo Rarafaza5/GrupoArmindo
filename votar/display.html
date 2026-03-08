@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1920"/>
+<title>Display — Resultados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // ===== SUBSTITUI AQUI COM A TUA CONFIG FIREBASE =====
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  // ====================================================
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let config = {};
+  let votes = {};
+
+  function applyTheme(theme) {
+    if (!theme) return;
+    const root = document.documentElement;
+    root.style.setProperty('--bg', theme.bg || '#0a0a0a');
+    root.style.setProperty('--surface', theme.surface || '#141414');
+    root.style.setProperty('--accent', theme.accent || '#c9a84c');
+    root.style.setProperty('--accent2', theme.accent2 || '#e8d5a3');
+    root.style.setProperty('--text', theme.text || '#f5f0e8');
+    root.style.setProperty('--card-bg', theme.cardBg || '#1a1a1a');
+    root.style.setProperty('--font-display', theme.fontDisplay || "'Playfair Display', serif");
+    root.style.setProperty('--font-body', theme.fontBody || "'DM Sans', sans-serif");
+    if (theme.bgImage) {
+      document.body.style.backgroundImage = `url(${theme.bgImage})`;
+      document.body.style.backgroundSize = 'cover';
+    } else {
+      document.body.style.backgroundImage = '';
+    }
+  }
+
+  function renderResults() {
+    const candidates = config.candidates || [];
+    if (!candidates.length) return;
+
+    const sorted = [...candidates]
+      .map(c => ({ ...c, count: votes[c.id] || 0 }))
+      .sort((a, b) => b.count - a.count);
+
+    const total = sorted.reduce((s, c) => s + c.count, 0);
+    document.getElementById('totalCount').textContent = total;
+
+    const grid = document.getElementById('resultsGrid');
+    grid.innerHTML = '';
+
+    // Determine layout based on count
+    const count = sorted.length;
+    const cols = count <= 3 ? count : count <= 6 ? 3 : count <= 8 ? 4 : 5;
+    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+    sorted.forEach((c, i) => {
+      const pct = total ? (c.count / total * 100) : 0;
+      const isLeader = i === 0 && c.count > 0;
+      const item = document.createElement('div');
+      item.className = 'result-item' + (isLeader ? ' leader' : '');
+      item.style.animationDelay = (i * 0.08) + 's';
+
+      item.innerHTML = `
+        <div class="rank-badge">${String(i+1).padStart(2,'0')}</div>
+        <div class="photo-wrap">
+          ${c.photo ? `<img src="${c.photo}" alt="${c.name}" class="photo"/>` : `<div class="photo-placeholder">${c.name.charAt(0)}</div>`}
+          ${isLeader ? '<div class="crown">👑</div>' : ''}
+        </div>
+        <div class="info">
+          <div class="cname">${c.name}</div>
+          ${c.subtitle ? `<div class="csub">${c.subtitle}</div>` : ''}
+        </div>
+        <div class="vote-data">
+          <div class="vote-count">${c.count}</div>
+          <div class="vote-pct">${pct.toFixed(1)}%</div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" style="--target-w: ${pct}%"></div>
+        </div>
+      `;
+      grid.appendChild(item);
+    });
+  }
+
+  function updateStatus(isOpen) {
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    if (isOpen) {
+      dot.className = 'dot open';
+      txt.textContent = 'Votação Aberta';
+      txt.style.color = '#4ade80';
+    } else {
+      dot.className = 'dot closed';
+      txt.textContent = 'Votação Encerrada';
+      txt.style.color = '#ef4444';
+    }
+  }
+
+  onValue(ref(db, 'config'), (snap) => {
+    config = snap.val() || {};
+    applyTheme(config.theme);
+    document.getElementById('eventTitle').textContent = config.title || 'Resultados';
+    document.getElementById('eventSubtitle').textContent = config.subtitle || '';
+    updateStatus(config.votingOpen || false);
+    renderResults();
+  });
+
+  onValue(ref(db, 'votes'), (snap) => {
+    votes = snap.val() || {};
+    renderResults();
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.bar').forEach(bar => {
+        bar.style.width = bar.style.getPropertyValue('--target-w') || '0%';
+      });
+    }, 100);
+  });
+</script>
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --accent: #c9a84c;
+    --accent2: #e8d5a3;
+    --text: #f5f0e8;
+    --card-bg: #1a1a1a;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+
+  .page {
+    width: 1920px; height: 1080px;
+    display: flex; flex-direction: column;
+    padding: 48px 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* BACKGROUND EFFECTS */
+  .bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(120px);
+    opacity: 0.12;
+  }
+  .bg-glow-1 {
+    width: 600px; height: 600px;
+    background: var(--accent);
+    top: -200px; right: -100px;
+  }
+  .bg-glow-2 {
+    width: 400px; height: 400px;
+    background: var(--accent2);
+    bottom: -100px; left: 200px;
+    opacity: 0.07;
+  }
+
+  /* SCANLINES */
+  .scanlines {
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px);
+    z-index: 10;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 36px;
+    flex-shrink: 0;
+  }
+  .header-left { }
+  .event-title {
+    font-family: var(--font-display);
+    font-size: 56px; font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .event-subtitle {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--accent);
+    opacity: 0.9;
+  }
+
+  .header-right {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 10px;
+  }
+  .total-votes-box {
+    text-align: right;
+  }
+  .total-label {
+    font-size: 13px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: rgba(255,255,255,0.3);
+    margin-bottom: 2px;
+  }
+  .total-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 52px; font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .status-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .dot.open { background: #4ade80; box-shadow: 0 0 10px #4ade80; animation: pulse 2s infinite; }
+  .dot.closed { background: #ef4444; }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 6px #4ade8077; }
+    50% { box-shadow: 0 0 18px #4ade80cc; }
+  }
+  #statusText {
+    font-size: 14px; font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent) 20%, var(--accent) 80%, transparent);
+    opacity: 0.3;
+    margin-bottom: 32px;
+    flex-shrink: 0;
+  }
+
+  /* RESULTS GRID */
+  #resultsGrid {
+    display: grid;
+    gap: 16px;
+    flex: 1;
+    align-content: start;
+  }
+
+  .result-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 14px;
+    position: relative; overflow: hidden;
+    animation: slideIn 0.5s both;
+    transition: border-color 0.3s;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .result-item.leader {
+    border-color: var(--accent);
+    background: rgba(201,168,76,0.06);
+  }
+  .result-item::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .result-item.leader::before { opacity: 1; }
+
+  .rank-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: rgba(255,255,255,0.25);
+    width: 24px; flex-shrink: 0;
+    text-align: center;
+  }
+  .result-item.leader .rank-badge { color: var(--accent); }
+
+  .photo-wrap {
+    position: relative; flex-shrink: 0;
+  }
+  .photo {
+    width: 60px; height: 60px;
+    border-radius: 10px; object-fit: cover;
+    display: block;
+  }
+  .photo-placeholder {
+    width: 60px; height: 60px; border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--accent); opacity: 0.5;
+  }
+  .crown {
+    position: absolute; top: -12px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    filter: drop-shadow(0 0 8px rgba(255,200,0,0.6));
+  }
+
+  .info { flex: 1; min-width: 0; }
+  .cname {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--text);
+  }
+  .result-item.leader .cname { color: var(--accent2); }
+  .csub {
+    font-size: 12px; color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .vote-data {
+    text-align: right; flex-shrink: 0;
+    margin-left: 10px;
+  }
+  .vote-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px; font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+  .result-item.leader .vote-count { color: var(--accent); }
+  .vote-pct {
+    font-size: 11px; color: rgba(255,255,255,0.3);
+    margin-top: 2px;
+  }
+
+  .bar-wrap {
+    width: 80px; height: 3px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  }
+  .result-item.leader .bar { background: var(--accent2); }
+
+  /* FOOTER */
+  .footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 20px; flex-shrink: 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .footer-brand {
+    font-size: 12px; color: rgba(255,255,255,0.2);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .footer-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: rgba(255,255,255,0.2);
+  }
+
+  /* NO DATA */
+  .no-data {
+    display: flex; align-items: center; justify-content: center;
+    flex: 1;
+    flex-direction: column; gap: 16px;
+    color: rgba(255,255,255,0.2);
+  }
+  .no-data .icon { font-size: 48px; opacity: 0.4; }
+  .no-data p { font-family: var(--font-display); font-size: 24px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="scanlines"></div>
+
+  <header class="header">
+    <div class="header-left">
+      <div class="event-title" id="eventTitle">Resultados</div>
+      <div class="event-subtitle" id="eventSubtitle"></div>
+    </div>
+    <div class="header-right">
+      <div class="total-votes-box">
+        <div class="total-label">Total de Votos</div>
+        <div class="total-number" id="totalCount">0</div>
+      </div>
+      <div class="status-row">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusText">—</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <div id="resultsGrid"></div>
+
+  <footer class="footer">
+    <div class="footer-brand">VOTE SYSTEM</div>
+    <div class="footer-time" id="footerTime"></div>
+  </footer>
+</div>
+
+<script>
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('footerTime').textContent =
+      now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  // Trigger bar animations when bars become visible
+  const observer = new MutationObserver(() => {
+    setTimeout(() => {
+      document.querySelectorAll('.bar').forEach(bar => {
+        const target = bar.style.getPropertyValue('--target-w');
+        if (target) bar.style.width = target;
+      });
+    }, 200);
+  });
+  observer.observe(document.getElementById('resultsGrid'), { childList: true });
+</script>
+</body>
+</html>

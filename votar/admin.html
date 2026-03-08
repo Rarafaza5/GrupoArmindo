@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — Votação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // ===== SUBSTITUI AQUI COM A TUA CONFIG FIREBASE =====
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  // ====================================================
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let config = {};
+  let candidates = [];
+
+  // ---- AUTH ----
+  const ADMIN_PASS = "admin1234"; // muda isto!
+  let authed = false;
+
+  function checkAuth() {
+    const stored = sessionStorage.getItem('admin_auth');
+    if (stored === ADMIN_PASS) { authed = true; showApp(); return; }
+    document.getElementById('authWall').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+  }
+  window.doLogin = function() {
+    const val = document.getElementById('passInput').value;
+    if (val === ADMIN_PASS) {
+      sessionStorage.setItem('admin_auth', val);
+      authed = true;
+      document.getElementById('authWall').style.display = 'none';
+      showApp();
+    } else {
+      document.getElementById('authError').style.display = 'block';
+      document.getElementById('passInput').classList.add('shake');
+      setTimeout(() => document.getElementById('passInput').classList.remove('shake'), 500);
+    }
+  };
+  document.getElementById('passInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.doLogin();
+  });
+
+  function showApp() {
+    document.getElementById('mainApp').style.display = 'block';
+    loadConfig();
+  }
+
+  // ---- LOAD CONFIG ----
+  function loadConfig() {
+    onValue(ref(db, 'config'), (snap) => {
+      config = snap.val() || {};
+      candidates = config.candidates || [];
+      populateForm();
+      renderCandidateList();
+    });
+
+    onValue(ref(db, 'votes'), (snap) => {
+      const votes = snap.val() || {};
+      updateVoteCounts(votes);
+    });
+  }
+
+  function populateForm() {
+    document.getElementById('f_title').value = config.title || '';
+    document.getElementById('f_subtitle').value = config.subtitle || '';
+    document.getElementById('f_description').value = config.description || '';
+
+    const t = config.theme || {};
+    document.getElementById('t_bg').value = t.bg || '#0a0a0a';
+    document.getElementById('t_surface').value = t.surface || '#141414';
+    document.getElementById('t_accent').value = t.accent || '#c9a84c';
+    document.getElementById('t_accent2').value = t.accent2 || '#e8d5a3';
+    document.getElementById('t_text').value = t.text || '#f5f0e8';
+    document.getElementById('t_cardBg').value = t.cardBg || '#1a1a1a';
+    document.getElementById('t_fontDisplay').value = t.fontDisplay || "'Playfair Display', serif";
+    document.getElementById('t_fontBody').value = t.fontBody || "'DM Sans', sans-serif";
+    document.getElementById('t_radius').value = t.radius || '12px';
+
+    document.getElementById('votingToggle').checked = config.votingOpen || false;
+    updateToggleLabel(config.votingOpen);
+  }
+
+  // ---- VOTING TOGGLE ----
+  window.toggleVoting = async function() {
+    const isOpen = document.getElementById('votingToggle').checked;
+    await set(ref(db, 'config/votingOpen'), isOpen);
+    updateToggleLabel(isOpen);
+    showToast(isOpen ? '✅ Votação Aberta!' : '🔒 Votação Fechada');
+  };
+  function updateToggleLabel(isOpen) {
+    const lbl = document.getElementById('toggleLabel');
+    const badge = document.getElementById('votingBadge');
+    if (isOpen) {
+      lbl.textContent = 'Fechar Votação';
+      badge.textContent = 'ABERTA';
+      badge.className = 'badge open';
+    } else {
+      lbl.textContent = 'Abrir Votação';
+      badge.textContent = 'FECHADA';
+      badge.className = 'badge closed';
+    }
+  }
+
+  // ---- RESET VOTES ----
+  window.resetVotes = async function() {
+    if (!confirm('Tens a certeza que queres apagar TODOS os votos? Esta ação é irreversível.')) return;
+    await set(ref(db, 'votes'), null);
+    showToast('🗑 Votos apagados!');
+  };
+
+  // ---- SAVE EVENT INFO ----
+  window.saveEventInfo = async function() {
+    const updates = {
+      title: document.getElementById('f_title').value,
+      subtitle: document.getElementById('f_subtitle').value,
+      description: document.getElementById('f_description').value,
+    };
+    await set(ref(db, 'config/title'), updates.title);
+    await set(ref(db, 'config/subtitle'), updates.subtitle);
+    await set(ref(db, 'config/description'), updates.description);
+    showToast('✅ Informação guardada!');
+  };
+
+  // ---- SAVE THEME ----
+  window.saveTheme = async function() {
+    const theme = {
+      bg: document.getElementById('t_bg').value,
+      surface: document.getElementById('t_surface').value,
+      accent: document.getElementById('t_accent').value,
+      accent2: document.getElementById('t_accent2').value,
+      text: document.getElementById('t_text').value,
+      cardBg: document.getElementById('t_cardBg').value,
+      fontDisplay: document.getElementById('t_fontDisplay').value,
+      fontBody: document.getElementById('t_fontBody').value,
+      radius: document.getElementById('t_radius').value,
+    };
+    await set(ref(db, 'config/theme'), theme);
+    showToast('🎨 Tema guardado!');
+  };
+
+  // ---- PRESET THEMES ----
+  const presets = {
+    eurovisao: {
+      bg:'#04021a', surface:'#0a0830', accent:'#f5c518', accent2:'#ffe066',
+      text:'#f0eeff', cardBg:'#100e35',
+      fontDisplay:"'Playfair Display', serif", fontBody:"'DM Sans', sans-serif", radius:'14px'
+    },
+    oscares: {
+      bg:'#0d0900', surface:'#1a1200', accent:'#c9a84c', accent2:'#e8d5a3',
+      text:'#f5f0e8', cardBg:'#1a1400',
+      fontDisplay:"'Playfair Display', serif", fontBody:"'DM Sans', sans-serif", radius:'4px'
+    },
+    festival: {
+      bg:'#001a0a', surface:'#002010', accent:'#00e676', accent2:'#69f0ae',
+      text:'#e8fff2', cardBg:'#001a0d',
+      fontDisplay:"'Playfair Display', serif", fontBody:"'DM Sans', sans-serif", radius:'20px'
+    },
+    modern: {
+      bg:'#f5f5f0', surface:'#efefea', accent:'#1a1a1a', accent2:'#444',
+      text:'#1a1a1a', cardBg:'#ffffff',
+      fontDisplay:"'Playfair Display', serif", fontBody:"'DM Sans', sans-serif", radius:'8px'
+    }
+  };
+
+  window.applyPreset = function(name) {
+    const p = presets[name];
+    if (!p) return;
+    Object.keys(p).forEach(k => {
+      const el = document.getElementById('t_' + k);
+      if (el) el.value = p[k];
+    });
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-preset="${name}"]`)?.classList.add('active');
+  };
+
+  // ---- CANDIDATES ----
+  function renderCandidateList() {
+    const list = document.getElementById('candidateList');
+    list.innerHTML = '';
+    if (candidates.length === 0) {
+      list.innerHTML = '<div class="empty-list">Nenhum candidato ainda. Adiciona um abaixo!</div>';
+      return;
+    }
+    candidates.forEach((c, i) => {
+      const item = document.createElement('div');
+      item.className = 'candidate-item';
+      item.dataset.id = c.id;
+      item.innerHTML = `
+        <div class="c-drag">⠿</div>
+        <div class="c-thumb">
+          ${c.photo ? `<img src="${c.photo}" alt=""/>` : `<div class="c-initial">${(c.name||'?').charAt(0)}</div>`}
+        </div>
+        <div class="c-info">
+          <div class="c-name">${c.name || '(sem nome)'}</div>
+          <div class="c-sub">${c.subtitle || ''}</div>
+        </div>
+        <div class="c-votes-badge" id="votes_${c.id}">0 votos</div>
+        <div class="c-actions">
+          <button class="btn-icon" onclick="editCandidate(${i})" title="Editar">✏️</button>
+          <button class="btn-icon danger" onclick="removeCandidate(${i})" title="Remover">🗑</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function updateVoteCounts(votes) {
+    candidates.forEach(c => {
+      const el = document.getElementById('votes_' + c.id);
+      if (el) el.textContent = (votes[c.id] || 0) + ' votos';
+    });
+    // Also update results section
+    renderResults(votes);
+  }
+
+  function renderResults(votes) {
+    const area = document.getElementById('resultsArea');
+    if (!candidates.length) { area.innerHTML = '<p class="empty-list">Sem candidatos.</p>'; return; }
+    const sorted = [...candidates].map(c => ({ ...c, count: votes[c.id] || 0 }))
+      .sort((a,b) => b.count - a.count);
+    const total = sorted.reduce((s,c) => s + c.count, 0);
+    area.innerHTML = sorted.map((c,i) => {
+      const pct = total ? Math.round(c.count / total * 100) : 0;
+      return `
+        <div class="result-row">
+          <div class="result-rank">#${i+1}</div>
+          <div class="result-thumb">${c.photo ? `<img src="${c.photo}"/>` : `<div class="c-initial">${(c.name||'?').charAt(0)}</div>`}</div>
+          <div class="result-info">
+            <div class="result-name">${c.name}</div>
+            <div class="result-bar-wrap">
+              <div class="result-bar" style="width:${pct}%"></div>
+            </div>
+          </div>
+          <div class="result-count">${c.count} <span>(${pct}%)</span></div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('totalVotes').textContent = total;
+  }
+
+  // ---- ADD / EDIT CANDIDATE ----
+  let editingIndex = -1;
+
+  window.openAddCandidate = function() {
+    editingIndex = -1;
+    document.getElementById('candidateModalTitle').textContent = 'Adicionar Candidato';
+    document.getElementById('c_name').value = '';
+    document.getElementById('c_subtitle').value = '';
+    document.getElementById('c_description').value = '';
+    document.getElementById('c_photoPreview').src = '';
+    document.getElementById('c_photoPreview').style.display = 'none';
+    document.getElementById('c_photoB64').value = '';
+    document.getElementById('candidateModal').classList.add('show');
+  };
+
+  window.editCandidate = function(i) {
+    editingIndex = i;
+    const c = candidates[i];
+    document.getElementById('candidateModalTitle').textContent = 'Editar Candidato';
+    document.getElementById('c_name').value = c.name || '';
+    document.getElementById('c_subtitle').value = c.subtitle || '';
+    document.getElementById('c_description').value = c.description || '';
+    if (c.photo) {
+      document.getElementById('c_photoPreview').src = c.photo;
+      document.getElementById('c_photoPreview').style.display = 'block';
+      document.getElementById('c_photoB64').value = c.photo;
+    } else {
+      document.getElementById('c_photoPreview').style.display = 'none';
+      document.getElementById('c_photoB64').value = '';
+    }
+    document.getElementById('candidateModal').classList.add('show');
+  };
+
+  window.removeCandidate = async function(i) {
+    if (!confirm(`Remover "${candidates[i].name}"?`)) return;
+    candidates.splice(i, 1);
+    await set(ref(db, 'config/candidates'), candidates);
+  };
+
+  window.saveCandidate = async function() {
+    const name = document.getElementById('c_name').value.trim();
+    if (!name) { alert('Nome obrigatório!'); return; }
+    const photo = document.getElementById('c_photoB64').value;
+    const candidate = {
+      id: editingIndex >= 0 ? candidates[editingIndex].id : 'c_' + Date.now(),
+      name,
+      subtitle: document.getElementById('c_subtitle').value.trim(),
+      description: document.getElementById('c_description').value.trim(),
+      photo: photo || null,
+    };
+    if (editingIndex >= 0) {
+      candidates[editingIndex] = candidate;
+    } else {
+      candidates.push(candidate);
+    }
+    await set(ref(db, 'config/candidates'), candidates);
+    closeModal('candidateModal');
+    showToast('✅ Candidato guardado!');
+  };
+
+  window.closeModal = function(id) {
+    document.getElementById(id).classList.remove('show');
+  };
+
+  // ---- PHOTO UPLOAD (PNG → base64) ----
+  window.handlePhotoUpload = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 500 * 1024) {
+      alert('Foto muito grande! Máximo: 500KB. Usa uma imagem mais pequena ou comprimida.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const b64 = e.target.result;
+      document.getElementById('c_photoB64').value = b64;
+      document.getElementById('c_photoPreview').src = b64;
+      document.getElementById('c_photoPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // ---- TOAST ----
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  checkAuth();
+
+  document.getElementById('passInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.doLogin();
+  });
+</script>
+
+<style>
+  :root {
+    --bg: #0e0e12;
+    --surface: #16161c;
+    --surface2: #1e1e26;
+    --accent: #7c6fff;
+    --accent-dim: #7c6fff33;
+    --text: #e8e8f0;
+    --text-muted: #666;
+    --border: #2a2a36;
+    --danger: #ff5252;
+    --success: #4ade80;
+    --radius: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* AUTH WALL */
+  #authWall {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--bg);
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .auth-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 360px;
+    text-align: center;
+  }
+  .auth-box h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  .auth-box p { color: var(--text-muted); margin-bottom: 28px; font-size: 0.85rem; }
+  .auth-box input {
+    width: 100%; padding: 14px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem; text-align: center;
+    letter-spacing: 0.2em;
+    margin-bottom: 12px;
+  }
+  .auth-box input:focus { outline: none; border-color: var(--accent); }
+  #authError { color: var(--danger); font-size: 0.8rem; display: none; margin-bottom: 12px; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  /* LAYOUT */
+  #mainApp { display: none; }
+  .admin-layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px; flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+  .sidebar-logo span { color: var(--text-muted); display: block; font-size: 0.7rem; margin-top: 2px; }
+
+  .nav-section { padding: 0 12px 8px; }
+  .nav-label {
+    font-size: 0.65rem; font-weight: 600;
+    color: var(--text-muted); letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 8px 8px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    cursor: pointer; color: var(--text-muted);
+    transition: background 0.15s, color 0.15s;
+    font-size: 0.88rem;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent-dim); color: var(--accent); }
+  .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+  .main-content {
+    flex: 1; padding: 32px;
+    overflow-y: auto;
+  }
+
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+  .page-header p { color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; }
+
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* VOTING CONTROL */
+  .vote-control {
+    display: flex; align-items: center; gap: 20px;
+    flex-wrap: wrap;
+  }
+  .toggle-wrap {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .toggle {
+    position: relative; width: 56px; height: 30px;
+    cursor: pointer;
+  }
+  .toggle input { display: none; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--border);
+    border-radius: 30px;
+    transition: background 0.25s;
+  }
+  .toggle input:checked ~ .toggle-track { background: var(--success); }
+  .toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #fff; transition: transform 0.25s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(26px); }
+  .badge {
+    padding: 4px 12px; border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .badge.open { background: #4ade8022; color: var(--success); }
+  .badge.closed { background: #ff525222; color: var(--danger); }
+
+  /* FORM */
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .form-group { flex: 1; min-width: 200px; }
+  .form-group label {
+    display: block; font-size: 0.78rem;
+    color: var(--text-muted); margin-bottom: 6px;
+    font-weight: 500; letter-spacing: 0.03em;
+  }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .color-input-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .color-input-wrap input[type=color] {
+    width: 40px; height: 36px; padding: 2px;
+    border-radius: 6px; cursor: pointer;
+  }
+  .color-input-wrap input[type=text] {
+    flex: 1;
+  }
+
+  /* PRESETS */
+  .preset-row {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .preset-btn {
+    padding: 8px 16px; border-radius: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer; font-size: 0.82rem;
+    transition: all 0.15s;
+  }
+  .preset-btn:hover { border-color: var(--accent); color: var(--text); }
+  .preset-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    padding: 10px 20px; border-radius: 8px; border: none;
+    font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 500;
+    cursor: pointer; transition: all 0.15s; display: inline-flex;
+    align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: #ff525222; border: 1px solid var(--danger); color: var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+
+  /* CANDIDATES */
+  .candidates-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .candidates-toolbar p { color: var(--text-muted); font-size: 0.82rem; }
+
+  #candidateList { display: flex; flex-direction: column; gap: 10px; }
+  .empty-list {
+    text-align: center; color: var(--text-muted);
+    padding: 40px; font-size: 0.88rem;
+  }
+
+  .candidate-item {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px;
+    transition: border-color 0.15s;
+  }
+  .candidate-item:hover { border-color: var(--accent); }
+  .c-drag { color: var(--text-muted); cursor: grab; font-size: 1.1rem; }
+  .c-thumb {
+    width: 44px; height: 44px; border-radius: 8px;
+    overflow: hidden; flex-shrink: 0;
+    background: var(--surface);
+  }
+  .c-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .c-initial {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: var(--accent); font-size: 1.2rem;
+  }
+  .c-info { flex: 1; min-width: 0; }
+  .c-name { font-weight: 500; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .c-sub { color: var(--text-muted); font-size: 0.78rem; margin-top: 2px; }
+  .c-votes-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; color: var(--accent);
+    background: var(--accent-dim);
+    padding: 3px 8px; border-radius: 4px;
+    white-space: nowrap;
+  }
+  .c-actions { display: flex; gap: 6px; }
+  .btn-icon {
+    background: none; border: 1px solid var(--border);
+    border-radius: 6px; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.9rem;
+    transition: all 0.15s;
+  }
+  .btn-icon:hover { background: var(--surface); border-color: var(--accent); }
+  .btn-icon.danger:hover { border-color: var(--danger); background: #ff525215; }
+
+  /* RESULTS */
+  .results-stats {
+    display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .stat-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 20px;
+    flex: 1; min-width: 120px;
+  }
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem; color: var(--accent);
+    font-weight: 700;
+  }
+  .stat-label { color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; }
+
+  #resultsArea { display: flex; flex-direction: column; gap: 10px; }
+  .result-row {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px;
+  }
+  .result-rank {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem; color: var(--text-muted);
+    width: 28px; text-align: center;
+  }
+  .result-thumb {
+    width: 40px; height: 40px; border-radius: 6px;
+    overflow: hidden; flex-shrink: 0;
+    background: var(--surface);
+  }
+  .result-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .result-info { flex: 1; min-width: 0; }
+  .result-name { font-weight: 500; font-size: 0.9rem; margin-bottom: 6px; }
+  .result-bar-wrap {
+    height: 4px; background: var(--border); border-radius: 4px;
+  }
+  .result-bar {
+    height: 100%; background: var(--accent);
+    border-radius: 4px; transition: width 0.5s ease;
+    min-width: 2px;
+  }
+  .result-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem; color: var(--text);
+    white-space: nowrap;
+  }
+  .result-count span { color: var(--text-muted); font-size: 0.75rem; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    width: 100%; max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .modal-header h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.95rem;
+  }
+  .modal-close {
+    background: none; border: none;
+    color: var(--text-muted); font-size: 1.3rem;
+    cursor: pointer; padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .photo-upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    margin-bottom: 16px;
+  }
+  .photo-upload-area:hover { border-color: var(--accent); }
+  .photo-upload-area input { display: none; }
+  #c_photoPreview {
+    width: 80px; height: 80px;
+    border-radius: 10px; object-fit: cover;
+    margin: 8px auto 0; display: none;
+  }
+  .upload-hint { color: var(--text-muted); font-size: 0.82rem; }
+  .upload-hint strong { color: var(--accent); }
+
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    z-index: 200;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateX(0); }
+
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .main-content { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="authWall" style="display:flex">
+  <div class="auth-box">
+    <div style="font-size:2rem;margin-bottom:12px">🔐</div>
+    <h2>Admin Panel</h2>
+    <p>Introduz a password de administrador para continuar.</p>
+    <p id="authError">Password incorreta.</p>
+    <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password"/>
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp">
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        VOTE ADMIN
+        <span>Painel de Controlo</span>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Controlo</div>
+        <a class="nav-item active" onclick="showSection('control',this)">
+          <span class="icon">⚡</span> Votação
+        </a>
+        <a class="nav-item" onclick="showSection('results',this)">
+          <span class="icon">📊</span> Resultados
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Configuração</div>
+        <a class="nav-item" onclick="showSection('event',this)">
+          <span class="icon">📝</span> Evento
+        </a>
+        <a class="nav-item" onclick="showSection('candidates',this)">
+          <span class="icon">👥</span> Candidatos
+        </a>
+        <a class="nav-item" onclick="showSection('theme',this)">
+          <span class="icon">🎨</span> Tema
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Links</div>
+        <a class="nav-item" href="vote.html" target="_blank">
+          <span class="icon">🗳</span> Página Voto
+        </a>
+        <a class="nav-item" href="display.html" target="_blank">
+          <span class="icon">📺</span> Display OBS
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="main-content">
+
+      <!-- SECTION: CONTROL -->
+      <div id="sec_control" class="section active">
+        <div class="page-header">
+          <div>
+            <h1>Controlo da Votação</h1>
+            <p>Abre e fecha a votação em tempo real</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Estado</div>
+          <div class="vote-control">
+            <label class="toggle">
+              <input type="checkbox" id="votingToggle" onchange="toggleVoting()"/>
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+            <span id="toggleLabel" style="font-size:0.95rem;font-weight:500">Abrir Votação</span>
+            <span id="votingBadge" class="badge closed">FECHADA</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Votos</div>
+          <div class="results-stats">
+            <div class="stat-box">
+              <div class="stat-value" id="totalVotes">0</div>
+              <div class="stat-label">Total de Votos</div>
+            </div>
+          </div>
+          <button class="btn btn-danger" onclick="resetVotes()">🗑 Apagar Todos os Votos</button>
+        </div>
+      </div>
+
+      <!-- SECTION: RESULTS -->
+      <div id="sec_results" class="section">
+        <div class="page-header">
+          <div>
+            <h1>Resultados</h1>
+            <p>Actualizado em tempo real</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Rankings</div>
+          <div id="resultsArea"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: EVENT INFO -->
+      <div id="sec_event" class="section">
+        <div class="page-header">
+          <div>
+            <h1>Informação do Evento</h1>
+            <p>Título, subtítulo e descrição</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Detalhes</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Título do Evento</label>
+              <input type="text" id="f_title" placeholder="ex: Festival da Canção 2025"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Subtítulo</label>
+              <input type="text" id="f_subtitle" placeholder="ex: Vota no teu favorito!"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Descrição (opcional)</label>
+              <textarea id="f_description" placeholder="Texto adicional para o público..."></textarea>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="saveEventInfo()">💾 Guardar</button>
+        </div>
+      </div>
+
+      <!-- SECTION: CANDIDATES -->
+      <div id="sec_candidates" class="section">
+        <div class="page-header">
+          <div>
+            <h1>Candidatos</h1>
+            <p>Gere os candidatos da votação</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="candidates-toolbar">
+            <p>Candidatos disponíveis</p>
+            <button class="btn btn-primary" onclick="openAddCandidate()">+ Adicionar</button>
+          </div>
+          <div id="candidateList"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: THEME -->
+      <div id="sec_theme" class="section">
+        <div class="page-header">
+          <div>
+            <h1>Tema Visual</h1>
+            <p>Personaliza a aparência da votação</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Presets</div>
+          <div class="preset-row">
+            <button class="preset-btn" data-preset="eurovisao" onclick="applyPreset('eurovisao')">🎤 Eurovisão</button>
+            <button class="preset-btn" data-preset="oscares" onclick="applyPreset('oscares')">🏆 Óscares</button>
+            <button class="preset-btn" data-preset="festival" onclick="applyPreset('festival')">🎶 Festival</button>
+            <button class="preset-btn" data-preset="modern" onclick="applyPreset('modern')">☀️ Claro</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Cores</div>
+          <div class="theme-grid">
+            <div class="form-group">
+              <label>Fundo Principal</label>
+              <div class="color-input-wrap">
+                <input type="color" oninput="document.getElementById('t_bg').value=this.value" onchange="document.getElementById('t_bg').value=this.value"/>
+                <input type="text" id="t_bg" placeholder="#0a0a0a"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Superfície</label>
+              <div class="color-input-wrap">
+                <input type="color" oninput="document.getElementById('t_surface').value=this.value"/>
+                <input type="text" id="t_surface" placeholder="#141414"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Cor de Destaque</label>
+              <div class="color-input-wrap">
+                <input type="color" oninput="document.getElementById('t_accent').value=this.value"/>
+                <input type="text" id="t_accent" placeholder="#c9a84c"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Destaque 2</label>
+              <div class="color-input-wrap">
+                <input type="color" oninput="document.getElementById('t_accent2').value=this.value"/>
+                <input type="text" id="t_accent2" placeholder="#e8d5a3"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Texto</label>
+              <div class="color-input-wrap">
+                <input type="color" oninput="document.getElementById('t_text').value=this.value"/>
+                <input type="text" id="t_text" placeholder="#f5f0e8"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Fundo Cartão</label>
+              <div class="color-input-wrap">
+                <input type="color" oninput="document.getElementById('t_cardBg').value=this.value"/>
+                <input type="text" id="t_cardBg" placeholder="#1a1a1a"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Tipografia & Forma</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Font Títulos (Google Fonts CSS)</label>
+              <input type="text" id="t_fontDisplay" placeholder="'Playfair Display', serif"/>
+            </div>
+            <div class="form-group">
+              <label>Font Corpo</label>
+              <input type="text" id="t_fontBody" placeholder="'DM Sans', sans-serif"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="max-width:200px">
+              <label>Raio dos Cantos</label>
+              <input type="text" id="t_radius" placeholder="12px"/>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveTheme()">🎨 Aplicar Tema</button>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- CANDIDATE MODAL -->
+<div class="modal-overlay" id="candidateModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="candidateModalTitle">Adicionar Candidato</h3>
+      <button class="modal-close" onclick="closeModal('candidateModal')">✕</button>
+    </div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Nome *</label>
+      <input type="text" id="c_name" placeholder="ex: Mariza"/>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Subtítulo / Categoria</label>
+      <input type="text" id="c_subtitle" placeholder="ex: Fado, Best Actress, Portugal..."/>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Descrição (opcional)</label>
+      <textarea id="c_description" rows="3" placeholder="Breve descrição..."></textarea>
+    </div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Foto</label>
+      <label class="photo-upload-area" for="photoFileInput">
+        <input type="file" id="photoFileInput" accept="image/png,image/jpeg,image/webp" onchange="handlePhotoUpload(this)"/>
+        <div>📷</div>
+        <div class="upload-hint">Clica para fazer upload<br/><strong>PNG / JPG / WEBP</strong> · Máx. 500KB</div>
+        <img id="c_photoPreview" src="" alt="Preview"/>
+      </label>
+      <input type="hidden" id="c_photoB64"/>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('candidateModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCandidate()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function showSection(name, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec_' + name).classList.add('active');
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>
