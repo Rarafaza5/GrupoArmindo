@@ -12,16 +12,15 @@
   import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   // ===== SUBSTITUI AQUI COM A TUA CONFIG FIREBASE =====
-const firebaseConfig = {
-  apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
-  authDomain: "aawards.firebaseapp.com",
-  databaseURL: "https://aawards-default-rtdb.firebaseio.com",
-  projectId: "aawards",
-  storageBucket: "aawards.firebasestorage.app",
-  messagingSenderId: "839334918366",
-  appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
-  measurementId: "G-NLLMB9THVX"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+    authDomain: "aawards.firebaseapp.com",
+    databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+    projectId: "aawards",
+    storageBucket: "aawards.firebasestorage.app",
+    messagingSenderId: "839334918366",
+    appId: "1:839334918366:web:454a259fa3e2665b46ea4f"
+  };
   // ====================================================
 
   const app = initializeApp(firebaseConfig);
@@ -344,6 +343,237 @@ const firebaseConfig = {
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
+
+  // ---- TEMPLATES ----
+  const TEMPLATES = [
+    // EUROVISÃO (10)
+    { id:"ESC01", cat:"🎤 Eurovisão", name:"Eurovision Grand Prix", desc:"Veludo azul-noite, estrelas douradas, energia de final em Malmö",
+      p:{ bg:"#04021a", ac:"#f5c518", cb:"#0a0830" },
+      theme:{ bg:"#04021a", surface:"#080624", accent:"#f5c518", accent2:"#ffe999", text:"#f0eeff", textMuted:"#6a6490", cardBg:"#0a0830", cardBorder:"#1e1a55", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Outfit', sans-serif", radius:"14px" } },
+    { id:"ESC02", cat:"🎤 Eurovisão", name:"Neon Stage", desc:"Cyberpunk rosado, luzes de palco, vibes Loreen 2023",
+      p:{ bg:"#0d001a", ac:"#ff3cac", cb:"#160025" },
+      theme:{ bg:"#0d001a", surface:"#160025", accent:"#ff3cac", accent2:"#ff99dd", text:"#fff0ff", textMuted:"#7a4080", cardBg:"#1a002d", cardBorder:"#3a0050", fontDisplay:"'Playfair Display', serif", fontBody:"'DM Sans', sans-serif", radius:"20px" } },
+    { id:"ESC03", cat:"🎤 Eurovisão", name:"Dourado de Berlim", desc:"Preto profundo com ouro berlim, clássico e imponente",
+      p:{ bg:"#080808", ac:"#d4a843", cb:"#111111" },
+      theme:{ bg:"#080808", surface:"#111111", accent:"#d4a843", accent2:"#f0cc70", text:"#f8f4ea", textMuted:"#6a6050", cardBg:"#111111", cardBorder:"#2a2010", fontDisplay:"'Cinzel', serif", fontBody:"'Inter', sans-serif", radius:"6px" } },
+    { id:"ESC04", cat:"🎤 Eurovisão", name:"Bandeiras & Confetti", desc:"Azul europeu e ciano brilhante, energia de gala europeia",
+      p:{ bg:"#001233", ac:"#00d4ff", cb:"#001a45" },
+      theme:{ bg:"#001233", surface:"#001a45", accent:"#00d4ff", accent2:"#80eaff", text:"#e8f4ff", textMuted:"#4a6a90", cardBg:"#001a45", cardBorder:"#003080", fontDisplay:"'Bebas Neue', sans-serif", fontBody:"'Outfit', sans-serif", radius:"10px" } },
+    { id:"ESC05", cat:"🎤 Eurovisão", name:"Holographic Stage", desc:"Roxo holográfico iridescente, próximo nível de espetáculo",
+      p:{ bg:"#0a0014", ac:"#b060ff", cb:"#12001e" },
+      theme:{ bg:"#0a0014", surface:"#12001e", accent:"#b060ff", accent2:"#d4a0ff", text:"#f5eeff", textMuted:"#6a4090", cardBg:"#12001e", cardBorder:"#2a0040", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'DM Sans', sans-serif", radius:"18px" } },
+    { id:"ESC06", cat:"🎤 Eurovisão", name:"Mediterrâneo Azul", desc:"Azul grego e branco puro, verão mediterrâneo — Lisboa 2018",
+      p:{ bg:"#001a33", ac:"#4da6ff", cb:"#00264d" },
+      theme:{ bg:"#001a33", surface:"#00264d", accent:"#4da6ff", accent2:"#99ccff", text:"#e8f2ff", textMuted:"#3a6090", cardBg:"#00264d", cardBorder:"#004080", fontDisplay:"'Playfair Display', serif", fontBody:"'Outfit', sans-serif", radius:"16px" } },
+    { id:"ESC07", cat:"🎤 Eurovisão", name:"Fogo de Artifício", desc:"Vermelho fogo e laranja brilhante, gran finale explosivo",
+      p:{ bg:"#0f0300", ac:"#ff5500", cb:"#1a0600" },
+      theme:{ bg:"#0f0300", surface:"#1a0600", accent:"#ff5500", accent2:"#ffaa44", text:"#fff4e8", textMuted:"#7a4020", cardBg:"#1a0600", cardBorder:"#3a1000", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'DM Sans', sans-serif", radius:"12px" } },
+    { id:"ESC08", cat:"🎤 Eurovisão", name:"Crystal Ballroom", desc:"Prata e gelo, atmosfera de sala de cristal sueca",
+      p:{ bg:"#08101a", ac:"#a0c8ff", cb:"#0d1a2a" },
+      theme:{ bg:"#08101a", surface:"#0d1a2a", accent:"#a0c8ff", accent2:"#d0e8ff", text:"#eef4ff", textMuted:"#4a6880", cardBg:"#0d1a2a", cardBorder:"#1a304a", fontDisplay:"'Playfair Display', serif", fontBody:"'Inter', sans-serif", radius:"14px" } },
+    { id:"ESC09", cat:"🎤 Eurovisão", name:"Turquesa Moderno", desc:"Verde-azulado nórdico, limpo e eletrizante",
+      p:{ bg:"#020f0f", ac:"#00e5cc", cb:"#041818" },
+      theme:{ bg:"#020f0f", surface:"#041818", accent:"#00e5cc", accent2:"#80f5eb", text:"#e0fffc", textMuted:"#3a7070", cardBg:"#041818", cardBorder:"#0a3030", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Outfit', sans-serif", radius:"22px" } },
+    { id:"ESC10", cat:"🎤 Eurovisão", name:"Laser Show", desc:"Verde neon laser sobre negro absoluto — Wiwi vibe",
+      p:{ bg:"#000000", ac:"#00ff41", cb:"#050f05" },
+      theme:{ bg:"#000000", surface:"#050f05", accent:"#00ff41", accent2:"#80ff99", text:"#e0ffe5", textMuted:"#2a6030", cardBg:"#050f05", cardBorder:"#0a2010", fontDisplay:"'Bebas Neue', sans-serif", fontBody:"'DM Mono', monospace", radius:"4px" } },
+    // ÓSCARES (10)
+    { id:"OSC01", cat:"🏆 Óscares", name:"Hollywood Gold", desc:"O clássico absoluto — preto fosco, estatueta dourada",
+      p:{ bg:"#0d0900", ac:"#c9a84c", cb:"#1a1200" },
+      theme:{ bg:"#0d0900", surface:"#1a1200", accent:"#c9a84c", accent2:"#e8d5a3", text:"#f5f0e8", textMuted:"#6a5a30", cardBg:"#1a1400", cardBorder:"#2a2000", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Outfit', sans-serif", radius:"4px" } },
+    { id:"OSC02", cat:"🏆 Óscares", name:"Red Carpet", desc:"Vermelho profundo e ouro, glamour de estrela na passadeira",
+      p:{ bg:"#120004", ac:"#c9a84c", cb:"#1e0008" },
+      theme:{ bg:"#120004", surface:"#1e0008", accent:"#c9a84c", accent2:"#f0cc80", text:"#fff0f2", textMuted:"#7a3040", cardBg:"#1e0008", cardBorder:"#3a0010", fontDisplay:"'Playfair Display', serif", fontBody:"'DM Sans', sans-serif", radius:"6px" } },
+    { id:"OSC03", cat:"🏆 Óscares", name:"Silver Screen", desc:"Cinza chumbo e prata, cinema clássico a preto e branco",
+      p:{ bg:"#0a0a0a", ac:"#b0b8c8", cb:"#141414" },
+      theme:{ bg:"#0a0a0a", surface:"#141414", accent:"#b0b8c8", accent2:"#d8dde8", text:"#e8ecf0", textMuted:"#5a6070", cardBg:"#141414", cardBorder:"#282830", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Inter', sans-serif", radius:"2px" } },
+    { id:"OSC04", cat:"🏆 Óscares", name:"Champagne Toast", desc:"Bege champanhe e bronze, elegância de gala de luxo",
+      p:{ bg:"#1a1208", ac:"#d4a055", cb:"#241a0c" },
+      theme:{ bg:"#1a1208", surface:"#241a0c", accent:"#d4a055", accent2:"#eecb8a", text:"#f5ede0", textMuted:"#7a6040", cardBg:"#241a0c", cardBorder:"#3a2a10", fontDisplay:"'Cinzel', serif", fontBody:"'Outfit', sans-serif", radius:"8px" } },
+    { id:"OSC05", cat:"🏆 Óscares", name:"Midnight Gala", desc:"Azul meia-noite e ouro, depois da cerimónia no Vanity Fair",
+      p:{ bg:"#01050f", ac:"#d4a843", cb:"#040a1a" },
+      theme:{ bg:"#01050f", surface:"#040a1a", accent:"#d4a843", accent2:"#f0cc70", text:"#eef2ff", textMuted:"#404a70", cardBg:"#040a1a", cardBorder:"#0a1530", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'DM Sans', sans-serif", radius:"10px" } },
+    { id:"OSC06", cat:"🏆 Óscares", name:"Ivory & Marble", desc:"Fundo claro marfim, letra preta, mármore de Beverly Hills",
+      p:{ bg:"#f5f0e8", ac:"#8b6914", cb:"#ede8dc" },
+      theme:{ bg:"#f5f0e8", surface:"#ede8dc", accent:"#8b6914", accent2:"#c4a030", text:"#1a1208", textMuted:"#7a6840", cardBg:"#ede8dc", cardBorder:"#d0c8b0", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Inter', sans-serif", radius:"6px" } },
+    { id:"OSC07", cat:"🏆 Óscares", name:"Kodak Moment", desc:"Sépia fotográfico, nostalgia do cinema de 35mm",
+      p:{ bg:"#140c00", ac:"#e8a040", cb:"#1e1200" },
+      theme:{ bg:"#140c00", surface:"#1e1200", accent:"#e8a040", accent2:"#f5c870", text:"#f5e8d0", textMuted:"#7a5830", cardBg:"#1e1200", cardBorder:"#3a2800", fontDisplay:"'Playfair Display', serif", fontBody:"'Outfit', sans-serif", radius:"8px" } },
+    { id:"OSC08", cat:"🏆 Óscares", name:"Spotlight", desc:"Fundo escuro, círculo de luz dourada — a estatueta no centro",
+      p:{ bg:"#050505", ac:"#f0c040", cb:"#0d0d0d" },
+      theme:{ bg:"#050505", surface:"#0d0d0d", accent:"#f0c040", accent2:"#f8dc80", text:"#fff8e8", textMuted:"#605030", cardBg:"#0d0d0d", cardBorder:"#1e1800", fontDisplay:"'Cinzel', serif", fontBody:"'DM Sans', sans-serif", radius:"0px" } },
+    { id:"OSC09", cat:"🏆 Óscares", name:"Emerald Deco", desc:"Art déco verde esmeralda, ousado como Cate Blanchett",
+      p:{ bg:"#010f08", ac:"#40c878", cb:"#051a0e" },
+      theme:{ bg:"#010f08", surface:"#051a0e", accent:"#40c878", accent2:"#90e8b8", text:"#e8fff2", textMuted:"#2a6040", cardBg:"#051a0e", cardBorder:"#0a3020", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Inter', sans-serif", radius:"4px" } },
+    { id:"OSC10", cat:"🏆 Óscares", name:"Rose Gold Awards", desc:"Ouro rosé contemporâneo, moderno e glamoroso",
+      p:{ bg:"#100508", ac:"#d4807a", cb:"#1a0a0d" },
+      theme:{ bg:"#100508", surface:"#1a0a0d", accent:"#d4807a", accent2:"#f0b0a8", text:"#fff0f0", textMuted:"#7a4040", cardBg:"#1a0a0d", cardBorder:"#351018", fontDisplay:"'Playfair Display', serif", fontBody:"'Outfit', sans-serif", radius:"16px" } },
+    // DESPORTO (2)
+    { id:"SPT01", cat:"⚽ Desporto", name:"Stadium Roar", desc:"Verde campo, branco — energia de clássico futebol",
+      p:{ bg:"#001a00", ac:"#00e640", cb:"#002800" },
+      theme:{ bg:"#001a00", surface:"#002800", accent:"#00e640", accent2:"#80f0a0", text:"#e8ffe8", textMuted:"#2a6030", cardBg:"#002800", cardBorder:"#004800", fontDisplay:"'Bebas Neue', sans-serif", fontBody:"'Outfit', sans-serif", radius:"8px" } },
+    { id:"SPT02", cat:"⚽ Desporto", name:"Gold Medal", desc:"Azul olímpico e ouro, cerimónia de medalhas dos Jogos",
+      p:{ bg:"#001030", ac:"#f5c040", cb:"#001840" },
+      theme:{ bg:"#001030", surface:"#001840", accent:"#f5c040", accent2:"#f8d880", text:"#e8f0ff", textMuted:"#3a5080", cardBg:"#001840", cardBorder:"#002060", fontDisplay:"'Bebas Neue', sans-serif", fontBody:"'DM Sans', sans-serif", radius:"10px" } },
+    // MÚSICA (3)
+    { id:"MUS01", cat:"🎵 Música", name:"Vinyl Night", desc:"Preto de vinil, âmbar analógico — clube de jazz às 2h",
+      p:{ bg:"#050300", ac:"#d47a20", cb:"#0d0800" },
+      theme:{ bg:"#050300", surface:"#0d0800", accent:"#d47a20", accent2:"#f0aa60", text:"#f5e8d0", textMuted:"#6a4820", cardBg:"#0d0800", cardBorder:"#2a1800", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'DM Mono', monospace", radius:"100px" } },
+    { id:"MUS02", cat:"🎵 Música", name:"Grammys Stage", desc:"Roxo profundo e brilhos de prata — noite dos Grammys",
+      p:{ bg:"#0a0014", ac:"#c060ff", cb:"#120020" },
+      theme:{ bg:"#0a0014", surface:"#120020", accent:"#c060ff", accent2:"#e0a0ff", text:"#f8f0ff", textMuted:"#6840a0", cardBg:"#120020", cardBorder:"#280040", fontDisplay:"'Playfair Display', serif", fontBody:"'Outfit', sans-serif", radius:"14px" } },
+    { id:"MUS03", cat:"🎵 Música", name:"Festival Verão", desc:"Laranja pôr do sol, poeira, Glastonbury feeling",
+      p:{ bg:"#150800", ac:"#ff7a20", cb:"#1f1000" },
+      theme:{ bg:"#150800", surface:"#1f1000", accent:"#ff7a20", accent2:"#ffb060", text:"#fff4e8", textMuted:"#7a4820", cardBg:"#1f1000", cardBorder:"#3a1800", fontDisplay:"'Bebas Neue', sans-serif", fontBody:"'Outfit', sans-serif", radius:"20px" } },
+    // TV (2)
+    { id:"TV01", cat:"📺 Televisão", name:"Emmy Night", desc:"Carmim e bronze — cerimónia dos Emmy Awards",
+      p:{ bg:"#100008", ac:"#c07840", cb:"#1a0010" },
+      theme:{ bg:"#100008", surface:"#1a0010", accent:"#c07840", accent2:"#e0a870", text:"#fff0f8", textMuted:"#7a3860", cardBg:"#1a0010", cardBorder:"#300018", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Inter', sans-serif", radius:"8px" } },
+    { id:"TV02", cat:"📺 Televisão", name:"Bafta London", desc:"Azul real britânico e dourado — BAFTA no Royal Opera House",
+      p:{ bg:"#000820", ac:"#c8a84c", cb:"#001030" },
+      theme:{ bg:"#000820", surface:"#001030", accent:"#c8a84c", accent2:"#e8cc80", text:"#eef4ff", textMuted:"#3a4870", cardBg:"#001030", cardBorder:"#001848", fontDisplay:"'Cinzel', serif", fontBody:"'DM Sans', sans-serif", radius:"6px" } },
+    // GAMING (2)
+    { id:"GAM01", cat:"🎮 Gaming", name:"Pixel Arena", desc:"Azul neón gaming, HUD de videojogo, The Game Awards",
+      p:{ bg:"#020810", ac:"#00d4ff", cb:"#040e1a" },
+      theme:{ bg:"#020810", surface:"#040e1a", accent:"#00d4ff", accent2:"#80eaff", text:"#d0f0ff", textMuted:"#2a5870", cardBg:"#040e1a", cardBorder:"#082030", fontDisplay:"'Space Mono', monospace", fontBody:"'DM Mono', monospace", radius:"4px" } },
+    { id:"GAM02", cat:"🎮 Gaming", name:"Magma Core", desc:"Vermelho lava, cinza aço — combate intenso",
+      p:{ bg:"#0f0200", ac:"#ff3a00", cb:"#180500" },
+      theme:{ bg:"#0f0200", surface:"#180500", accent:"#ff3a00", accent2:"#ff8040", text:"#fff0e8", textMuted:"#7a2810", cardBg:"#180500", cardBorder:"#350800", fontDisplay:"'Bebas Neue', sans-serif", fontBody:"'Outfit', sans-serif", radius:"6px" } },
+    // MODA (2)
+    { id:"MOD01", cat:"👗 Moda", name:"Fashion Week", desc:"Branco imaculado, preto editorial — Paris Fashion Week",
+      p:{ bg:"#f8f8f8", ac:"#1a1a1a", cb:"#f0f0f0" },
+      theme:{ bg:"#f8f8f8", surface:"#f0f0f0", accent:"#1a1a1a", accent2:"#444444", text:"#0a0a0a", textMuted:"#888888", cardBg:"#f0f0f0", cardBorder:"#dddddd", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Inter', sans-serif", radius:"2px" } },
+    { id:"MOD02", cat:"👗 Moda", name:"Vogue Cover", desc:"Rosa millennial e magenta — Vogue ousado e moderno",
+      p:{ bg:"#1a0010", ac:"#ff2d78", cb:"#240018" },
+      theme:{ bg:"#1a0010", surface:"#240018", accent:"#ff2d78", accent2:"#ff80b0", text:"#fff0f5", textMuted:"#804060", cardBg:"#240018", cardBorder:"#400030", fontDisplay:"'Playfair Display', serif", fontBody:"'DM Sans', sans-serif", radius:"18px" } },
+    // CIÊNCIA (2)
+    { id:"SCI01", cat:"🔭 Ciência", name:"Deep Space", desc:"Cosmos escuro, estrelas e nebulosas — NASA awards",
+      p:{ bg:"#010208", ac:"#6080ff", cb:"#030510" },
+      theme:{ bg:"#010208", surface:"#030510", accent:"#6080ff", accent2:"#a0b0ff", text:"#d0d8ff", textMuted:"#3a4070", cardBg:"#030510", cardBorder:"#0a1030", fontDisplay:"'Space Mono', monospace", fontBody:"'DM Sans', sans-serif", radius:"12px" } },
+    { id:"SCI02", cat:"🔭 Ciência", name:"Lab Green", desc:"Verde laboratório, fundo branco — Prémio Nobel",
+      p:{ bg:"#f4fff6", ac:"#008040", cb:"#eafff0" },
+      theme:{ bg:"#f4fff6", surface:"#eafff0", accent:"#008040", accent2:"#40c070", text:"#001a08", textMuted:"#3a7050", cardBg:"#eafff0", cardBorder:"#b0ddb8", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Inter', sans-serif", radius:"8px" } },
+    // POLÍTICA (1)
+    { id:"POL01", cat:"🗳 Política", name:"Eleições", desc:"Azul institucional sério, limpo e democrático",
+      p:{ bg:"#f0f4f8", ac:"#1a4a8c", cb:"#e4ecf4" },
+      theme:{ bg:"#f0f4f8", surface:"#e4ecf4", accent:"#1a4a8c", accent2:"#4a7acc", text:"#0a1a30", textMuted:"#4a6080", cardBg:"#e4ecf4", cardBorder:"#c0d0e0", fontDisplay:"'Outfit', sans-serif", fontBody:"'Inter', sans-serif", radius:"8px" } },
+    // NATUREZA (1)
+    { id:"NAT01", cat:"🌿 Natureza", name:"Floresta Profunda", desc:"Verde musgo, terra e madeira — sustentável e orgânico",
+      p:{ bg:"#020a02", ac:"#5ac84a", cb:"#040f04" },
+      theme:{ bg:"#020a02", surface:"#040f04", accent:"#5ac84a", accent2:"#90e080", text:"#e8f5e8", textMuted:"#3a6030", cardBg:"#040f04", cardBorder:"#0a2008", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'DM Sans', sans-serif", radius:"20px" } },
+    // FESTIVAL (1)
+    { id:"FES01", cat:"🎉 Festival", name:"Carnaval", desc:"Cores explosivas, confetti, Carnaval do Rio",
+      p:{ bg:"#1a0020", ac:"#ff4400", cb:"#260030" },
+      theme:{ bg:"#1a0020", surface:"#260030", accent:"#ff4400", accent2:"#ffaa00", text:"#fff8e0", textMuted:"#7a4060", cardBg:"#260030", cardBorder:"#400050", fontDisplay:"'Bebas Neue', sans-serif", fontBody:"'Outfit', sans-serif", radius:"24px" } },
+    // MINIMALISTA (1)
+    { id:"MIN01", cat:"⬜ Minimalista", name:"Pure White", desc:"Ultra minimalista — branco total, cinza suave, máxima elegância",
+      p:{ bg:"#ffffff", ac:"#333333", cb:"#f5f5f5" },
+      theme:{ bg:"#ffffff", surface:"#f5f5f5", accent:"#333333", accent2:"#666666", text:"#111111", textMuted:"#999999", cardBg:"#f5f5f5", cardBorder:"#e0e0e0", fontDisplay:"'Cormorant Garamond', serif", fontBody:"'Inter', sans-serif", radius:"4px" } },
+  ];
+
+  let tplActiveCat = 'all';
+  let tplAppliedId = null;
+
+  window.applyTemplate = async function(id) {
+    const t = TEMPLATES.find(x => x.id === id);
+    if (!t) return;
+    await set(ref(db, 'config/theme'), t.theme);
+    await set(ref(db, 'config/title'), t.name);
+    await set(ref(db, 'config/subtitle'), t.desc);
+    tplAppliedId = id;
+    document.querySelectorAll('.tpl-card').forEach(c => {
+      c.classList.toggle('tpl-applied', c.dataset.id === id);
+    });
+    showToast(`✨ "${t.name}" aplicado!`);
+  };
+
+  function buildTemplatesSection() {
+    const filterBar = document.getElementById('tpl-filter-bar');
+    const container = document.getElementById('tpl-container');
+    if (!filterBar || !container || filterBar.dataset.built) return;
+    filterBar.dataset.built = '1';
+
+    const cats = ['all', ...new Set(TEMPLATES.map(t => t.cat))];
+    cats.forEach(cat => {
+      const count = cat === 'all' ? TEMPLATES.length : TEMPLATES.filter(t => t.cat === cat).length;
+      const btn = document.createElement('button');
+      btn.className = 'tpl-filter-btn' + (cat === 'all' ? ' active' : '');
+      btn.textContent = cat === 'all' ? `Todos (${count})` : `${cat} (${count})`;
+      btn.onclick = () => {
+        tplActiveCat = cat;
+        filterBar.querySelectorAll('.tpl-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        container.querySelectorAll('.tpl-section-block').forEach(s => {
+          s.style.display = (cat === 'all' || s.dataset.cat === cat) ? 'block' : 'none';
+        });
+      };
+      filterBar.appendChild(btn);
+    });
+
+    const grouped = {};
+    TEMPLATES.forEach(t => { (grouped[t.cat] = grouped[t.cat] || []).push(t); });
+
+    Object.entries(grouped).forEach(([cat, list]) => {
+      const block = document.createElement('div');
+      block.className = 'tpl-section-block';
+      block.dataset.cat = cat;
+
+      const label = document.createElement('div');
+      label.className = 'tpl-cat-label';
+      label.innerHTML = `<span>${cat}</span>`;
+      block.appendChild(label);
+
+      const grid = document.createElement('div');
+      grid.className = 'tpl-grid';
+
+      list.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'tpl-card' + (tplAppliedId === t.id ? ' tpl-applied' : '');
+        card.dataset.id = t.id;
+        card.innerHTML = `
+          <div class="tpl-preview" style="background:${t.p.bg}">
+            <div class="tpl-mock-bar" style="border-color:${t.p.ac}33">
+              <div class="tpl-mock-dot" style="background:${t.p.ac}"></div>
+              <div class="tpl-mock-line" style="background:${t.p.ac};opacity:.7;width:55%"></div>
+              <div class="tpl-mock-line" style="background:${t.p.ac};opacity:.4;width:35%"></div>
+            </div>
+            <div class="tpl-mock-cards">
+              ${[1,2,3].map(() => `
+                <div class="tpl-mock-card" style="background:${t.p.cb};border-color:${t.p.ac}22">
+                  <div style="height:28px;border-radius:4px;background:${t.p.ac}20;margin-bottom:5px"></div>
+                  <div style="height:4px;border-radius:2px;background:${t.p.ac};opacity:.5;width:70%"></div>
+                  <div style="height:3px;border-radius:2px;background:${t.p.ac};opacity:.25;width:45%;margin-top:3px"></div>
+                  <div style="height:12px;border-radius:3px;border:1px solid ${t.p.ac};opacity:.6;margin-top:6px"></div>
+                </div>`).join('')}
+            </div>
+            <div class="tpl-id">${t.id}</div>
+          </div>
+          <div class="tpl-info">
+            <div class="tpl-name">${t.name}</div>
+            <div class="tpl-desc">${t.desc}</div>
+            <div class="tpl-swatches">
+              ${[t.p.bg, t.p.ac, t.p.cb].map(c => `<span class="tpl-swatch" style="background:${c}" title="${c}"></span>`).join('')}
+            </div>
+          </div>
+          <button class="tpl-apply-btn" onclick="applyTemplate('${t.id}')">
+            <span class="tpl-btn-normal">Aplicar Tema →</span>
+            <span class="tpl-btn-done">✓ Aplicado</span>
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+
+      block.appendChild(grid);
+      container.appendChild(block);
+    });
+  }
+
+  // Hook into showSection to build templates lazily
+  const _origShowSection = window.showSection;
+  window.showSection = function(name, el) {
+    _origShowSection(name, el);
+    if (name === 'templates') buildTemplatesSection();
+  };
 
   checkAuth();
 
@@ -799,7 +1029,113 @@ const firebaseConfig = {
     .sidebar { display: none; }
     .main-content { padding: 20px; }
   }
+
+  /* ── TEMPLATES ── */
+  .tpl-filter-btn {
+    padding: 6px 14px; border-radius: 7px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); font-family: 'Inter', sans-serif;
+    font-size: 0.75rem; cursor: pointer; transition: all .15s;
+    white-space: nowrap;
+  }
+  .tpl-filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .tpl-filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  .tpl-section-block { margin-bottom: 36px; }
+
+  .tpl-cat-label {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  }
+  .tpl-cat-label span {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    font-weight: 700; letter-spacing: .14em; color: var(--accent);
+  }
+  .tpl-cat-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .tpl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+  }
+
+  .tpl-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    position: relative;
+  }
+  .tpl-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(0,0,0,.4);
+  }
+  .tpl-card.tpl-applied { border-color: #4ade80; box-shadow: 0 0 0 1px #4ade8028; }
+
+  .tpl-preview {
+    height: 130px; padding: 12px 10px 10px;
+    position: relative; overflow: hidden;
+    transition: filter .2s;
+  }
+  .tpl-card:hover .tpl-preview { filter: brightness(1.1); }
+
+  .tpl-mock-bar {
+    display: flex; flex-direction: column; gap: 4px;
+    border-bottom: 1px solid; padding-bottom: 7px; margin-bottom: 8px;
+  }
+  .tpl-mock-dot { width: 7px; height: 7px; border-radius: 50%; margin-bottom: 2px; }
+  .tpl-mock-line { height: 4px; border-radius: 2px; }
+
+  .tpl-mock-cards { display: flex; gap: 5px; }
+  .tpl-mock-card { flex:1; border-radius: 5px; border: 1px solid; padding: 5px; }
+
+  .tpl-id {
+    position: absolute; top: 7px; right: 7px;
+    font-family: 'Space Mono', monospace; font-size: .58rem;
+    font-weight: 700; padding: 2px 7px; border-radius: 3px;
+    background: rgba(0,0,0,.55); color: rgba(255,255,255,.55);
+    backdrop-filter: blur(4px);
+  }
+
+  .tpl-info { padding: 11px 13px 0; flex:1; }
+  .tpl-name {
+    font-family: 'Space Mono', monospace; font-size: .8rem; font-weight: 700;
+    color: var(--text); margin-bottom: 3px;
+  }
+  .tpl-card.tpl-applied .tpl-name { color: #4ade80; }
+  .tpl-desc { font-size: .72rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
+  .tpl-swatches { display:flex; gap:5px; margin-bottom: 12px; }
+  .tpl-swatch {
+    width:16px; height:16px; border-radius:50%;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.1);
+    transition: transform .15s; cursor: default;
+  }
+  .tpl-swatch:hover { transform: scale(1.3); }
+
+  .tpl-apply-btn {
+    margin: 0 13px 13px;
+    padding: 9px 12px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-muted);
+    font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 500;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tpl-apply-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tpl-card.tpl-applied .tpl-apply-btn { background: #4ade8018; border-color: #4ade80; color: #4ade80; }
+  .tpl-btn-normal { display:block; }
+  .tpl-btn-done   { display:none; }
+  .tpl-card.tpl-applied .tpl-btn-normal { display:none; }
+  .tpl-card.tpl-applied .tpl-btn-done   { display:block; }
 </style>
+<script>
+  function showSection(name, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec_' + name).classList.add('active');
+    el.classList.add('active');
+  }
+</script>
 </head>
 <body>
 
@@ -852,6 +1188,9 @@ const firebaseConfig = {
         </a>
         <a class="nav-item" href="display.html" target="_blank">
           <span class="icon">📺</span> Display OBS
+        </a>
+        <a class="nav-item" onclick="showSection('templates',this)">
+          <span class="icon">🎨</span> 37 Templates
         </a>
       </div>
     </aside>
@@ -1046,6 +1385,18 @@ const firebaseConfig = {
         <button class="btn btn-primary" onclick="saveTheme()">🎨 Aplicar Tema</button>
       </div>
 
+      <!-- SECTION: TEMPLATES -->
+      <div id="sec_templates" class="section">
+        <div class="page-header">
+          <div>
+            <h1>37 Templates</h1>
+            <p>Aplica instantaneamente — tema + título + subtítulo</p>
+          </div>
+        </div>
+        <div id="tpl-filter-bar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;"></div>
+        <div id="tpl-container"></div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -1091,13 +1442,5 @@ const firebaseConfig = {
 
 <div class="toast" id="toast"></div>
 
-<script>
-  function showSection(name, el) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('sec_' + name).classList.add('active');
-    el.classList.add('active');
-  }
-</script>
 </body>
 </html>
