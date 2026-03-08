@@ -5,15 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Votação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 
-<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   // ===== SUBSTITUI AQUI COM A TUA CONFIG FIREBASE =====
- const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
   authDomain: "aawards.firebaseapp.com",
   databaseURL: "https://aawards-default-rtdb.firebaseio.com",
@@ -31,533 +30,846 @@
   let currentConfig = null;
   let hasVoted = false;
   let votingOpen = false;
+  let initialized = false;
 
   const VOTE_KEY = "voted_session_" + window.location.hostname;
+  function getVotedId() { return localStorage.getItem(VOTE_KEY); }
+  function setVoted(id) { localStorage.setItem(VOTE_KEY, id); }
 
-  function getVotedId() {
-    return localStorage.getItem(VOTE_KEY);
-  }
-  function setVoted(candidateId) {
-    localStorage.setItem(VOTE_KEY, candidateId);
-  }
-
+  /* ── THEME ── */
   function applyTheme(theme) {
-    const root = document.documentElement;
     if (!theme) return;
-    root.style.setProperty('--bg', theme.bg || '#0a0a0a');
-    root.style.setProperty('--surface', theme.surface || '#141414');
-    root.style.setProperty('--accent', theme.accent || '#c9a84c');
-    root.style.setProperty('--accent2', theme.accent2 || '#e8d5a3');
-    root.style.setProperty('--text', theme.text || '#f5f0e8');
-    root.style.setProperty('--text-muted', theme.textMuted || '#888');
-    root.style.setProperty('--card-bg', theme.cardBg || '#1a1a1a');
-    root.style.setProperty('--card-border', theme.cardBorder || '#2a2a2a');
-    root.style.setProperty('--font-display', theme.fontDisplay || "'Playfair Display', serif");
-    root.style.setProperty('--font-body', theme.fontBody || "'DM Sans', sans-serif");
-    root.style.setProperty('--radius', theme.radius || '12px');
-
+    const r = document.documentElement;
+    r.style.setProperty('--bg',          theme.bg          || '#07060a');
+    r.style.setProperty('--surface',     theme.surface     || '#100f14');
+    r.style.setProperty('--accent',      theme.accent      || '#c8a96e');
+    r.style.setProperty('--accent2',     theme.accent2     || '#e8d5a3');
+    r.style.setProperty('--text',        theme.text        || '#f0ece4');
+    r.style.setProperty('--text-muted',  theme.textMuted   || '#6b6560');
+    r.style.setProperty('--card-bg',     theme.cardBg      || '#13121a');
+    r.style.setProperty('--card-border', theme.cardBorder  || '#252330');
+    r.style.setProperty('--font-display',theme.fontDisplay || "'Cormorant Garamond', serif");
+    r.style.setProperty('--font-body',   theme.fontBody    || "'Outfit', sans-serif");
+    r.style.setProperty('--radius',      theme.radius      || '16px');
     if (theme.bgImage) {
       document.body.style.backgroundImage = `url(${theme.bgImage})`;
       document.body.style.backgroundSize = 'cover';
-      document.body.style.backgroundPosition = 'center';
       document.body.style.backgroundAttachment = 'fixed';
     } else {
       document.body.style.backgroundImage = '';
     }
   }
 
+  /* ── CLOSED SCREEN ── */
+  function showClosedScreen(eventName) {
+    document.getElementById('closedScreen').style.display = 'flex';
+    document.getElementById('votingScreen').style.display = 'none';
+    document.getElementById('closedEventName').textContent = eventName || '';
+    // trigger animation reset
+    const el = document.getElementById('closedScreen');
+    el.classList.remove('visible');
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
+  }
+
+  function showVotingScreen() {
+    document.getElementById('closedScreen').style.display = 'none';
+    document.getElementById('votingScreen').style.display = 'block';
+  }
+
+  /* ── CANDIDATES ── */
   function renderCandidates(candidates, votedId) {
     const grid = document.getElementById('candidatesGrid');
     if (!candidates || candidates.length === 0) {
-      grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:60px 0;">Sem candidatos disponíveis.</p>';
+      grid.innerHTML = `<div class="empty-msg">Sem candidatos disponíveis de momento.</div>`;
       return;
     }
     grid.innerHTML = '';
     candidates.forEach((c, i) => {
       const isVoted = votedId === c.id;
+      const alreadyVoted = !!votedId;
       const card = document.createElement('div');
-      card.className = 'candidate-card' + (isVoted ? ' voted' : '');
-      card.style.animationDelay = (i * 0.07) + 's';
+      card.className = 'card' + (isVoted ? ' card--voted' : '') + (alreadyVoted && !isVoted ? ' card--dimmed' : '');
+      card.style.setProperty('--delay', i * 0.06 + 's');
+
       card.innerHTML = `
-        <div class="candidate-number">${String(i+1).padStart(2,'0')}</div>
-        <div class="candidate-img-wrap">
-          ${c.photo ? `<img src="${c.photo}" alt="${c.name}" class="candidate-img"/>` : `<div class="candidate-img-placeholder"><span>${c.name.charAt(0)}</span></div>`}
-          ${isVoted ? '<div class="voted-badge"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>' : ''}
+        <div class="card__num">${String(i+1).padStart(2,'0')}</div>
+
+        <div class="card__photo-wrap">
+          ${c.photo
+            ? `<img src="${c.photo}" alt="${c.name}" class="card__photo"/>`
+            : `<div class="card__photo-placeholder">${c.name.charAt(0).toUpperCase()}</div>`
+          }
+          ${isVoted ? `
+            <div class="card__check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>` : ''}
         </div>
-        <div class="candidate-info">
-          <div class="candidate-name">${c.name}</div>
-          ${c.subtitle ? `<div class="candidate-subtitle">${c.subtitle}</div>` : ''}
-          ${c.description ? `<div class="candidate-desc">${c.description}</div>` : ''}
+
+        <div class="card__body">
+          <div class="card__name">${c.name}</div>
+          ${c.subtitle ? `<div class="card__subtitle">${c.subtitle}</div>` : ''}
+          ${c.description ? `<div class="card__desc">${c.description}</div>` : ''}
         </div>
-        ${!votedId ? `<button class="vote-btn" data-id="${c.id}" data-name="${c.name}">
-          <span>Votar</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>` : (isVoted ? '<div class="voted-label">O teu voto</div>' : '<div class="not-voted-label">—</div>')}
+
+        <div class="card__footer">
+          ${!alreadyVoted
+            ? `<button class="vote-btn" data-id="${c.id}" data-name="${c.name}">
+                <span class="vote-btn__text">Votar</span>
+                <span class="vote-btn__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </span>
+               </button>`
+            : isVoted
+              ? `<div class="voted-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg> O teu voto</div>`
+              : `<div class="voted-other"></div>`
+          }
+        </div>
       `;
-      if (!votedId) {
+
+      if (!alreadyVoted) {
         card.querySelector('.vote-btn').addEventListener('click', () => castVote(c.id, c.name));
       }
       grid.appendChild(card);
     });
   }
 
-  async function castVote(candidateId, candidateName) {
+  /* ── CAST VOTE ── */
+  async function castVote(id, name) {
     if (hasVoted || !votingOpen) return;
-    const modal = document.getElementById('confirmModal');
-    document.getElementById('confirmName').textContent = candidateName;
-    modal.classList.add('show');
+    document.getElementById('confirmName').textContent = name;
+    openModal('confirmModal');
     document.getElementById('confirmYes').onclick = async () => {
-      modal.classList.remove('show');
+      closeModal('confirmModal');
       hasVoted = true;
-      setVoted(candidateId);
-      const voteRef = ref(db, `votes/${candidateId}`);
-      const snap = await get(voteRef);
-      const current = snap.exists() ? snap.val() : 0;
-      await set(voteRef, current + 1);
-      reloadCandidates();
-      showThankYou(candidateName);
+      setVoted(id);
+      const vRef = ref(db, `votes/${id}`);
+      const snap = await get(vRef);
+      await set(vRef, (snap.exists() ? snap.val() : 0) + 1);
+      renderCandidates(currentConfig.candidates || [], id);
+      showThankYou(name);
     };
-    document.getElementById('confirmNo').onclick = () => modal.classList.remove('show');
-  }
-
-  function reloadCandidates() {
-    if (!currentConfig) return;
-    renderCandidates(currentConfig.candidates || [], getVotedId());
+    document.getElementById('confirmNo').onclick = () => closeModal('confirmModal');
   }
 
   function showThankYou(name) {
-    const toast = document.getElementById('toast');
-    document.getElementById('toastMsg').textContent = `Votaste em "${name}"! Obrigado!`;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 4000);
+    document.getElementById('toastMsg').textContent = `Votaste em "${name}"! Obrigado.`;
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4500);
   }
 
-  function updateStatus(isOpen) {
-    votingOpen = isOpen;
-    const statusEl = document.getElementById('votingStatus');
-    const statusDot = document.getElementById('statusDot');
-    if (isOpen) {
-      statusEl.textContent = 'Votação Aberta';
-      statusEl.className = 'status-badge open';
-      statusDot.className = 'status-dot open';
-    } else {
-      statusEl.textContent = 'Votação Fechada';
-      statusEl.className = 'status-badge closed';
-      statusDot.className = 'status-dot closed';
-    }
-    const grid = document.getElementById('candidatesGrid');
-    grid.className = isOpen ? 'candidates-grid' : 'candidates-grid voting-closed';
-  }
+  function openModal(id) { document.getElementById(id).classList.add('show'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-  // Listen for config changes
+  /* ── FIREBASE LISTENER ── */
   onValue(ref(db, 'config'), (snap) => {
     const data = snap.val();
     if (!data) return;
     currentConfig = data;
 
     applyTheme(data.theme);
-
-    document.getElementById('eventTitle').textContent = data.title || 'Votação';
+    const title = data.title || 'Votação';
+    document.title = title;
+    document.getElementById('eventTitle').textContent = title;
     document.getElementById('eventSubtitle').textContent = data.subtitle || '';
     document.getElementById('eventDescription').textContent = data.description || '';
-    document.title = data.title || 'Votação';
 
+    votingOpen = data.votingOpen || false;
     const voted = getVotedId();
-    renderCandidates(data.candidates || [], voted);
     if (voted) hasVoted = true;
 
-    updateStatus(data.votingOpen || false);
+    if (votingOpen) {
+      showVotingScreen();
+      updateStatusBar(true);
+      renderCandidates(data.candidates || [], voted);
+    } else {
+      showClosedScreen(title);
+      updateStatusBar(false);
+    }
+
+    if (!initialized) {
+      // fade in body
+      document.body.style.opacity = '1';
+      initialized = true;
+    }
   });
 
-  document.getElementById('confirmModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('confirmModal')) {
-      document.getElementById('confirmModal').classList.remove('show');
-    }
+  function updateStatusBar(isOpen) {
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    dot.className = 'status-dot ' + (isOpen ? 'open' : 'closed');
+    txt.textContent = isOpen ? 'Votação Aberta' : 'Votação Encerrada';
+    txt.style.color = isOpen ? 'var(--accent)' : 'var(--text-muted)';
+  }
+
+  document.getElementById('confirmModal').addEventListener('click', e => {
+    if (e.target.id === 'confirmModal') closeModal('confirmModal');
   });
 </script>
 
 <style>
   :root {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --accent: #c9a84c;
-    --accent2: #e8d5a3;
-    --text: #f5f0e8;
-    --text-muted: #777;
-    --card-bg: #1a1a1a;
-    --card-border: #2a2a2a;
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'DM Sans', sans-serif;
-    --radius: 12px;
+    --bg:           #07060a;
+    --surface:      #100f14;
+    --accent:       #c8a96e;
+    --accent2:      #e8d5a3;
+    --text:         #f0ece4;
+    --text-muted:   #6b6560;
+    --card-bg:      #13121a;
+    --card-border:  #252330;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body:    'Outfit', sans-serif;
+    --radius:       16px;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-body);
+    font-weight: 400;
     min-height: 100vh;
-    transition: background 0.5s, color 0.5s;
+    opacity: 0;
+    transition: opacity 0.6s ease, background 0.6s, color 0.4s;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .noise-overlay {
+  /* ── AMBIENT GLOWS ── */
+  .glow-layer {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.4;
+    overflow: hidden;
+  }
+  .glow {
+    position: absolute; border-radius: 50%;
+    filter: blur(160px); pointer-events: none;
+  }
+  .glow-1 {
+    width: 50vw; height: 50vw;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%);
+    top: -15vw; right: -10vw; opacity: 0.6;
+  }
+  .glow-2 {
+    width: 40vw; height: 40vw;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent2) 8%, transparent), transparent 70%);
+    bottom: 0; left: -5vw; opacity: 0.5;
   }
 
+  /* ── GRAIN ── */
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(20px, 4vw, 60px);
+    height: 56px;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    backdrop-filter: blur(20px) saturate(1.5);
+    border-bottom: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
+  }
+  .topbar-logo {
+    font-family: var(--font-display);
+    font-size: 1rem; font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    opacity: 0.8;
+  }
+  .status-pill {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 14px;
+    border-radius: 100px;
+    background: color-mix(in srgb, var(--card-bg) 90%, transparent);
+    border: 1px solid var(--card-border);
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-muted);
+    flex-shrink: 0;
+    transition: background 0.4s, box-shadow 0.4s;
+  }
+  .status-dot.open {
+    background: #5dde8a;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #5dde8a 20%, transparent);
+    animation: pulse-dot 2.4s ease infinite;
+  }
+  .status-dot.closed { background: #e05555; }
+  @keyframes pulse-dot {
+    0%,100% { box-shadow: 0 0 0 3px color-mix(in srgb, #5dde8a 20%, transparent); }
+    50%      { box-shadow: 0 0 0 6px color-mix(in srgb, #5dde8a 0%, transparent); }
+  }
+  #statusText {
+    font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    transition: color 0.4s;
+    color: var(--text-muted);
+  }
+
+  /* ── PAGE WRAP ── */
   .page-wrap {
-    position: relative; z-index: 1;
-    max-width: 1200px; margin: 0 auto; padding: 0 24px 80px;
+    position: relative; z-index: 2;
+    max-width: 1280px; margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 60px) 100px;
   }
 
-  /* HEADER */
+  /* ── HEADER ── */
   .site-header {
     text-align: center;
-    padding: 60px 0 48px;
-    border-bottom: 1px solid var(--card-border);
-    margin-bottom: 48px;
+    padding: clamp(52px, 8vw, 96px) 0 clamp(40px, 6vw, 64px);
+    margin-bottom: 56px;
     position: relative;
   }
+  .site-header::after {
+    content: '';
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: min(480px, 80%); height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+    opacity: 0.25;
+  }
 
-  .header-deco {
-    display: flex; align-items: center; justify-content: center;
-    gap: 16px; margin-bottom: 24px;
+  .header-ornament {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    margin-bottom: 28px;
+    animation: fadeDown 0.7s ease both;
   }
-  .header-deco-line {
-    height: 1px; width: 60px;
+  .orn-line {
+    flex: 1; max-width: 80px; height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent));
+    opacity: 0.5;
   }
-  .header-deco-line.right {
-    background: linear-gradient(90deg, var(--accent), transparent);
+  .orn-line.r { background: linear-gradient(90deg, var(--accent), transparent); }
+  .orn-star {
+    display: flex; gap: 5px; align-items: center;
   }
-  .header-deco-diamond {
-    width: 8px; height: 8px;
+  .orn-star span {
+    display: block; width: 5px; height: 5px;
     background: var(--accent);
     transform: rotate(45deg);
+    opacity: 0.8;
   }
+  .orn-star span:nth-child(2) { width: 7px; height: 7px; opacity: 1; }
 
   #eventTitle {
     font-family: var(--font-display);
-    font-size: clamp(2.4rem, 5vw, 4rem);
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
+    font-size: clamp(2.8rem, 6vw, 5.2rem);
+    font-weight: 700;
+    line-height: 1.0;
+    letter-spacing: -0.01em;
     color: var(--text);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    animation: fadeDown 0.7s 0.1s ease both;
   }
   #eventSubtitle {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+    font-weight: 300;
     color: var(--accent);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    animation: fadeDown 0.7s 0.18s ease both;
+    opacity: 0.9;
   }
   #eventDescription {
+    font-size: 0.9rem;
     color: var(--text-muted);
-    font-size: 0.95rem;
-    max-width: 500px; margin: 0 auto 24px;
-    line-height: 1.6;
+    max-width: 460px; margin: 0 auto;
+    line-height: 1.7;
+    animation: fadeDown 0.7s 0.24s ease both;
   }
 
-  .status-area {
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── VOTING SCREEN ── */
+  #votingScreen { display: none; }
+
+  /* Instruction strip */
+  .instruction-strip {
     display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 44px;
+    padding: 12px 24px;
+    background: color-mix(in srgb, var(--card-bg) 70%, transparent);
+    border: 1px solid var(--card-border);
+    border-radius: 100px;
+    width: fit-content; margin-left: auto; margin-right: auto;
+    animation: fadeUp 0.6s 0.3s ease both;
   }
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #555;
+  .instruction-strip svg { color: var(--accent); opacity: 0.8; flex-shrink:0; }
+  .instruction-strip span {
+    font-size: 0.8rem; font-weight: 400;
+    color: var(--text-muted); letter-spacing: 0.03em;
   }
-  .status-dot.open {
-    background: #4ade80;
-    box-shadow: 0 0 8px #4ade8088;
-    animation: pulse-dot 2s infinite;
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  .status-dot.closed { background: #ef4444; }
-  @keyframes pulse-dot {
-    0%,100% { box-shadow: 0 0 6px #4ade8066; }
-    50% { box-shadow: 0 0 14px #4ade80cc; }
-  }
-  .status-badge {
-    font-size: 0.8rem; font-weight: 500;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .status-badge.open { color: #4ade80; }
-  .status-badge.closed { color: #ef4444; }
 
-  /* GRID */
+  /* ── GRID ── */
   .candidates-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 20px;
   }
 
-  .candidates-grid.voting-closed .vote-btn { display: none; }
+  .empty-msg {
+    grid-column: 1/-1;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 80px 20px;
+    font-size: 0.9rem;
+  }
 
-  .candidate-card {
+  /* ── CARD ── */
+  .card {
+    --card-accent: var(--accent);
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: var(--radius);
-    padding: 24px;
-    display: flex; flex-direction: column; gap: 16px;
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 14px;
     position: relative; overflow: hidden;
-    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-    animation: fadeUp 0.5s both;
     cursor: default;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+    animation: cardIn 0.55s var(--delay, 0s) cubic-bezier(0.22, 1, 0.36, 1) both;
   }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(22px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
   }
-  .candidate-card:hover {
+  .card:hover {
+    border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px -10px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .card--voted {
     border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent),
+                0 16px 48px -8px rgba(0,0,0,0.5);
   }
-  .candidate-card.voted {
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--card-bg) 85%, var(--accent) 15%);
-  }
-  .candidate-card::before {
+  .card--voted:hover { transform: translateY(-4px); }
+  .card--dimmed { opacity: 0.45; }
+  .card--dimmed:hover { opacity: 0.65; transform: none; }
+
+  /* Shimmer top line */
+  .card::before {
     content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: 0; transition: opacity 0.25s;
+    transition: left 0.6s ease;
+    opacity: 0.8;
   }
-  .candidate-card:hover::before, .candidate-card.voted::before { opacity: 1; }
+  .card:hover::before, .card--voted::before { left: 100%; }
+  .card--voted::before { left: 0; width: 100%; transition: none; opacity: 1; animation: shimmer 2.4s 1s ease infinite; }
+  @keyframes shimmer {
+    0%   { left: -100%; opacity: 0.8; }
+    50%  { opacity: 1; }
+    100% { left: 100%; opacity: 0.8; }
+  }
 
-  .candidate-number {
+  .card__num {
     font-family: var(--font-display);
-    font-size: 0.75rem; font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.1em;
-    opacity: 0.7;
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--accent); opacity: 0.55;
   }
 
-  .candidate-img-wrap {
+  .card__photo-wrap {
     position: relative;
-    width: 100%; aspect-ratio: 1/1;
-    border-radius: calc(var(--radius) - 4px);
+    width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: calc(var(--radius) - 6px);
     overflow: hidden;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
   }
-  .candidate-img {
+  .card__photo {
     width: 100%; height: 100%;
     object-fit: cover;
-    transition: transform 0.4s;
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .candidate-card:hover .candidate-img { transform: scale(1.04); }
-  .candidate-img-placeholder {
+  .card:hover .card__photo { transform: scale(1.05); }
+
+  .card__photo-placeholder {
     width: 100%; height: 100%;
-    background: var(--surface);
     display: flex; align-items: center; justify-content: center;
-  }
-  .candidate-img-placeholder span {
     font-family: var(--font-display);
-    font-size: 3rem; font-weight: 900;
-    color: var(--accent); opacity: 0.4;
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.18;
+    background: linear-gradient(135deg, var(--card-bg), color-mix(in srgb, var(--accent) 6%, var(--card-bg)));
   }
 
-  .voted-badge {
-    position: absolute; top: 10px; right: 10px;
-    width: 36px; height: 36px; border-radius: 50%;
+  .card__check {
+    position: absolute; top: 12px; right: 12px;
+    width: 38px; height: 38px; border-radius: 50%;
     background: var(--accent);
     display: flex; align-items: center; justify-content: center;
-    color: #000;
+    box-shadow: 0 4px 16px -2px rgba(0,0,0,0.5);
+    animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .card__check svg { width: 18px; height: 18px; color: #000; }
+  @keyframes checkPop {
+    from { transform: scale(0) rotate(-30deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg); opacity: 1; }
   }
 
-  .candidate-info { flex: 1; }
-  .candidate-name {
+  .card__body { flex: 1; min-width: 0; }
+  .card__name {
     font-family: var(--font-display);
-    font-size: 1.15rem; font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
+    font-size: 1.2rem; font-weight: 600;
     line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 5px;
   }
-  .candidate-subtitle {
-    font-size: 0.82rem;
-    color: var(--accent);
-    font-style: italic;
+  .card--voted .card__name { color: var(--accent2); }
+  .card__subtitle {
+    font-size: 0.78rem; font-weight: 400;
+    color: var(--accent); opacity: 0.8;
+    letter-spacing: 0.02em;
     margin-bottom: 8px;
   }
-  .candidate-desc {
-    font-size: 0.82rem;
+  .card__desc {
+    font-size: 0.78rem;
     color: var(--text-muted);
-    line-height: 1.5;
+    line-height: 1.55;
   }
+
+  .card__footer { margin-top: auto; }
 
   .vote-btn {
     width: 100%;
-    padding: 12px 20px;
+    padding: 13px 18px;
     background: transparent;
-    border: 1px solid var(--accent);
-    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+    border-radius: calc(var(--radius) - 4px);
     color: var(--accent);
     font-family: var(--font-body);
-    font-size: 0.88rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: background 0.2s, color 0.2s, transform 0.15s;
-  }
-  .vote-btn:hover {
-    background: var(--accent);
-    color: #000;
-    transform: scale(1.02);
-  }
-  .vote-btn:active { transform: scale(0.98); }
-
-  .voted-label {
-    text-align: center;
     font-size: 0.82rem;
-    color: var(--accent);
     font-weight: 500;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
-    padding: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+    transition: background 0.22s, border-color 0.22s, color 0.22s, transform 0.18s, box-shadow 0.22s;
+    position: relative; overflow: hidden;
   }
-  .not-voted-label {
-    text-align: center;
-    color: var(--text-muted);
-    opacity: 0.3;
-    padding: 10px;
+  .vote-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+  }
+  .vote-btn:hover::after { transform: scaleX(1); }
+  .vote-btn:hover { color: #000; border-color: var(--accent); box-shadow: 0 6px 24px -4px rgba(0,0,0,0.4); }
+  .vote-btn:active { transform: scale(0.98); }
+  .vote-btn__text, .vote-btn__icon { position: relative; z-index: 1; }
+  .vote-btn__icon svg { width: 14px; height: 14px; display: block; }
+
+  .voted-pill {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 11px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius: calc(var(--radius) - 4px);
+    font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent);
   }
 
-  /* CLOSED OVERLAY */
-  .voting-closed-msg {
+  /* ── CLOSED SCREEN ── */
+  #closedScreen {
     display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 65vh;
     text-align: center;
-    padding: 80px 0;
-    color: var(--text-muted);
+    padding: 60px 20px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
   }
-  .candidates-grid.voting-closed + .voting-closed-msg { display: block; }
+  #closedScreen.visible { opacity: 1; }
 
-  /* CONFIRM MODAL */
+  .closed-icon {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--card-bg) 90%, transparent);
+    border: 1px solid var(--card-border);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 36px;
+    position: relative;
+    animation: closedIconIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .closed-icon::before {
+    content: '';
+    position: absolute; inset: -8px;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+  .closed-icon::after {
+    content: '';
+    position: absolute; inset: -18px;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+  .closed-icon svg { color: var(--accent); opacity: 0.7; }
+  @keyframes closedIconIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .closed-eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    animation: closedTextIn 0.7s 0.2s ease both;
+  }
+
+  .closed-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5.5vw, 4.4rem);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 20px;
+    animation: closedTextIn 0.7s 0.3s ease both;
+  }
+
+  .closed-event-name {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.5vw, 1.7rem);
+    font-weight: 300;
+    color: var(--accent);
+    padding: 10px 28px;
+    border-top: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+    animation: closedTextIn 0.7s 0.4s ease both;
+  }
+
+  .closed-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    max-width: 380px;
+    line-height: 1.7;
+    animation: closedTextIn 0.7s 0.5s ease both;
+  }
+
+  .closed-dots {
+    display: flex; gap: 8px; margin-top: 44px;
+    animation: closedTextIn 0.7s 0.6s ease both;
+  }
+  .closed-dots span {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); opacity: 0.3;
+    animation: dotPulse 2s ease infinite;
+  }
+  .closed-dots span:nth-child(2) { animation-delay: 0.4s; }
+  .closed-dots span:nth-child(3) { animation-delay: 0.8s; }
+  @keyframes dotPulse {
+    0%,100% { opacity: 0.2; transform: scale(1); }
+    50%      { opacity: 0.8; transform: scale(1.4); }
+  }
+  @keyframes closedTextIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── CONFIRM MODAL ── */
   .modal-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(6px);
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(12px) saturate(1.2);
     align-items: center; justify-content: center;
+    padding: 24px;
   }
   .modal-overlay.show { display: flex; }
+
   .modal-box {
-    background: var(--surface);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 40px;
-    max-width: 420px; width: 90%;
-    text-align: center;
-    animation: modalIn 0.25s ease;
-  }
-  @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.92) translateY(12px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  .modal-box h3 {
-    font-family: var(--font-display);
-    font-size: 1.5rem; margin-bottom: 10px;
-    color: var(--text);
-  }
-  .modal-box p {
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-  .modal-box .confirm-name {
-    font-family: var(--font-display);
-    font-size: 1.2rem; font-weight: 700;
-    color: var(--accent);
-    display: block; margin: 12px 0 28px;
-  }
-  .modal-btns { display: flex; gap: 12px; }
-  .modal-btns button {
-    flex: 1; padding: 14px;
-    border-radius: 8px; border: none;
-    font-family: var(--font-body);
-    font-size: 0.95rem; font-weight: 500;
-    cursor: pointer; transition: opacity 0.2s;
-  }
-  .modal-btns button:hover { opacity: 0.85; }
-  #confirmYes {
-    background: var(--accent);
-    color: #000;
-  }
-  #confirmNo {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    color: var(--text);
+    border-radius: 24px;
+    padding: clamp(32px, 5vw, 48px);
+    max-width: 420px; width: 100%;
+    text-align: center;
+    position: relative; overflow: hidden;
+    animation: modalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .modal-box::before {
+    content: '';
+    position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.5;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(24px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  /* TOAST */
+  .modal-box .modal-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .modal-box .modal-icon svg { color: var(--accent); }
+  .modal-box h3 {
+    font-family: var(--font-display);
+    font-size: 1.7rem; font-weight: 700;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .modal-box .modal-p {
+    font-size: 0.88rem; color: var(--text-muted);
+    line-height: 1.6; margin-bottom: 4px;
+  }
+  .modal-box .confirm-name {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.4rem; font-weight: 600;
+    color: var(--accent);
+    padding: 12px 0 20px;
+  }
+  .modal-box .modal-warn {
+    font-size: 0.74rem;
+    color: var(--text-muted); opacity: 0.7;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns button {
+    flex: 1; padding: 15px;
+    border-radius: 12px; border: none;
+    font-family: var(--font-body);
+    font-size: 0.88rem; font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .modal-btns button:hover { opacity: 0.85; }
+  .modal-btns button:active { transform: scale(0.97); }
+  #confirmYes { background: var(--accent); color: #000; font-weight: 600; }
+  #confirmNo  { background: color-mix(in srgb, var(--surface) 80%, transparent); border: 1px solid var(--card-border); color: var(--text-muted); }
+
+  /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 32px; left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: var(--accent);
-    color: #000;
-    padding: 14px 28px;
-    border-radius: 50px;
-    font-weight: 500;
-    font-size: 0.95rem;
-    z-index: 200;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateX(-50%) translateY(80px);
+    display: flex; align-items: center; gap: 10px;
+    background: color-mix(in srgb, var(--card-bg) 95%, transparent);
+    border: 1px solid var(--card-border);
+    border-left: 3px solid var(--accent);
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-size: 0.88rem; font-weight: 400;
+    z-index: 300;
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
     white-space: nowrap;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
   }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast-icon { color: var(--accent); font-size: 1rem; }
 
-  /* CLOSED STATE */
-  .closed-state {
-    text-align: center;
-    padding: 80px 20px;
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .candidates-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .card { padding: 14px; gap: 10px; }
+    #eventTitle { font-size: 2.4rem; }
+    .instruction-strip { padding: 10px 18px; }
   }
-  .closed-state svg { color: var(--text-muted); margin-bottom: 20px; }
-  .closed-state h3 {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-  }
-  .closed-state p { color: var(--text-muted); font-size: 0.9rem; }
-
-  @media (max-width: 600px) {
-    .candidates-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
-    .candidate-card { padding: 16px; }
-    .site-header { padding: 40px 0 32px; }
-  }
-  @media (max-width: 400px) {
+  @media (max-width: 360px) {
     .candidates-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
-<div class="noise-overlay"></div>
+
+<div class="glow-layer">
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+</div>
+<div class="grain"></div>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-logo" id="topbarTitle">VOTE</div>
+  <div class="status-pill">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">—</span>
+  </div>
+</nav>
+
 <div class="page-wrap">
+
+  <!-- HEADER -->
   <header class="site-header">
-    <div class="header-deco">
-      <div class="header-deco-line"></div>
-      <div class="header-deco-diamond"></div>
-      <div class="header-deco-line right"></div>
+    <div class="header-ornament">
+      <div class="orn-line"></div>
+      <div class="orn-star">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="orn-line r"></div>
     </div>
-    <h1 id="eventTitle">A carregar...</h1>
+    <h1 id="eventTitle">A carregar…</h1>
     <div id="eventSubtitle"></div>
     <p id="eventDescription"></p>
-    <div class="status-area">
-      <div id="statusDot" class="status-dot"></div>
-      <span id="votingStatus" class="status-badge">—</span>
-    </div>
   </header>
 
-  <div id="candidatesGrid" class="candidates-grid"></div>
+  <!-- ── CLOSED SCREEN ── -->
+  <div id="closedScreen">
+    <div class="closed-icon">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <p class="closed-eyebrow">Em breve</p>
+    <h2 class="closed-headline">As votações ainda<br/>não abriram</h2>
+    <span class="closed-event-name" id="closedEventName"></span>
+    <p class="closed-sub">Aguarda pela abertura oficial da votação. A página actualiza-se automaticamente quando estiver disponível.</p>
+    <div class="closed-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- ── VOTING SCREEN ── -->
+  <div id="votingScreen">
+    <div class="instruction-strip">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>Escolhe o teu favorito — apenas um voto por pessoa</span>
+    </div>
+    <div class="candidates-grid" id="candidatesGrid"></div>
+  </div>
+
 </div>
 
-<!-- Confirm Modal -->
+<!-- CONFIRM MODAL -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
+    <div class="modal-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
     <h3>Confirmar Voto</h3>
-    <p>Tens a certeza que queres votar em</p>
+    <p class="modal-p">Estás prestes a votar em</p>
     <span class="confirm-name" id="confirmName"></span>
-    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:24px;">O voto é definitivo e não pode ser alterado.</p>
+    <p class="modal-warn">O voto é definitivo e não pode ser alterado ou retirado.</p>
     <div class="modal-btns">
       <button id="confirmNo">Cancelar</button>
       <button id="confirmYes">Confirmar Voto</button>
@@ -565,9 +877,11 @@
   </div>
 </div>
 
-<!-- Toast -->
+<!-- TOAST -->
 <div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
   <span id="toastMsg"></span>
 </div>
+
 </body>
 </html>
