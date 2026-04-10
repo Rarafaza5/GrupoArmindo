@@ -1,0 +1,461 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    --bg-color: #F8F7F3; /* Ultra premium cream paper */
+    --text-primary: #0A0A0A; /* Obsidian black */
+    --text-secondary: #5A5A58; 
+    --border-color: rgba(10, 10, 10, 0.15);
+    --border-dark: #0A0A0A;
+    --accent: #C5A059; /* Oscar Gold */
+    --accent-dark: #A38242;
+    
+    --font-heading: 'Cinzel', serif; /* Cinematic, Oscar-worthy serif */
+    --font-editorial: 'Cormorant Garamond', serif; /* Gorgeous reading typography */
+    --font-ui: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Luxurious Paper Texture Overlay */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+body {
+    font-family: var(--font-editorial);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animations */
+@keyframes revealUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drawLine {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Header & Navigation */
+.header {
+    padding: 2.5rem 5% 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    animation: fadeIn 1.5s ease-out;
+}
+
+.date-bar {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 1.5rem;
+    position: relative;
+    font-weight: 500;
+}
+
+.date-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--border-color);
+    transform-origin: left;
+    animation: drawLine 1.5s cubic-bezier(0.86, 0, 0.07, 1) forwards;
+}
+
+.logo-container {
+    text-align: center;
+    margin: 3rem 0 2rem;
+    overflow: hidden;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-size: clamp(4rem, 8vw, 7rem);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -2px;
+    line-height: 1;
+    display: inline-block;
+    animation: revealUp 1.2s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.logo-subtitle {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    animation: fadeIn 2s ease-out 0.5s both;
+}
+
+.nav-links {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border-dark);
+    border-bottom: 1px solid var(--border-dark);
+    margin: 0 auto 3rem;
+    max-width: 100%;
+}
+
+.nav-link {
+    font-family: var(--font-ui);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    font-weight: 500;
+    text-transform: uppercase;
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+span.highlight-nav {
+    color: var(--accent);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 1px;
+    background-color: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.btn-primary {
+    font-family: var(--font-ui);
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    padding: 0.75rem 2rem;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    border-radius: 0; /* Strict editorial square */
+    background: linear-gradient(to top, var(--text-primary) 50%, transparent 50%);
+    background-size: 100% 200%;
+    background-position: top;
+}
+
+.btn-primary:hover {
+    color: var(--bg-color);
+    background-position: bottom;
+}
+
+/* Container */
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 5% 6rem;
+}
+
+.section-label {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: var(--accent);
+}
+
+.section-label::before, .section-label::after {
+    content: '';
+    height: 1px;
+    flex-grow: 1;
+    background: var(--border-color);
+}
+
+/* Oscar-worthy Grid (Asymmetrical Masonry feel) */
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 4rem 3rem;
+}
+
+/* Card General Logic */
+.card {
+    text-decoration: none;
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    group;
+    position: relative;
+    opacity: 0; /* For JS reveal */
+    animation: revealUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.card:hover .card-title {
+    color: var(--accent-dark);
+}
+
+.card-category {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.card-title {
+    font-family: var(--font-editorial);
+    font-size: 2.2rem;
+    line-height: 1.1;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    transition: color 0.4s ease;
+}
+
+.card-excerpt {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    flex-grow: 1;
+    font-weight: 300;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-meta {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    font-weight: 500;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* The Grand Layout: First article spans massive area like Vogue / NYT Magazine */
+.card:nth-child(1) { grid-column: span 12; border-bottom: 1px solid var(--border-dark); padding-bottom: 4rem; margin-bottom: 2rem; }
+.card:nth-child(1) .card-title { font-size: clamp(3rem, 6vw, 5.5rem); font-family: var(--font-heading); margin-bottom: 2rem; }
+.card:nth-child(1) .card-excerpt { font-size: 1.25rem; font-family: var(--font-editorial); column-count: 2; column-gap: 3rem; -webkit-line-clamp: 10; display: block; }
+.card:nth-child(1) .card-category { border: 1px solid var(--accent); padding: 0.3rem 1rem; border-radius: 50px; }
+
+/* Secondary articles logic */
+.card:nth-child(2) { grid-column: span 8; border-right: 1px solid var(--border-color); padding-right: 3rem; }
+.card:nth-child(3) { grid-column: span 4; }
+
+.card:nth-child(n+4) { grid-column: span 4; border-top: 1px solid var(--border-color); padding-top: 3rem; }
+
+/* Writer Form Area (The Editor's Desk) */
+.writer-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: transparent;
+    padding: 2rem 0;
+}
+
+.writer-container h2 {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.editor-desc {
+    text-align: center;
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 4rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+/* Minimalist input floating label styling */
+input, select, textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    color: var(--text-primary);
+    font-family: var(--font-editorial);
+    font-size: 1.5rem;
+    transition: all 0.4s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+}
+
+input::placeholder, textarea::placeholder {
+    color: #b0b0b0;
+    font-style: italic;
+    font-family: var(--font-editorial);
+}
+
+textarea {
+    min-height: 500px;
+    resize: vertical;
+    font-size: 1.25rem;
+    line-height: 1.8;
+}
+
+label {
+    display: none; /* We use gorgeous placeholders here for pure visual art */
+}
+
+/* Article Reader */
+.article-header {
+    max-width: 900px;
+    margin: 3rem auto 5rem;
+    text-align: center;
+}
+
+.article-category {
+    font-family: var(--font-ui);
+    display: inline-block;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--accent);
+    padding: 0.4rem 1.5rem;
+    border-radius: 50px;
+}
+
+.article-title {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 1.05;
+    margin-bottom: 2.5rem;
+    font-weight: 600;
+}
+
+.article-meta {
+    font-family: var(--font-ui);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-weight: 500;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+}
+
+.article-content {
+    max-width: 750px;
+    margin: 0 auto 8rem;
+    font-family: var(--font-editorial);
+    font-size: 1.4rem;
+    line-height: 1.9;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    font-weight: 400;
+}
+
+.article-content::first-letter {
+    font-family: var(--font-heading);
+    font-size: 6rem;
+    line-height: 0.8;
+    float: left;
+    margin-right: 1rem;
+    color: var(--accent);
+}
+
+/* Loader */
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    border-top-color: var(--accent);
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    margin: 6rem auto;
+}
+
+.hidden { display: none !important; }
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .card:nth-child(1) .card-excerpt { column-count: 1; }
+    .card:nth-child(2) { grid-column: span 12; border-right: none; border-bottom: 1px solid var(--border-color); padding-right: 0; padding-bottom: 3rem; margin-bottom: 3rem;}
+    .card:nth-child(3), .card:nth-child(n+4) { grid-column: span 6; }
+}
+
+@media (max-width: 768px) {
+    .nav-links { flex-wrap: wrap; gap: 1rem; flex-direction: column;}
+    .card:nth-child(3), .card:nth-child(n+4) { grid-column: span 12; border-top: none; border-bottom: 1px solid var(--border-color); padding-top: 0; padding-bottom: 3rem; margin-bottom: 3rem;}
+    .article-title { font-size: 2.5rem; }
+    .article-content { font-size: 1.2rem; }
+}

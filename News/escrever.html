@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Sua Crónica | Shaaare</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="date-bar">
+            <span>Sala de Imprensa</span>
+            <span id="current-date">A Carregar...</span>
+            <span>Acesso Livre</span>
+        </div>
+        
+        <div class="logo-container">
+            <a href="index.html" class="logo">Shaaare<span>.</span></a>
+        </div>
+
+        <nav class="nav-links">
+            <a href="index.html" class="nav-link">O Fio da Notícia</a>
+            <a href="escrever.html" class="btn-primary">A Sua Crónica</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="writer-container">
+            <h2>A Voz do Autor</h2>
+            <p class="editor-desc">Deixe a sua marca literária. Partilhe uma visão distinta sem constrangimentos.</p>
+            
+            <form id="write-form">
+                <div class="form-group">
+                    <input type="text" id="titulo" placeholder="O título da sua obra prima..." required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" id="autor" placeholder="Assinado por (O seu nome)..." required>
+                </div>
+                
+                <div class="form-group">
+                    <select id="categoria" required>
+                        <option value="" disabled selected>Selecione a Secção Editorial...</option>
+                        <option value="Notícia">Notícia de Primeira Linha</option>
+                        <option value="Opinião">Artigo de Opinião</option>
+                        <option value="Crónica">Crónica Literária</option>
+                        <option value="Ensaio">Ensaio Pormenorizado</option>
+                        <option value="Reportagem">Reportagem Especial</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <textarea id="conteudo" placeholder="Comece aqui a sua redação formidável..." required></textarea>
+                </div>
+                
+                <button type="submit" id="submit-btn" class="btn-primary" style="align-self: center;">Concluir e Publicar Edição</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-PT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    </script>
+    <script type="module" src="js/escrever.js"></script>
+</body>
+</html>

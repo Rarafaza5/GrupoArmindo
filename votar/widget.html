@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1920"/>
+<title>Widget — Contador de Votos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+    authDomain: "aawards.firebaseapp.com",
+    databaseURL: "https://aawards-default-rtdb.firebaseio.com",
+    projectId: "aawards",
+    storageBucket: "aawards.firebasestorage.app",
+    messagingSenderId: "839334918366",
+    appId: "1:839334918366:web:454a259fa3e2665b46ea4f",
+    measurementId: "G-NLLMB9THVX"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let lastTotal = 0;
+  let config = {};
+
+  function applyTheme(theme) {
+    if (!theme) return;
+    const r = document.documentElement;
+    r.style.setProperty('--accent', theme.accent || '#c8a96e');
+    r.style.setProperty('--accent2', theme.accent2 || '#e8d5a3');
+    r.style.setProperty('--text', theme.text || '#f0ece4');
+    r.style.setProperty('--font-display', theme.fontDisplay || "'Cormorant Garamond', serif");
+    r.style.setProperty('--font-body', theme.fontBody || "'Outfit', sans-serif");
+  }
+
+  function animateCounter(from, to, duration) {
+    const el = document.getElementById('voteNumber');
+    const start = performance.now();
+    const diff = to - from;
+    if (diff === 0) { el.textContent = to; return; }
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(from + diff * ease);
+      el.textContent = current;
+      if (progress < 1) requestAnimationFrame(tick);
+      else el.textContent = to;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function triggerPulse() {
+    const ring = document.getElementById('pulseRing');
+    ring.classList.remove('animate');
+    void ring.offsetWidth;
+    ring.classList.add('animate');
+
+    const ring2 = document.getElementById('pulseRing2');
+    ring2.classList.remove('animate');
+    void ring2.offsetWidth;
+    ring2.classList.add('animate');
+
+    const floater = document.createElement('div');
+    floater.className = 'float-plus';
+    floater.textContent = '+1';
+    document.getElementById('widget').appendChild(floater);
+    setTimeout(() => floater.remove(), 1300);
+
+    const glow = document.getElementById('glowFlash');
+    glow.classList.remove('flash');
+    void glow.offsetWidth;
+    glow.classList.add('flash');
+  }
+
+  function emitSparkles() {
+    const container = document.getElementById('sparkleContainer');
+    for (let i = 0; i < 14; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'sparkle';
+      const angle = (Math.PI * 2 * i) / 14;
+      const dist = 65 + Math.random() * 45;
+      const x = Math.cos(angle) * dist;
+      const y = Math.sin(angle) * dist;
+      spark.style.setProperty('--tx', x + 'px');
+      spark.style.setProperty('--ty', y + 'px');
+      spark.style.animationDelay = (Math.random() * 0.12) + 's';
+      spark.style.background = Math.random() > 0.5 ? 'var(--accent)' : 'var(--accent2)';
+      container.appendChild(spark);
+      setTimeout(() => spark.remove(), 950);
+    }
+  }
+
+  onValue(ref(db, 'config'), (snap) => {
+    config = snap.val() || {};
+    applyTheme(config.theme);
+    document.getElementById('eventName').textContent = config.title || '';
+    const isOpen = config.votingOpen || false;
+    document.getElementById('statusDot').className = 'status-dot ' + (isOpen ? 'open' : 'closed');
+    document.getElementById('statusLabel').textContent = isOpen ? 'AO VIVO' : 'ENCERRADO';
+    document.getElementById('statusLabel').style.color = isOpen ? '#5dde8a' : '#ef4444';
+  });
+
+  onValue(ref(db, 'votes'), (snap) => {
+    const votes = snap.val() || {};
+    const total = Object.values(votes).reduce((s, v) => s + (typeof v === 'number' ? v : 0), 0);
+    if (total > lastTotal && lastTotal > 0) {
+      triggerPulse();
+      emitSparkles();
+    }
+    animateCounter(lastTotal, total, 650);
+    lastTotal = total;
+  });
+</script>
+
+<style>
+  :root {
+    --accent: #c8a96e;
+    --accent2: #e8d5a3;
+    --text: #f0ece4;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Outfit', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: transparent;
+    overflow: hidden;
+    width: 440px;
+    height: 210px;
+  }
+
+  #widget {
+    width: 420px;
+    height: 188px;
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    padding: 24px 32px;
+    position: relative;
+    background: rgba(8, 6, 12, 0.88);
+    border: 1px solid rgba(200, 169, 110, 0.18);
+    border-radius: 22px;
+    backdrop-filter: blur(20px);
+    box-shadow:
+      0 24px 72px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(255,255,255,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    margin: 11px;
+    overflow: hidden;
+  }
+
+  /* Gradient noise texture */
+  #widget::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 30% 0%, rgba(200,169,110,0.06), transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Top accent line */
+  #widget::before {
+    content: '';
+    position: absolute; top: 0; left: 18%; right: 18%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.55;
+  }
+
+  /* Glow flash on vote */
+  #glowFlash {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 35% 50%, rgba(200,169,110,0.18), transparent 65%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  #glowFlash.flash {
+    animation: glowFlash 0.9s ease-out forwards;
+  }
+  @keyframes glowFlash {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Vote circle */
+  .vote-circle {
+    width: 118px; height: 118px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    z-index: 2;
+  }
+
+  .vote-circle-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(200,169,110,0.22);
+    background: linear-gradient(135deg,
+      rgba(200,169,110,0.08) 0%,
+      rgba(200,169,110,0.03) 50%,
+      rgba(200,169,110,0.07) 100%
+    );
+  }
+  .vote-circle-inner {
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(200,169,110,0.1);
+    background: rgba(200,169,110,0.04);
+  }
+  .vote-circle-dot {
+    position: absolute;
+    inset: 22px;
+    border-radius: 50%;
+    background: rgba(200,169,110,0.03);
+    border: 1px solid rgba(200,169,110,0.06);
+  }
+
+  #pulseRing {
+    position: absolute; inset: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #pulseRing.animate {
+    animation: pulseExpand 0.9s ease-out forwards;
+  }
+  #pulseRing2 {
+    position: absolute; inset: -6px;
+    border-radius: 50%;
+    border: 1px solid var(--accent2);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #pulseRing2.animate {
+    animation: pulseExpand 0.9s 0.15s ease-out forwards;
+  }
+  @keyframes pulseExpand {
+    0% { transform: scale(0.85); opacity: 0.95; }
+    100% { transform: scale(1.55); opacity: 0; }
+  }
+
+  #sparkleContainer {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 3;
+  }
+  .sparkle {
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    animation: sparkleMove 0.75s ease-out forwards;
+    box-shadow: 0 0 6px currentColor;
+  }
+  @keyframes sparkleMove {
+    0% { transform: translate(0,0) scale(1.2); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+  }
+
+  #voteNumber {
+    font-family: 'DM Mono', monospace;
+    font-size: 44px;
+    font-weight: 500;
+    color: var(--accent);
+    position: relative;
+    z-index: 4;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    text-shadow: 0 0 40px rgba(200,169,110,0.28);
+  }
+
+  /* Info side */
+  .info-side {
+    display: flex; flex-direction: column;
+    justify-content: center;
+    gap: 10px; flex: 1; min-width: 0;
+    z-index: 2;
+  }
+
+  .vote-label {
+    font-family: var(--font-body);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(240,236,228,0.38);
+  }
+
+  #eventName {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: linear-gradient(180deg, var(--text) 50%, color-mix(in srgb, var(--text) 55%, transparent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .divider-line {
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, rgba(200,169,110,0.2), transparent);
+  }
+
+  .status-row {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #555;
+    transition: all 0.4s;
+    flex-shrink: 0;
+  }
+  .status-dot.open {
+    background: #5dde8a;
+    box-shadow: 0 0 10px rgba(93,222,138,0.55);
+    animation: statusPulse 2.2s ease infinite;
+  }
+  .status-dot.closed { background: #ef4444; }
+  @keyframes statusPulse {
+    0%,100% { box-shadow: 0 0 6px rgba(93,222,138,0.35); }
+    50% { box-shadow: 0 0 14px rgba(93,222,138,0.65); }
+  }
+
+  #statusLabel {
+    font-family: var(--font-body);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #5dde8a;
+  }
+
+  /* Floating +1 */
+  .float-plus {
+    position: absolute;
+    left: 80px;
+    bottom: 58%;
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--accent);
+    pointer-events: none;
+    animation: floatUp 1.2s ease-out forwards;
+    text-shadow: 0 0 14px rgba(200,169,110,0.6);
+    z-index: 10;
+    letter-spacing: -0.02em;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1.1); }
+    55% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-65px) scale(0.65); }
+  }
+
+  /* Vertical separator */
+  .vert-divider {
+    width: 1px; height: 60px;
+    background: linear-gradient(180deg, transparent, rgba(200,169,110,0.2), transparent);
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="widget">
+  <div id="glowFlash"></div>
+
+  <div class="vote-circle">
+    <div class="vote-circle-ring"></div>
+    <div class="vote-circle-inner"></div>
+    <div class="vote-circle-dot"></div>
+    <div id="pulseRing"></div>
+    <div id="pulseRing2"></div>
+    <div id="sparkleContainer"></div>
+    <div id="voteNumber">0</div>
+  </div>
+
+  <div class="vert-divider"></div>
+
+  <div class="info-side">
+    <div class="vote-label">Total de Votos</div>
+    <div id="eventName"></div>
+    <div class="divider-line"></div>
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusLabel">—</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

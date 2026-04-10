@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shaaare - Editoria Premium do Grupo Armindo</title>
+    <meta name="description" content="O jornal de prestígio aberto à comunidade.">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="date-bar">
+            <span>Edição de Colecionador</span>
+            <span id="current-date">A Carregar...</span>
+            <span>Voz e Cultura</span>
+        </div>
+        
+        <div class="logo-container">
+            <a href="index.html" class="logo">Shaaare<span>.</span></a>
+            <div class="logo-subtitle">Jornalismo Comunitário Armindo</div>
+        </div>
+
+        <nav class="nav-links">
+            <a href="index.html" class="nav-link"><span class="highlight-nav">O</span> Fio da Notícia</a>
+            <a href="escrever.html" class="btn-primary">A Sua Crónica</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="section-label">A Primeira Página</div>
+        
+        <div id="loader" class="loader"></div>
+        <div id="articles-grid" class="articles-grid hidden">
+            <!-- Articles will be injected here via JS -->
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-PT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

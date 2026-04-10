@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitura | Shaaare</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="date-bar">
+            <span>Arquivo Literário</span>
+            <span id="current-date">A Carregar...</span>
+            <span>Edição Especial</span>
+        </div>
+        
+        <div class="logo-container">
+            <a href="index.html" class="logo">Shaaare<span>.</span></a>
+        </div>
+
+        <nav class="nav-links">
+            <a href="index.html" class="nav-link">O Fio da Notícia</a>
+            <a href="escrever.html" class="btn-primary">A Sua Crónica</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="loader" class="loader"></div>
+        
+        <article id="article-container" class="hidden">
+            <div class="article-header">
+                <span id="art-category" class="article-category">Categoria</span>
+                <h1 id="art-title" class="article-title">O Resvél do Tempo e a Poesia</h1>
+                <div class="article-meta">
+                    <span id="art-author">Por Autor</span>
+                    <span>&#10042;</span>
+                    <span id="art-date">Data</span>
+                </div>
+            </div>
+            
+            <div id="art-content" class="article-content">
+                <!-- Content goes here -->
+            </div>
+            
+            <div style="text-align: center; margin: 4rem 0 0;">
+                <a href="index.html" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.7rem;">&larr; Voltar ao Início</a>
+            </div>
+        </article>
+        
+        <div id="error-container" class="hidden" style="text-align: center; margin: 8rem auto;">
+            <p style="font-family: var(--font-heading); font-size: 4rem; color: var(--accent); margin-bottom: 1rem;">Opps</p>
+            <h2 style="font-family: var(--font-editorial); font-size: 2.5rem; margin-bottom: 1.5rem;">Arquivos Inalcançáveis</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 4rem; font-family: var(--font-editorial); font-size: 1.2rem; font-style: italic;">A peça jornalística que procura escapou-nos por entre os dedos do tempo.</p>
+            <a href="index.html" class="btn-primary">Folhear a Primeira Página</a>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-PT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    </script>
+    <script type="module" src="js/artigo.js"></script>
+</body>
+</html>
