@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bingo Armindo 🎱 — Party Edition</title>
+    <meta name="description" content="O melhor jogo de Bingo multiplayer online para festas e grupos. Joga com amigos em tempo real!">
+    <!-- Premium Typography -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="app.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- ============================================================ -->
+    <!-- WIN POPUP                                                     -->
+    <!-- ============================================================ -->
+    <div id="win-popup" class="modal hidden">
+        <div class="modal-content win-celebration">
+            <h2 id="win-title">🎉 Vitória!</h2>
+            <div class="neon-glow-icon" id="win-icon">🏆</div>
+            <p id="win-message" class="win-msg">Alguém completou o jogo!</p>
+            <button id="btn-close-win" class="btn primary huge mt-1">Continuar</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- KICKED POPUP                                                  -->
+    <!-- ============================================================ -->
+    <div id="kicked-popup" class="modal hidden">
+        <div class="modal-content kick-alert" style="max-width:400px;">
+            <div style="font-size:3rem;margin-bottom:1rem;">🚪</div>
+            <h2 class="error-msg" style="font-size:1.8rem;">Foste Expulso</h2>
+            <p style="margin: 1rem 0 1.5rem;">O anfitrião removeu-te desta sala. Podes tentar entrar noutra.</p>
+            <button id="btn-kicked-ok" class="btn outline huge">Voltar ao Lobby</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- LOBBY VIEW                                                    -->
+    <!-- ============================================================ -->
+    <main id="view-lobby" class="view active lobby-layout">
+
+        <canvas id="lobby-bg-canvas"></canvas>
+
+        <div class="card-panel">
+            <div class="logo-container">
+                <h1><span class="brand-bingo">🎱 BINGO</span> <span class="brand-name">Armindo</span></h1>
+                <p class="logo-tagline">Party Edition · Multiplayer Online</p>
+                <div class="logo-balls">
+                    <div class="logo-ball"></div>
+                    <div class="logo-ball"></div>
+                    <div class="logo-ball"></div>
+                    <div class="logo-ball"></div>
+                    <div class="logo-ball"></div>
+                </div>
+            </div>
+
+            <div class="lobby-actions">
+
+                <!-- HOST CARD -->
+                <div class="action-card" id="host-card">
+                    <span class="section-icon">👑</span>
+                    <h3>Anfitrião</h3>
+                    <p style="margin-bottom:1rem;">Cria a sala e controla o sorteio para toda a party.</p>
+
+                    <div class="input-group">
+                        <input type="text" id="host-name" placeholder="O teu Nome" maxlength="15" autocomplete="off" />
+                    </div>
+
+                    <span class="avatar-picker-label">Escolhe o teu Avatar</span>
+                    <div class="avatar-grid" id="host-avatar-grid"></div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                        <div class="input-group">
+                            <label>Cartões (1-15)</label>
+                            <input type="number" id="host-card-count" value="3" min="1" max="15" />
+                        </div>
+                        <div class="input-group">
+                            <label>Rondas do Torneio</label>
+                            <input type="number" id="host-rounds-count" value="1" min="1" max="50" />
+                        </div>
+                    </div>
+
+                    <button id="btn-create-room" class="btn primary huge mt-1">Criar Sala 🎉</button>
+                </div>
+
+                <!-- PLAYER CARD -->
+                <div class="action-card" id="player-card">
+                    <span class="section-icon">🎮</span>
+                    <h3>Convidado</h3>
+                    <p style="margin-bottom:1rem;">Insere o código e puxa uma cadeira para a party!</p>
+
+                    <div class="input-group">
+                        <input type="text" id="input-room-code" placeholder="Código da Sala (4 letras)" maxlength="4" autocomplete="off" style="text-transform:uppercase; letter-spacing:4px; font-weight:800; font-size:1.1rem; text-align:center;" />
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="input-player-name" placeholder="O teu Nome" maxlength="15" autocomplete="off" />
+                    </div>
+
+                    <span class="avatar-picker-label">Escolhe o teu Avatar</span>
+                    <div class="avatar-grid" id="player-avatar-grid"></div>
+
+                    <div class="input-group">
+                        <label>Número de Cartões</label>
+                        <input type="number" id="input-card-count" value="3" min="1" max="15" />
+                    </div>
+
+                    <button id="btn-join-room" class="btn secondary huge">Entrar na Party 🚀</button>
+                    <p id="join-error" class="error-msg"></p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- GAME VIEW                                                     -->
+    <!-- ============================================================ -->
+    <main id="view-game" class="view hidden game-layout">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="game-sidebar">
+
+            <!-- Tournament Badge -->
+            <div id="tournament-badge" class="tournament-badge hidden">
+                <span class="t-icon">🏆</span>
+                <span id="display-round-progress">Ronda 1 de 1</span>
+            </div>
+
+            <!-- Header -->
+            <div class="sidebar-header">
+                <h2>Sala <span id="game-room-code" class="highlight">---</span></h2>
+                <div class="controls-group">
+                    <button id="btn-copy-link" class="btn outline small" title="Copiar Link da Sala">🔗</button>
+                    <button id="btn-toggle-music" class="btn outline small" title="Música">🎵</button>
+                    <button id="btn-leave-room" class="btn outline small" title="Sair">🚪</button>
+                </div>
+            </div>
+
+            <!-- Player Info -->
+            <div class="sidebar-user-info">
+                <div class="user-avatar-display" id="display-player-avatar">🎮</div>
+                <div class="user-info-text">
+                    <div class="name" id="display-player-name">---</div>
+                    <div class="role" id="display-player-role">Jogador</div>
+                </div>
+                <div class="user-score-box">
+                    <div id="display-player-score" class="score-value">0</div>
+                    <div class="score-label">pts</div>
+                </div>
+            </div>
+
+            <!-- Auto-Mark Toggle (Guest only) -->
+            <div class="auto-mark-toggle" id="auto-mark-box">
+                <span class="auto-mark-label">🤖 Marcação Automática</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-mark-toggle" />
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <!-- HOST CONTROLS -->
+            <div id="host-control-panel" class="host-control-panel">
+                <div class="auto-draw-box">
+                    <span class="label">⚙️ Controlo de Sorteio</span>
+                    <div class="speed-controls">
+                        <div class="input-group">
+                            <label>Seg / Bola</label>
+                            <input type="number" id="input-draw-seconds" value="6" min="2" max="60" />
+                        </div>
+                        <div class="input-group">
+                            <label>Tempo Total (min)</label>
+                            <input type="number" id="input-total-minutes" placeholder="Ex: 5" min="1" max="60" />
+                        </div>
+                    </div>
+                    <button id="btn-start-draw" class="btn primary huge mt-1">▶ Iniciar Sorteio</button>
+                    <button id="btn-pause-draw" class="btn outline huge mt-1 hidden">⏸ Pausar</button>
+                    <button id="btn-next-round" class="btn secondary huge mt-1 hidden">⏭ Nova Ronda</button>
+                </div>
+
+                <div class="player-management">
+                    <div class="player-list-header">Jogadores na Sala</div>
+                    <ul id="player-list-ul" class="player-list"></ul>
+                </div>
+            </div>
+
+            <!-- Prize Box -->
+            <div class="sidebar-prize-box">
+                <div id="prize-icon" class="prize-icon">🔥</div>
+                <div id="display-current-prize" class="prize-value">1 Linha</div>
+                <div id="display-current-points" class="prize-points">50 Pontos</div>
+            </div>
+
+            <!-- History Board (Hidden on mobile) -->
+            <div class="history-board">
+                <span class="label">📋 Registo (<span id="drawn-count">0</span>/90)</span>
+                <div id="number-grid" class="number-grid"></div>
+            </div>
+
+        </aside>
+
+        <!-- RIGHT MAIN AREA -->
+        <section class="game-main-area">
+
+            <!-- Live Draw Bar -->
+            <div class="live-action-bar">
+
+                <div class="live-ball-container">
+                    <span class="draw-pulse">Última Bola</span>
+                    <div class="ball-shell" id="ball-shell">
+                        <span id="player-current-number" class="highlight-number">--</span>
+                    </div>
+                </div>
+
+                <div class="ball-info">
+                    <div id="ball-announcement" class="ball-text">A aguardar sorteio...</div>
+                    <div id="ball-count-display" class="ball-count">0 bolas sorteadas</div>
+                </div>
+
+                <!-- Timer (shown only when drawing) -->
+                <div class="timer-bar-wrapper" id="timer-wrapper" style="display:none;">
+                    <div class="timer-bar-label">⏱ Próxima Bola</div>
+                    <div class="timer-bar-track">
+                        <div class="timer-bar-fill" id="timer-bar-fill"></div>
+                    </div>
+                    <div class="timer-countdown" id="timer-countdown">--</div>
+                </div>
+
+                <button id="btn-call-bingo" class="btn secondary bingo-btn">BINGO!</button>
+            </div>
+
+            <!-- Tickets + Chat -->
+            <div class="game-bottom-area">
+
+                <!-- Ticket Area -->
+                <div class="ticket-vault">
+                    <div id="ticket-container" class="ticket-container"></div>
+                </div>
+
+                <!-- Chat Panel -->
+                <div class="chat-panel" id="chat-panel">
+                    <div class="chat-header">
+                        💬 Chat da Party
+                    </div>
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-reactions" id="chat-reactions"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Mensagem..." maxlength="60" autocomplete="off" />
+                        <button id="btn-send-chat">➤</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- FINAL PODIUM MODAL                                           -->
+    <!-- ============================================================ -->
+    <div id="podium-modal" class="modal hidden">
+        <div class="modal-content podium-layout">
+            <h1 class="podium-title">🏆 Fim do Torneio</h1>
+            <p class="podium-subtitle">A poeira assentou. Temos um Campeão!</p>
+
+            <div id="podium-list" class="podium-list"></div>
+
+            <div class="podium-actions">
+                <button id="btn-restart-tournament" class="btn primary huge hidden">🔄 Novo Torneio</button>
+                <p id="wait-host-restart" class="dim-text">A aguardar que o Anfitrião reinicie o torneio...</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
