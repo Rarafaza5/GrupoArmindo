@@ -38,6 +38,7 @@ if (!playerId) {
 }
 let isHost         = false;
 let myTickets      = [];
+let myCardCount    = 3;  // saved card count so round resets use the correct number
 let markedCells    = new Set();
 let allDrawnNumbers = [];
 let remainingNumbers = [];
@@ -55,6 +56,7 @@ let timerSecondsLeft = 0;
 
 // UI
 let wasDrawingBeforeWin = false;
+let winPopupShownForStage = -1;  // deduplication: track which stage we already showed
 let chatUnsubscribe    = null;
 let selectedHostAvatar = playerAvatar;
 let selectedPlayerAvatar = playerAvatar;
@@ -445,6 +447,7 @@ function setupGameScreen(cardCount) {
         hostPanel.classList.remove('active');
     }
 
+    myCardCount = cardCount;
     generatePlayerTickets(cardCount);
     switchView('game');
     initAudio();
@@ -464,14 +467,15 @@ function leaveRoom(wasKicked = false) {
     if (chatUnsubscribe) chatUnsubscribe();
 
     stopTimer();
-    currentRoomId    = null;
+    currentRoomId         = null;
     markedCells.clear();
-    allDrawnNumbers  = [];
-    myTickets        = [];
-    lastRoundId      = 0;
-    lastProcessedBall = 0;
-    isDrawing        = false;
-    chatUnsubscribe  = null;
+    allDrawnNumbers       = [];
+    myTickets             = [];
+    lastRoundId           = 0;
+    lastProcessedBall     = 0;
+    isDrawing             = false;
+    chatUnsubscribe       = null;
+    winPopupShownForStage = -1;
 
     document.getElementById('chat-messages').innerHTML = '';
     document.getElementById('timer-wrapper').style.display = 'none';
@@ -637,10 +641,15 @@ function listenToRoom() {
             }
         }
 
-        // Winner
-        if (data.winners) {
-            showWinPopup(data.winners, data.gameStage);
+        // Winner — only show once per stage transition to avoid re-showing on every Firebase update
+        if (data.winners && data.gameStage && (data.gameStage - 1) !== winPopupShownForStage) {
+            winPopupShownForStage = data.gameStage - 1;
+            showWinPopup(data.winners, data.gameStage - 1);
             startConfetti();
+        }
+        if (!data.winners) {
+            // reset so next win can show again
+            winPopupShownForStage = -1;
         }
 
         // My score
@@ -680,8 +689,8 @@ function listenToRoom() {
         // New round detected
         if (data.roundId && data.roundId !== lastRoundId) {
             lastRoundId = data.roundId;
-            const cardCount = parseInt(document.getElementById('input-card-count')?.value || 3);
-            generatePlayerTickets(cardCount);
+            winPopupShownForStage = -1; // reset so victories can show in the new round
+            generatePlayerTickets(myCardCount);
             document.getElementById('player-current-number').innerText = "--";
             document.getElementById('ball-announcement').innerText    = "Nova Ronda — Boa sorte!";
             document.getElementById('ball-count-display').innerText   = "0 bolas sorteadas";
@@ -1096,12 +1105,13 @@ function showWinPopup(message, stage) {
     const iconEl = document.getElementById('win-icon');
 
     msgEl.innerText  = message;
-    iconEl.innerText = icons[stage - 1] || '🏆';
+    iconEl.innerText = icons[stage] || '🏆';
     popup.classList.remove('hidden');
     popup.classList.add('active');
     playWinSound();
 
     let secondsLeft = 3;
+    let timerDone = false;
     closeBtn.innerText = `Continuar (${secondsLeft}s)`;
     closeBtn.disabled  = true;
 
@@ -1111,6 +1121,9 @@ function showWinPopup(message, stage) {
             closeBtn.innerText = `Continuar (${secondsLeft}s)`;
         } else {
             clearInterval(timer);
+            timerDone = true;
+            closeBtn.innerText = 'Continuar';
+            closeBtn.disabled = false;
             autoResume();
         }
     }, 1000);
@@ -1125,15 +1138,28 @@ function showWinPopup(message, stage) {
             }
         }
     }
+
+    // Store autoResume so manual close button can also trigger it
+    popup._autoResume = autoResume;
+    popup._cancelTimer = () => { if (!timerDone) { clearInterval(timer); closeBtn.disabled = false; closeBtn.innerText = 'Continuar'; } };
 }
 
 function closeWinPopup() {
     const popup = document.getElementById('win-popup');
+    if (popup._cancelTimer) popup._cancelTimer();
     popup.classList.remove('active');
     popup.classList.add('hidden');
 }
 
-document.getElementById('btn-close-win').addEventListener('click', closeWinPopup);
+document.getElementById('btn-close-win').addEventListener('click', async () => {
+    const popup = document.getElementById('win-popup');
+    // If the host closes manually, still clean up Firebase and resume drawing
+    if (popup._autoResume) {
+        await popup._autoResume();
+    } else {
+        closeWinPopup();
+    }
+});
 
 // ====== TICKET GENERATION ======
 function generatePlayerTickets(count) {

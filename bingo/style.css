@@ -219,11 +219,11 @@ select option { background: var(--bg-deep); }
     width: 100vw;
     height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 1rem;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 #lobby-bg-canvas {
@@ -245,6 +245,7 @@ select option { background: var(--bg-deep); }
     width: 100%;
     box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
     text-align: center;
+    margin: auto;
 }
 
 .logo-container {
