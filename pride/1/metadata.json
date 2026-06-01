@@ -1,0 +1,6 @@
+{
+  "name": "Grupo Armindo - Pride Doodle",
+  "description": "Um Google Doodle interativo celebrando o mês do orgulho para o Grupo Armindo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
