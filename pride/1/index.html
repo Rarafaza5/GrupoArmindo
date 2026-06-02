@@ -1,13 +1,114 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Grupo Armindo - Festival do Orgulho</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Start Screen -->
+  <div id="startScreen" class="overlay flex-center start-bg">
+    <div class="card p-8">
+      <h1>GRUPO ARMINDO</h1>
+      <h2 class="sub-title">FESTIVAL DO ORGULHO LGBTQIA+ 🏳️‍🌈🏳️‍⚧️</h2>
+      <p>
+        As cores do nosso desfile se espalharam pela ilha e as forças da <b>Intolerância e Preconceito</b> estão tentando silenciar a nossa comunidade.<br><br>
+        Ao coletar a primeira cor, você despertará seu <b>Poder Prismático</b>. Colete cores, suba de nível, derrote a opressão com amor e celebre o Orgulho!
+      </p>
+      
+      <div class="controls-info">
+        <div>
+          <kbd>W/A/S/D</kbd> ou <kbd>Joystick</kbd>
+          <br><span>Mover</span>
+        </div>
+        <div>
+          <kbd>Espaço</kbd> ou <kbd>Botão Ação</kbd>
+          <br><span>Dash / Continuar</span>
+        </div>
+      </div>
+
+      <button id="btnStart" class="btn btn-primary">YAAAS! JOGAR 🏳️‍🌈</button>
+    </div>
+  </div>
+
+  <!-- Main UI Overlay -->
+  <div id="uiOverlay" class="hidden">
+    
+    <!-- Colors Grid -->
+    <div class="top-hud px-4">
+      <div id="colorsList" class="colors-list glass">
+        <!-- Will be populated by static HTML here -->
+        <div class="color-badge" id="color-badge-red" title="Vida"></div>
+        <div class="color-badge" id="color-badge-orange" title="Cura"></div>
+        <div class="color-badge" id="color-badge-yellow" title="Sol"></div>
+        <div class="color-badge" id="color-badge-green" title="Natureza"></div>
+        <div class="color-badge" id="color-badge-blue" title="Serenidade"></div>
+        <div class="color-badge" id="color-badge-purple" title="Espírito"></div>
+      </div>
+    </div>
+
+    <!-- RPG Stats HUD -->
+    <div class="stats-hud">
+       <div class="stat-box glass">
+         <div class="stat-header">
+            <span>❤ HP</span> <span id="hudHpText">100 / 100</span>
+         </div>
+         <div class="bar-bg"><div id="hudHpBar" class="bar hp-bar" style="width: 100%;"></div></div>
+       </div>
+
+       <div class="stat-box glass hidden-mobile">
+         <div class="stat-header">
+            <span id="hudLevelText" class="lvl-text">★ Nível 1</span>
+            <span id="hudXpText" class="xp-text">0 / 100 XP</span>
+         </div>
+         <div class="bar-bg"><div id="hudXpBar" class="bar xp-bar" style="width: 0%;"></div></div>
+         
+         <div class="coins-box mt-2">
+            <span class="coin-icon">🪙</span>
+            <span id="hudCoinsText">0</span>
+         </div>
+       </div>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div class="mobile-controls">
+       <div id="joystickBase" class="joystick-base">
+          <div id="joystickKnob" class="joystick-knob"></div>
+       </div>
+       <div id="btnAction" class="btn-action">
+          <span>SLAY!</span>
+       </div>
+    </div>
+
+  </div>
+
+  <!-- Dialogue Overlay -->
+  <div id="dialogueOverlay" class="hidden flex-center">
+    <div class="card p-8 text-center glass-card">
+      <h4 class="color-found">COR ENCONTRADA!</h4>
+      <p id="dialogueText" class="dialogue-msg">""</p>
+      <div class="continue-hint">Pressione [ESPAÇO] ou [AÇÃO] para continuar</div>
+    </div>
+  </div>
+
+  <!-- Victory Screen -->
+  <div id="winOverlay" class="hidden flex-center bg-dark">
+    <div class="card p-12 text-center glass-card">
+      <h2 class="win-title">FELIZ MÊS DO ORGULHO!</h2>
+      <p class="win-text">
+        Você uniu todas as cores, derrotou as sombras da opressão e trouxe a celebração para a ilha! Obrigado por espalhar amor, diversidade e muito orgulho com o <b>Grupo Armindo</b>!
+      </p>
+      <div class="mt-4">
+        <button id="btnContinue" class="btn btn-primary">Continuar Explorando</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
