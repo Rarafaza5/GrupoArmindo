@@ -808,12 +808,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const hudCoinsText = document.getElementById('hudCoinsText');
 
   // Launch Game View
-  doodleTrigger.addEventListener('click', () => {
-    googleView.classList.remove('active');
-    googleView.classList.add('hidden');
-    gameView.classList.remove('hidden');
-    gameView.classList.add('active');
-  });
+  if (doodleTrigger) {
+    doodleTrigger.addEventListener('click', () => {
+      googleView.classList.remove('active');
+      googleView.classList.add('hidden');
+      gameView.classList.remove('hidden');
+      gameView.classList.add('active');
+    });
+  }
 
   const btnLucky = document.getElementById('btnLucky');
   if (btnLucky) {
@@ -890,7 +892,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Start Game Engine
-  btnStartGame.addEventListener('click', startGame);
+  if (btnStartGame) {
+    btnStartGame.addEventListener('click', startGame);
+  }
 
   function startGame() {
     if(engine) {
@@ -959,21 +963,23 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', resizeCanvas);
 
   // Fullscreen
-  btnFullscreen.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      gameView.requestFullscreen().catch(err => {
-        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen();
-    }
-  });
+  if (btnFullscreen) {
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        gameView.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  }
 
   // Close Game completely
-  btnCloseGame.addEventListener('click', closeGame);
-  btnWinClose.addEventListener('click', closeGame);
-  btnGameOverClose.addEventListener('click', closeGame);
-  btnRestart.addEventListener('click', startGame);
+  if (btnCloseGame) btnCloseGame.addEventListener('click', closeGame);
+  if (btnWinClose) btnWinClose.addEventListener('click', closeGame);
+  if (btnGameOverClose) btnGameOverClose.addEventListener('click', closeGame);
+  if (btnRestart) btnRestart.addEventListener('click', startGame);
 
   function closeGame() {
     if(engine) {
@@ -1009,9 +1015,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  btnContinue.addEventListener('click', () => {
-    winOverlay.classList.add('hidden');
-  });
+  if (btnContinue) {
+    btnContinue.addEventListener('click', () => {
+      winOverlay.classList.add('hidden');
+    });
+  }
 
   // --- Mobile Controls ---
   const joystickBase = document.getElementById('joystickBase');
@@ -1022,6 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function handleJoystickMove(clientX, clientY) {
     if(!engine) return;
+    if(!joystickBase || !joystickKnob) return;
     const rect = joystickBase.getBoundingClientRect();
     const basePathX = rect.left + rect.width / 2;
     const basePathY = rect.top + rect.height / 2;
@@ -1039,35 +1048,39 @@ document.addEventListener('DOMContentLoaded', () => {
     engine.setJoystick(dx / maxJoystickDist, dy / maxJoystickDist);
   }
 
-  joystickBase.addEventListener('touchstart', e => {
-    isDraggingJoystick = true;
-    handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
-  }, {passive: false});
-
-  joystickBase.addEventListener('touchmove', e => {
-    if(isDraggingJoystick) {
-      e.preventDefault();
+  if (joystickBase) {
+    joystickBase.addEventListener('touchstart', e => {
+      isDraggingJoystick = true;
       handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  }, {passive: false});
+    }, {passive: false});
 
-  const endTouch = () => {
-    isDraggingJoystick = false;
-    joystickKnob.style.transform = `translate(-50%, -50%)`;
-    if(engine) engine.setJoystick(0, 0);
-  };
-  joystickBase.addEventListener('touchend', endTouch);
-  joystickBase.addEventListener('touchcancel', endTouch);
+    joystickBase.addEventListener('touchmove', e => {
+      if(isDraggingJoystick) {
+        e.preventDefault();
+        handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, {passive: false});
 
-  btnAction.addEventListener('touchstart', e => {
-    e.preventDefault();
-    if(engine) engine.triggerAction();
-  }, {passive: false});
-  
-  btnAction.addEventListener('mousedown', e => {
-    e.preventDefault();
-    if(engine) engine.triggerAction();
-  });
+    const endTouch = () => {
+      isDraggingJoystick = false;
+      if (joystickKnob) joystickKnob.style.transform = `translate(-50%, -50%)`;
+      if(engine) engine.setJoystick(0, 0);
+    };
+    joystickBase.addEventListener('touchend', endTouch);
+    joystickBase.addEventListener('touchcancel', endTouch);
+  }
+
+  if (btnAction) {
+    btnAction.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if(engine) engine.triggerAction();
+    }, {passive: false});
+    
+    btnAction.addEventListener('mousedown', e => {
+      e.preventDefault();
+      if(engine) engine.triggerAction();
+    });
+  }
 
   function generateConfetti() {
     confettiContainer.innerHTML = '';
