@@ -3,110 +3,268 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Grupo Armindo - Festival do Orgulho</title>
+  <title>Grupo Armindo</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Game Canvas -->
-  <canvas id="gameCanvas"></canvas>
+  <!-- Google Homepage UI -->
+  <div id="googleView" class="view-container active">
+    <!-- Top Navigation -->
+    <header class="google-header">
+      <div class="header-left">
+        <svg class="icon menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        <a href="#" class="header-link hidden-mobile">Sobre</a>
+        <a href="#" class="header-link hidden-mobile">Loja</a>
+      </div>
+      <div class="header-right">
+        <a href="#" class="header-link hidden-mobile">Gmail</a>
+        <a href="#" class="header-link hidden-mobile">Imagens</a>
+        <button class="icon-btn hidden-mobile" title="Laboratórios do Google Labs">
+           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3h15"/><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"/><path d="M6 14h12"/></svg>
+        </button>
+        <button class="icon-btn" title="Aplicações do Grupo Armindo">
+           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        </button>
+        <button class="user-btn">
+           <svg class="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+        </button>
+      </div>
+    </header>
 
-  <!-- Start Screen -->
-  <div id="startScreen" class="overlay flex-center start-bg">
-    <div class="card p-8">
-      <h1>GRUPO ARMINDO</h1>
-      <h2 class="sub-title">FESTIVAL DO ORGULHO LGBTQIA+ 🏳️‍🌈🏳️‍⚧️</h2>
-      <p>
-        As cores do nosso desfile se espalharam pela ilha e as forças da <b>Intolerância e Preconceito</b> estão tentando silenciar a nossa comunidade.<br><br>
-        Ao coletar a primeira cor, você despertará seu <b>Poder Prismático</b>. Colete cores, suba de nível, derrote a opressão com amor e celebre o Orgulho!
-      </p>
+    <!-- Main Content -->
+    <main class="google-main">
       
-      <div class="controls-info">
-        <div>
-          <kbd>W/A/S/D</kbd> ou <kbd>Joystick</kbd>
-          <br><span>Mover</span>
+      <!-- Doodle Logo Component -->
+      <div class="doodle-container" id="doodleTrigger" title="Clique para jogar: Festival do Orgulho do Grupo Armindo!">
+        <div class="play-overlay">
+          <div class="play-icon-circle">
+            <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
         </div>
-        <div>
-          <kbd>Espaço</kbd> ou <kbd>Botão Ação</kbd>
-          <br><span>Dash / Continuar</span>
+        
+        <div class="doodle-preview">
+           <div class="doodle-stripes">
+             <div style="background-color: #E40303;"></div>
+             <div style="background-color: #FF8C00;"></div>
+             <div style="background-color: #FFED00;"></div>
+             <div style="background-color: #008026;"></div>
+             <div style="background-color: #24408E;"></div>
+             <div style="background-color: #732982;"></div>
+           </div>
+           
+           <div class="doodle-text">
+             <span style="color: #E40303;">A</span>
+             <span style="color: #FF8C00;">R</span>
+             <span style="color: #FFED00;">M</span>
+             <span style="color: #008026;">I</span>
+             <span style="color: #24408E;">N</span>
+             <span style="color: #732982;">D</span>
+             <span style="color: #E40303;">O</span>
+           </div>
+           
+           <div class="doodle-deco deco-run">🏃🏽‍♀️</div>
+           <div class="doodle-deco deco-star">✨</div>
+        </div>
+        <div class="doodle-tooltip">Clique para jogar: Festival do Orgulho do Grupo Armindo!</div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" class="search-input" id="searchInput">
+        <div class="search-actions">
+           <svg class="action-icon hidden-mobile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
+           <svg class="action-icon microphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+           <svg class="action-icon lens" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="m12 15c1.66 0 3-1.31 3-2.97v-7.02c0-1.66-1.34-3.01-3-3.01s-3 1.34-3 3.01v7.02c0 1.66 1.34 2.97 3 2.97z"></path><path fill="#4285f4" d="m11 18.08h2v3.92h-2z"></path><path fill="#fbbc05" d="m7.05 16.87c-1.27-1.33-2.05-2.83-2.05-4.87h2c0 1.45 0.56 2.42 1.47 3.38v0.32l-1.15 1.18z"></path><path fill="#ea4335" d="m12 16.93a4.97 5.25 0 0 1 -3.54 -1.55l-1.41 1.49c1.26 1.34 3.02 2.13 4.95 2.13 3.87 0 6.99-2.92 6.99-7h-1.99c0 2.92-2.24 4.93-5 4.93z"></path></svg>
         </div>
       </div>
 
-      <button id="btnStart" class="btn btn-primary">YAAAS! JOGAR 🏳️‍🌈</button>
-    </div>
+      <!-- Action Buttons -->
+      <div class="google-buttons">
+        <button class="google-btn">Pesquisa Grupo Armindo</button>
+        <button id="btnLucky" class="google-btn">Sinto-me com sorte</button>
+      </div>
+
+      <!-- Translation -->
+      <div class="translation-text">
+         Disponibilizado em: <a href="#">English</a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="google-footer">
+       <div class="footer-top">Portugal</div>
+       <div class="footer-bottom">
+          <div class="footer-links flex-start">
+             <a href="#">Acerca de</a>
+             <a href="#">Publicidade</a>
+             <a href="#">Negócios</a>
+             <a href="#">Como funciona a Pesquisa</a>
+          </div>
+          <div class="footer-links flex-end">
+             <a href="#">Privacidade</a>
+             <a href="#">Termos</a>
+             <a href="#">Definições</a>
+          </div>
+       </div>
+    </footer>
   </div>
 
-  <!-- Main UI Overlay -->
-  <div id="uiOverlay" class="hidden">
-    
-    <!-- Colors Grid -->
-    <div class="top-hud px-4">
-      <div id="colorsList" class="colors-list glass">
-        <!-- Will be populated by static HTML here -->
-        <div class="color-badge" id="color-badge-red" title="Vida"></div>
-        <div class="color-badge" id="color-badge-orange" title="Cura"></div>
-        <div class="color-badge" id="color-badge-yellow" title="Sol"></div>
-        <div class="color-badge" id="color-badge-green" title="Natureza"></div>
-        <div class="color-badge" id="color-badge-blue" title="Serenidade"></div>
-        <div class="color-badge" id="color-badge-purple" title="Espírito"></div>
+  <!-- Game Overlay -->
+  <div id="gameView" class="view-container game-bg hidden fade">
+    <!-- Top right controls -->
+    <div class="game-top-controls">
+      <button id="btnFullscreen" class="floating-btn hidden-mobile" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <button id="btnCloseGame" class="floating-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <!-- Start Modal -->
+    <div id="startScreen" class="game-modal-container active">
+      <div class="title-logo">
+        <span style="color: transparent;">&nbsp;</span>
+        <span style="color: #E40303;">G</span>
+        <span style="color: #FF8C00;">R</span>
+        <span style="color: #FFED00;">U</span>
+        <span style="color: #008026;">P</span>
+        <span style="color: #24408E;">O</span>
+        <span style="color: transparent;">&nbsp;</span>
+        <span style="color: #732982;">A</span>
+        <span style="color: #E40303;">R</span>
+        <span style="color: #FF8C00;">M</span>
+        <span style="color: #FFED00;">I</span>
+        <span style="color: #008026;">N</span>
+        <span style="color: #24408E;">D</span>
+        <span style="color: #732982;">O</span>
+      </div>
+      
+      <div class="game-card">
+        <h2 class="game-title">FESTIVAL DO ORGULHO LGBTQIA+ 🏳️‍🌈🏳️‍⚧️</h2>
+        <p class="game-desc">
+          As cores do nosso desfile se espalharam pela ilha e as forças da <b>Intolerância e Preconceito</b> (mentes cinzentas) estão tentando silenciar a nossa comunidade. 
+          Ao coletar a primeira cor, você despertará seu <b>Poder Prismático</b>. Colete cores, suba de nível, derrote a opressão com amor e celebre o Orgulho com o Grupo Armindo!
+        </p>
+        
+        <div class="game-controls-info">
+          <div class="ctrl-group">
+            <div class="ctrl-keys">
+              <span class="hidden-mobile"><kbd>W/A/S/D</kbd></span>
+              <span class="mobile-only"><kbd>Joystick (Toque)</kbd></span>
+            </div>
+            <span>Mover</span>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-keys">
+              <span class="hidden-mobile"><kbd>Espaço</kbd></span>
+              <span class="mobile-only"><kbd>Botão Ação</kbd></span>
+            </div>
+            <span>Acelerar / Continuar</span>
+          </div>
+        </div>
+
+        <button id="btnStartGame" class="game-btn">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+          YAAAS! JOGAR 🏳️‍🌈
+        </button>
       </div>
     </div>
 
-    <!-- RPG Stats HUD -->
-    <div class="stats-hud">
-       <div class="stat-box glass">
-         <div class="stat-header">
-            <span>❤ HP</span> <span id="hudHpText">100 / 100</span>
-         </div>
-         <div class="bar-bg"><div id="hudHpBar" class="bar hp-bar" style="width: 100%;"></div></div>
-       </div>
+    <!-- Active Game UI -->
+    <div id="gamePlayContainer" class="hidden">
+      <canvas id="gameCanvas"></canvas>
 
-       <div class="stat-box glass hidden-mobile">
-         <div class="stat-header">
-            <span id="hudLevelText" class="lvl-text">★ Nível 1</span>
-            <span id="hudXpText" class="xp-text">0 / 100 XP</span>
+      <!-- Top HUD (Colors) -->
+      <div class="top-hud">
+        <div class="colors-list">
+          <div class="color-badge-col"><div class="color-badge" id="badge-red"></div><span class="badge-label hidden-mobile">Vida</span></div>
+          <div class="color-badge-col"><div class="color-badge" id="badge-orange"></div><span class="badge-label hidden-mobile">Cura</span></div>
+          <div class="color-badge-col"><div class="color-badge" id="badge-yellow"></div><span class="badge-label hidden-mobile">Sol</span></div>
+          <div class="color-badge-col"><div class="color-badge" id="badge-green"></div><span class="badge-label hidden-mobile">Natureza</span></div>
+          <div class="color-badge-col"><div class="color-badge" id="badge-blue"></div><span class="badge-label hidden-mobile">Serenidade</span></div>
+          <div class="color-badge-col"><div class="color-badge" id="badge-purple"></div><span class="badge-label hidden-mobile">Espírito</span></div>
+        </div>
+      </div>
+
+      <!-- Stats HUD -->
+      <div class="stats-hud">
+         <div class="stat-box">
+           <div class="stat-header">
+              <span>❤ HP</span> <span id="hudHpText">100 / 100</span>
+           </div>
+           <div class="bar-bg"><div id="hudHpBar" class="bar hp-bar" style="width: 100%;"></div></div>
          </div>
-         <div class="bar-bg"><div id="hudXpBar" class="bar xp-bar" style="width: 0%;"></div></div>
-         
-         <div class="coins-box mt-2">
-            <span class="coin-icon">🪙</span>
-            <span id="hudCoinsText">0</span>
+
+         <div class="stat-box hidden-mobile">
+           <div class="stat-header">
+              <span id="hudLevelText" class="lvl-text">★ Nível 1</span>
+              <span id="hudXpText" class="xp-text">0 / 100 XP</span>
+           </div>
+           <div class="bar-bg mb-3"><div id="hudXpBar" class="bar xp-bar" style="width: 0%;"></div></div>
+           
+           <div class="coins-container">
+              <div class="coin-icon"><span>🪙</span></div>
+              <span id="hudCoinsText">0</span>
+           </div>
          </div>
-       </div>
+      </div>
+
+      <!-- Mobile Controls -->
+      <div class="mobile-controls mobile-only">
+         <div id="joystickBase" class="joystick-base">
+            <div id="joystickKnob" class="joystick-knob"></div>
+         </div>
+         <div id="btnAction" class="btn-action">
+            <span>SLAY!</span>
+         </div>
+      </div>
+
+      <!-- Compass Tip Removed -->
     </div>
 
-    <!-- Mobile Controls -->
-    <div class="mobile-controls">
-       <div id="joystickBase" class="joystick-base">
-          <div id="joystickKnob" class="joystick-knob"></div>
-       </div>
-       <div id="btnAction" class="btn-action">
-          <span>SLAY!</span>
-       </div>
-    </div>
-
-  </div>
-
-  <!-- Dialogue Overlay -->
-  <div id="dialogueOverlay" class="hidden flex-center">
-    <div class="card p-8 text-center glass-card">
-      <h4 class="color-found">COR ENCONTRADA!</h4>
-      <p id="dialogueText" class="dialogue-msg">""</p>
-      <div class="continue-hint">Pressione [ESPAÇO] ou [AÇÃO] para continuar</div>
-    </div>
-  </div>
-
-  <!-- Victory Screen -->
-  <div id="winOverlay" class="hidden flex-center bg-dark">
-    <div class="card p-12 text-center glass-card">
-      <h2 class="win-title">FELIZ MÊS DO ORGULHO!</h2>
-      <p class="win-text">
-        Você uniu todas as cores, derrotou as sombras da opressão e trouxe a celebração para a ilha! Obrigado por espalhar amor, diversidade e muito orgulho com o <b>Grupo Armindo</b>!
-      </p>
-      <div class="mt-4">
-        <button id="btnContinue" class="btn btn-primary">Continuar Explorando</button>
+    <!-- Dialogue Overlay -->
+    <div id="dialogueOverlay" class="dialogue-overlay hidden">
+      <div class="dialogue-card" id="dialogueCard">
+        <div class="dialogue-glow" id="dialogueGlow"></div>
+        <h4>COR ENCONTRADA!</h4>
+        <p id="dialogueText">""</p>
+        <div class="continue-hint">Pressione [ESPAÇO] ou [AÇÃO] para continuar</div>
       </div>
     </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameOverOverlay" class="win-overlay hidden">
+      <div class="win-card" style="border-color: #374151;">
+        <h2 class="win-title" style="background: -webkit-linear-gradient(45deg, #9ca3af, #4b5563); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SOMBREADO...</h2>
+        <p class="win-text" style="color: #d1d5db; font-style: italic;">
+          "A jornada pela aceitação é formidável. O peso do preconceito nos fez cair desta vez, mas a nossa verdadeira essência nunca poderá ser apagada. Acenda a luz interior e tente novamente."
+        </p>
+        <div class="win-buttons">
+          <button id="btnRestart" class="win-btn win-btn-light">Renacer</button>
+          <button id="btnGameOverClose" class="win-btn win-btn-dark">Retornar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Win Overlay -->
+    <div id="winOverlay" class="win-overlay hidden">
+      <div class="confetti-container" id="confettiContainer"></div>
+      <div class="win-card">
+        <div class="win-card-bg"></div>
+        <h2 class="win-title">FELIZ MÊS DO ORGULHO!</h2>
+        <p class="win-text">
+          Você uniu todas as cores, derrotou as sombras da opressão e trouxe a celebração para a ilha! Obrigado por espalhar amor, diversidade e muito orgulho com o <b>Grupo Armindo</b>!
+        </p>
+        <div class="win-buttons">
+          <button id="btnContinue" class="win-btn win-btn-light">Continuar Explorando</button>
+          <button id="btnWinClose" class="win-btn win-btn-dark">Sair do Jogo</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="game.js"></script>
