@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quem conta um conto acrescenta um ponto — Um Conto Pride Coletivo</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- PDF Export Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Favicon Link -->
+  <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+
+  <!-- Background Blur Elements -->
+  <div class="bg-blur blur-1"></div>
+  <div class="bg-blur blur-2"></div>
+  <div class="bg-blur blur-3"></div>
+
+
+
+  <!-- Main Application Container -->
+  <main class="app-container">
+
+    <!-- Screen 0: Firebase Setup Wizard -->
+    <section id="view-setup" class="app-view hidden">
+      <div class="card glass-card wizard-card animate-fade-in">
+        <div class="pride-bar"></div>
+        <h2><i class="fa-solid fa-gears"></i> Configuração do Firebase</h2>
+        <p>Olá! Para iniciar este projeto comunitário, precisamos de associar uma base de dados do Firebase. Siga os passos abaixo:</p>
+        
+        <ol class="setup-steps">
+          <li>Crie um projeto no <a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase Console</a>.</li>
+          <li>Ative a autenticação <strong>E-mail/Senha</strong>.</li>
+          <li>Crie uma base de dados <strong>Cloud Firestore</strong> (em modo de teste).</li>
+          <li>Adicione uma aplicação web e copie as configurações do SDK (o objeto JSON).</li>
+        </ol>
+
+        <form id="form-setup">
+          <div class="form-group">
+            <label for="setup-config-json">Cole o objeto de configuração do Firebase (JSON):</label>
+            <textarea id="setup-config-json" rows="8" placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "quem-conta-conto.firebaseapp.com",
+  "projectId": "quem-conta-conto",
+  "storageBucket": "quem-conta-conto.appspot.com",
+  "messagingSenderId": "...",
+  "appId": "..."
+}' required></textarea>
+          </div>
+          <div class="setup-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar e Inicializar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Screen 1: Welcome & Landing Page -->
+    <section id="view-home" class="app-view">
+      <div class="hero-section animate-fade-in">
+        <h1>Quem Conta um Conto,<br><span class="gradient-text">Acrescenta um Ponto</span></h1>
+        <p class="hero-desc">Um conto coletivo de 7 dias celebrando o orgulho, a diversidade e a força das nossas vozes. Uma linha de cada vez, unimos corações e escrevemos a nossa história.</p>
+
+        <div class="hero-actions">
+          <button id="btn-hero-action" class="btn btn-primary btn-lg"><i class="fa-solid fa-pen-nib"></i> Deixar o Meu Ponto</button>
+          <a href="#rules-anchor" id="btn-learn-more" class="btn btn-outline btn-lg"><i class="fa-solid fa-circle-info"></i> Como Funciona</a>
+        </div>
+      </div>
+
+      <!-- Live Progress Grid -->
+      <div class="dashboard-grid animate-slide-up">
+        <div class="card glass-card info-card">
+          <div class="card-icon"><i class="fa-solid fa-calendar-day"></i></div>
+          <div class="info-content">
+            <h3>Progresso do Conto</h3>
+            <div class="progress-bar-container">
+              <div id="home-progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <span class="info-meta" id="home-event-day">Calculando dia...</span>
+          </div>
+        </div>
+
+        <div class="card glass-card info-card">
+          <div class="card-icon"><i class="fa-solid fa-pen-fancy"></i></div>
+          <div class="info-content">
+            <h3>Total de Pontos</h3>
+            <h2 id="home-total-paragraphs">-</h2>
+            <span class="info-meta">Parágrafos submetidos na história</span>
+          </div>
+        </div>
+
+        <div class="card glass-card info-card">
+          <div class="card-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="info-content">
+            <h3>Corações Ativos</h3>
+            <h2 id="home-total-authors">-</h2>
+            <span class="info-meta">Escritores que uniram vozes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rules & Info Section -->
+      <div id="rules-anchor" class="rules-section animate-slide-up">
+        <div class="section-title">
+          <h2>Como jogamos juntos?</h2>
+          <div class="divider"></div>
+        </div>
+
+        <div class="rules-grid">
+          <div class="rule-card">
+            <span class="rule-num">1</span>
+            <h3>Uma história Pride</h3>
+            <p>O enredo principal gira em torno do orgulho de ser quem se é, do amor, da luta histórica e da diversidade humana.</p>
+          </div>
+          <div class="rule-card">
+            <span class="rule-num">2</span>
+            <h3>Um parágrafo por dia</h3>
+            <p>Podes adicionar apenas 1 parágrafo por dia (máx. 1000 caracteres). Uma frase ou uma reflexão, a marca é tua.</p>
+          </div>
+          <div class="rule-card">
+            <span class="rule-num">3</span>
+            <h3>O elo misterioso</h3>
+            <p>Só podes ver o parágrafo escrito imediatamente antes do teu e os teus próprios contributos. A escrita alheia continua em segredo.</p>
+          </div>
+          <div class="rule-card">
+            <span class="rule-num">4</span>
+            <h3>A grande revelação</h3>
+            <p>No final do 7º dia, a história completa será unida, revelada e partilhada com todos os participantes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 2: Simplified Identification Profile (IP & LocalName) -->
+    <section id="view-auth" class="app-view hidden">
+      <div class="card glass-card auth-card animate-fade-in">
+        <div class="pride-bar"></div>
+        
+        <form id="form-identity" class="auth-form">
+          <h2>Como te queres chamar?</h2>
+          <p>Escolhe um nome ou um pseudónimo. Este nome será associado aos teus parágrafos no final e constará na lista de co-autores.</p>
+          
+          <div class="form-group">
+            <label for="identity-name">O teu Nome ou Pseudónimo</label>
+            <div class="input-icon">
+              <i class="fa-solid fa-signature"></i>
+              <input type="text" id="identity-name" required placeholder="Ex: Maria Amor, Rosa Rebelde ou Anónimo">
+            </div>
+          </div>
+
+          <div class="form-group terms-checkbox-group">
+            <label class="checkbox-container">
+              <input type="checkbox" id="identity-terms" required>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Aceito os <a href="#" id="link-open-terms">Termos de Uso e Política de Privacidade</a>.</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <span>Começar a Escrever</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Screen 3: Writing Workbench -->
+    <section id="view-workbench" class="app-view hidden">
+      <!-- Back Navigation -->
+      <div class="back-nav-container animate-fade-in">
+        <button id="btn-back-home-workbench" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Voltar ao Início</button>
+      </div>
+
+      <div class="workbench-grid">
+        
+        <!-- Main Workspace (Left/Center) -->
+        <div class="workspace-area animate-fade-in">
+          <div class="card glass-card workbench-card">
+            <div class="pride-bar"></div>
+            
+            <div class="workbench-header">
+              <div class="workbench-title-group">
+                <span class="badge" id="workbench-day-badge">Dia X de 7</span>
+                <h2>O Teu Ponto na História</h2>
+              </div>
+              <div id="workbench-user-profile" class="workbench-user-profile hidden">
+                <span>Escrevendo como: <strong id="workbench-display-name">...</strong></span>
+                <button id="btn-change-identity-workbench" class="btn btn-outline btn-sm" title="Mudar Nome/Pseudónimo"><i class="fa-solid fa-user-pen"></i></button>
+              </div>
+            </div>
+
+            <!-- Context Block: Previous Paragraph -->
+            <div class="previous-paragraph-container">
+              <div class="container-title">
+                <i class="fa-solid fa-link"></i> O Sussurro Anterior (O elo que deves continuar)
+              </div>
+              <blockquote id="prev-paragraph-text" class="story-font">
+                A carregar o elo anterior...
+              </blockquote>
+              <div id="prev-paragraph-meta" class="paragraph-meta hidden">
+                — Escrito por <span id="prev-author-name">Alguém</span>
+              </div>
+            </div>
+
+            <!-- Writing Area -->
+            <form id="form-paragraph" class="writing-form">
+              <div class="form-group">
+                <label for="paragraph-text">Escreve a continuação do conto, guiando-te pelo elo acima:</label>
+                <textarea id="paragraph-text" class="story-font" rows="8" maxlength="1000" required placeholder="Sussurra aqui a continuação desta história..."></textarea>
+                <div class="textarea-footer">
+                  <span class="character-counter"><span id="char-count">0</span> / 1000 caracteres</span>
+                  <span class="error-hint hidden" id="char-limit-warning">Aproximas-te do limite!</span>
+                </div>
+              </div>
+
+              <!-- Locked message for today -->
+              <div id="write-locked-container" class="locked-badge hidden">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                  <strong>Já adicionaste o teu ponto hoje!</strong>
+                  <p>Cada escritor só pode adicionar 1 parágrafo por dia. Esperamos por ti amanhã com um novo elo de ligação!</p>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" id="btn-submit-paragraph" class="btn btn-primary btn-lg btn-loading-container">
+                  <span class="btn-text"><i class="fa-solid fa-pen-nib"></i> Adicionar à História</span>
+                  <span class="spinner hidden"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Personal Timeline (Right) -->
+        <div class="history-area animate-slide-up">
+          <div class="card glass-card history-card">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> A Minha Linha Temporal</h2>
+            <p class="history-desc">Aqui podes rever todos os parágrafos que adicionaste a este conto.</p>
+            <div class="divider"></div>
+            
+            <div id="user-paragraphs-list" class="user-paragraphs-list">
+              <!-- Rendered via JS -->
+              <div class="empty-state">
+                <i class="fa-solid fa-feather"></i>
+                <p>Ainda não escreveste nenhum parágrafo nesta história.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Screen 4: Admin Dashboard -->
+    <section id="view-admin" class="app-view hidden">
+      <div class="admin-grid">
+        
+        <!-- Live Story Container (Left) -->
+        <div class="admin-main animate-fade-in">
+          <div class="card glass-card live-story-card">
+            <div class="pride-bar"></div>
+            
+            <div class="admin-card-header">
+              <div class="header-titles">
+                <h2><i class="fa-solid fa-book-open"></i> O Conto ao Vivo</h2>
+                <p>Painel de monitorização e leitura em tempo real da história comunitária.</p>
+              </div>
+              <div class="header-actions">
+                <button id="btn-back-home-admin" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Voltar ao Início</button>
+                <button id="btn-export-pdf" class="btn btn-success"><i class="fa-solid fa-file-pdf"></i> Exportar para PDF</button>
+              </div>
+            </div>
+            
+            <div class="divider"></div>
+
+            <!-- PDF printable container -->
+            <div id="pdf-export-container" class="pdf-container">
+              <!-- Cover page (only styled for PDF generation) -->
+              <div class="pdf-cover hidden-screen">
+                <div class="pdf-cover-content">
+                  <div class="pdf-tag">PROJETO COMUNITÁRIO DE ESCRITA</div>
+                  <h1 class="pdf-title">Quem Conta um Conto, Acrescenta um Ponto</h1>
+                  <div class="pdf-divider"></div>
+                  <p class="pdf-subtitle">Uma história coletiva celebrando o Orgulho e a Diversidade</p>
+                  <div class="pdf-metadata">
+                    <span class="pdf-meta-item"><strong>Edição:</strong> Pride</span>
+                    <span class="pdf-meta-item" id="pdf-meta-date"><strong>Data:</strong> Junho de 2026</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PDF List of Contributors (hidden-screen) -->
+              <div class="pdf-contributors hidden-screen">
+                <h2>Co-Autores do Conto</h2>
+                <div class="pdf-divider-small"></div>
+                <ul id="pdf-contributors-list">
+                  <!-- JS populated -->
+                </ul>
+              </div>
+
+              <!-- Main text layout -->
+              <div id="live-story-content" class="live-story-content story-font">
+                <!-- Javascript builds paragraphs here -->
+                <div class="empty-state">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  <p>A carregar o conto ao vivo...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Actions & Configs (Right) -->
+        <div class="admin-sidebar animate-slide-up">
+          <!-- Stats card -->
+          <div class="card glass-card stat-card">
+            <h3>Estatísticas Administrativas</h3>
+            <div class="admin-stats-list">
+              <div class="admin-stat-item">
+                <span class="label">Total Parágrafos:</span>
+                <span class="value" id="admin-stat-paragraphs">-</span>
+              </div>
+              <div class="admin-stat-item">
+                <span class="label">Total Participantes:</span>
+                <span class="value" id="admin-stat-writers">-</span>
+              </div>
+              <div class="admin-stat-item">
+                <span class="label">Dia do Evento:</span>
+                <span class="value" id="admin-stat-day">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuration Card -->
+          <div class="card glass-card config-card">
+            <h3>Definições do Evento</h3>
+            <div class="divider"></div>
+            
+            <form id="form-admin-config">
+              <div class="form-group">
+                <label for="admin-config-start-date">Data de Início do Evento</label>
+                <input type="date" id="admin-config-start-date" required>
+                <span class="input-hint">Usada para calcular o progresso dos 7 dias.</span>
+              </div>
+              <div class="form-group">
+                <label for="admin-config-passcode">Chave de Acesso Admin</label>
+                <input type="text" id="admin-config-passcode" required placeholder="Ex: pride2026">
+                <span class="input-hint">Palavra-passe para aceder a este painel no futuro.</span>
+              </div>
+              <div class="form-group">
+                <label class="toggle-container">
+                  <input type="checkbox" id="admin-config-active" checked>
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label">Conto Aberto a Submissões</span>
+                </label>
+              </div>
+              <button type="submit" id="btn-save-admin-config" class="btn btn-primary btn-block"><i class="fa-solid fa-save"></i> Guardar Definições</button>
+            </form>
+
+            <div class="danger-zone">
+              <h4>Zona de Perigo</h4>
+              <p>Estas ações são permanentes e afetam a base de dados.</p>
+              <button id="btn-admin-reset-story" class="btn btn-danger btn-block btn-sm"><i class="fa-solid fa-trash-can"></i> Reiniciar História</button>
+            </div>
+          </div>
+
+          <!-- Quick Actions & Reset Firebase config -->
+          <div class="card glass-card config-card">
+            <h3>Opções do Desenvolvedor</h3>
+            <div class="divider"></div>
+            <p>Se precisares de alterar as credenciais de ligação ao Firebase:</p>
+            <button id="btn-reset-firebase" class="btn btn-outline btn-block btn-sm"><i class="fa-solid fa-rotate-left"></i> Redefinir Configuração</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>&copy; 2026 <a href="https://grupoarmindo.me" target="_blank" rel="noopener" class="footer-link">Grupo Armindo</a>. Todos os direitos reservados.</p>
+      <p class="footer-pride"><i class="fa-solid fa-heart accent-text"></i> Orgulho em pertencer, coragem para contar.</p>
+      <button id="btn-secret-admin" class="btn-secret-lock" title="Painel Admin"><i class="fa-solid fa-lock"></i></button>
+    </div>
+  </footer>
+
+  <!-- Terms and Conditions Modal -->
+  <div id="modal-terms" class="modal hidden">
+    <div class="modal-content glass-card animate-fade-in">
+      <div class="pride-bar"></div>
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-gavel"></i> Termos de Uso e Privacidade</h2>
+        <button id="btn-close-terms" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3>1. O Projeto</h3>
+        <p>"Quem conta um conto acrescenta um ponto" é uma plataforma comunitária de escrita criativa e coletiva voluntária, sem fins comerciais ou lucrativos.</p>
+        
+        <h3>2. Exclusão de Responsabilidade</h3>
+        <p>A organização e os desenvolvedores deste projeto atuam unicamente como facilitadores tecnológicos. <strong>Não nos responsabilizamos sob qualquer circunstância pelo teor, precisão, veracidade, licitude ou opiniões expressas nos parágrafos submetidos</strong> pelos participantes. Cada escritor é única, pessoal e integralmente responsável pelas palavras que decide publicar.</p>
+        <p>Ao submeter um parágrafo neste site, o participante garante que o conteúdo é da sua própria autoria, não viola direitos intelectuais ou de personalidade de terceiros, e concede gratuitamente uma licença perpétua e não-exclusiva para que o texto integre a compilação final da história.</p>
+        
+        <h3>3. Privacidade e Proteção de Dados (Registo de IP)</h3>
+        <p>Para assegurar a mecânica do jogo (limitação de um parágrafo por dia) e evitar abusos ou spam, informamos que:</p>
+        <ul>
+          <li>É possível que o seu <strong>endereço IP</strong> público fique temporariamente registado na base de dados aquando da submissão, embora muito provavelmente este não venha a ser utilizado ou consultado de forma alguma.</li>
+          <li>É gerado um identificador técnico anónimo do navegador (fingerprint digital) guardado localmente no seu dispositivo.</li>
+          <li>Fica associado o nome ou pseudónimo que escolheu para o seu texto.</li>
+        </ul>
+        <p>Nenhuma outra informação (como e-mails, passwords ou geolocalização detalhada) é recolhida. Estes registos servem unicamente como barreira contra bots e serão eliminados quando o projeto for finalizado.</p>
+        
+        <h3>4. Moderação</h3>
+        <p>Embora não haja fiscalização prévia, a organização reserva-se o direito de remover ou editar, à posteriori, quaisquer parágrafos que contenham discurso de ódio, violência verbal, ofensas diretas ou material ilícito.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-agree-terms" class="btn btn-primary">Compreendi e Aceito</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Passcode Modal -->
+  <div id="modal-passcode" class="modal hidden">
+    <div class="modal-content glass-card animate-fade-in" style="max-width: 400px; margin: 10% auto;">
+      <div class="pride-bar"></div>
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-shield-halved"></i> Painel Administrativo</h2>
+        <button id="btn-close-passcode" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-admin-passcode">
+          <div class="form-group">
+            <label for="admin-passcode-input">Insere a Chave de Acesso:</label>
+            <input type="password" id="admin-passcode-input" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Verificar Chave</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast hidden">
+    <div class="toast-content">
+      <i class="toast-icon fa-solid fa-circle-info"></i>
+      <span id="toast-message">Mensagem...</span>
+    </div>
+  </div>
+
+  <!-- Javascript Modules -->
+  <script type="module" src="app.js"></script>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
