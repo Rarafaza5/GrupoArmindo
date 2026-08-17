@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tela Central — Armindo Awards '26</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold:        #c9a84c;
+      --gold-bright: #ffd700;
+      --gold-glow:   rgba(201, 168, 76, 0.4);
+      --cyan:        #00f5ff;
+      --magenta:     #ff007f;
+      --dark:        #07060a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #000;
+      cursor: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ─── LAYER STACK ─── */
+    /* z-index: 0 = PNG bg | 1 = canvas particles | 2 = vignette | 3 = glow border | 10 = jeoparty overlay */
+
+    /* ─── Background PNG ─── */
+    #bg-layer {
+      position: fixed; inset: 0; z-index: 0;
+      background: url('fundos/Central.png') center center / cover no-repeat;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── Particle Canvas ─── */
+    #particle-canvas {
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ─── Vignette Overlay ─── */
+    #vignette {
+      position: fixed; inset: 0; z-index: 2;
+      background: radial-gradient(ellipse at center,
+        transparent 50%,
+        rgba(0,0,0,0.45) 100%);
+      pointer-events: none;
+    }
+
+    /* ─── Gold Glow Border ─── */
+    #glow-border {
+      position: fixed; inset: 0; z-index: 3;
+      pointer-events: none;
+      box-shadow:
+        inset 0 0 60px rgba(201,168,76,0.12),
+        inset 0 0 120px rgba(201,168,76,0.06);
+      animation: borderPulse 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes borderPulse {
+      0%   { box-shadow: inset 0 0 60px rgba(201,168,76,0.10), inset 0 0 120px rgba(201,168,76,0.04); }
+      100% { box-shadow: inset 0 0 80px rgba(201,168,76,0.22), inset 0 0 160px rgba(201,168,76,0.10); }
+    }
+
+    /* ─── Scanline effect ─── */
+    #scanlines {
+      position: fixed; inset: 0; z-index: 4;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    /* ═══════════════════════════════════════════════
+       JEOPARTY OVERLAY
+    ═══════════════════════════════════════════════ */
+    #jeoparty-overlay {
+      position: fixed; inset: 0; z-index: 10;
+      background: radial-gradient(ellipse at 50% 50%, #150f2e 0%, #07060a 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #jeoparty-overlay.visible {
+      opacity: 1;
+    }
+
+    /* ─── BOARD ─── */
+    #board-wrap {
+      width: 100vw; height: 100vh;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.2vh;
+      padding: 2vh 1.5vw;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #board-wrap.show { opacity: 1; }
+
+    .cat-col { display: flex; flex-direction: column; gap: 1.2vh; }
+
+    .cat-header {
+      background: linear-gradient(135deg, rgba(30,20,60,0.9), rgba(15,10,35,0.9));
+      border: 1.5px solid rgba(138,43,226,0.35);
+      border-radius: 10px;
+      height: 13vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800; font-size: clamp(0.9rem, 1.5vw, 1.5rem);
+      text-transform: uppercase; letter-spacing: 1px; color: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .q-card {
+      flex-grow: 1;
+      background: rgba(20,16,38,0.65);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 2.8vw, 3rem);
+      font-weight: 700; color: var(--cyan);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .q-card.played  { opacity: 0.12; border-color: transparent; color: rgba(255,255,255,0.2); }
+    .q-card.active  { border-color: var(--cyan); box-shadow: 0 0 25px rgba(0,245,255,0.3); }
+
+    /* ─── QUESTION OVERLAY ─── */
+    #q-overlay {
+      position: absolute; inset: 0;
+      background: rgba(7,6,15,0.97);
+      backdrop-filter: blur(20px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 8vh 10vw;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #q-overlay.show { opacity: 1; }
+
+    .q-category-tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1rem, 1.5vw, 1.5rem);
+      font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
+      color: var(--gold-bright);
+      border: 1.5px solid var(--gold-bright);
+      padding: 8px 28px; border-radius: 30px;
+      box-shadow: 0 0 20px rgba(255,215,0,0.2);
+      margin-bottom: 3vh;
+      animation: pulseGold 2.5s ease-in-out infinite;
+    }
+    @keyframes pulseGold {
+      0%,100% { box-shadow: 0 0 10px rgba(255,215,0,0.15); }
+      50%      { box-shadow: 0 0 35px rgba(255,215,0,0.40); }
+    }
+
+    .q-points {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+      font-weight: 700; color: var(--cyan);
+      margin-bottom: 4vh;
+    }
+
+    .q-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2rem, 4vw, 4.5rem);
+      font-weight: 800; line-height: 1.25;
+      color: #fff; text-align: center;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.6);
+      max-width: 90%;
+      animation: textReveal 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    @keyframes textReveal {
+      from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
+      to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+    }
+
+    .q-answer-box {
+      margin-top: 5vh;
+      padding: 20px 50px; border-radius: 14px;
+      background: rgba(255,0,127,0.08);
+      border: 1.5px dashed var(--magenta);
+      display: none;
+      animation: ansReveal 0.5s ease forwards;
+    }
+    .q-answer-box.show { display: block; }
+    @keyframes ansReveal {
+      from { opacity: 0; transform: translateY(12px); filter: blur(4px); }
+      to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+    }
+    .q-answer-label {
+      font-size: 0.85rem; color: var(--magenta);
+      text-transform: uppercase; letter-spacing: 2.5px;
+      margin-bottom: 6px; font-weight: 700;
+    }
+    .q-answer-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.8vw, 2.8rem);
+      font-weight: 700; color: #fff;
+    }
+
+    /* ─── SCORES OVERLAY ─── */
+    #scores-overlay {
+      position: absolute; inset: 0;
+      background: rgba(7,6,15,0.95);
+      backdrop-filter: blur(20px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.6s ease;
+      gap: 3vh;
+    }
+    #scores-overlay.show { opacity: 1; }
+
+    .scores-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      font-weight: 900; letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(to right, var(--gold-bright), #ff8c00);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 2vh;
+    }
+
+    .scores-list {
+      display: flex; flex-direction: column; gap: 1.5vh;
+      width: 70vw; max-width: 900px;
+    }
+
+    .score-row {
+      display: flex; align-items: center; gap: 2vw;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 2.5vh 2vw;
+      transition: all 0.4s ease;
+    }
+    .score-rank {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+      font-weight: 900; color: rgba(255,255,255,0.3);
+      width: 2.5vw; text-align: center;
+    }
+    .score-rank.first  { color: var(--gold-bright); }
+    .score-rank.second { color: #c0c0c0; }
+    .score-rank.third  { color: #cd7f32; }
+    .score-swatch {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    }
+    .score-name {
+      flex: 1;
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+      font-weight: 800; color: #fff;
+    }
+    .score-pts {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+      font-weight: 700; color: var(--gold-bright);
+    }
+
+    /* ─── DAILY DOUBLE OVERLAY ─── */
+    #dd-overlay {
+      position: absolute; inset: 0;
+      background: rgba(20,10,0,0.97);
+      backdrop-filter: blur(20px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #dd-overlay.show { opacity: 1; }
+
+    .dd-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(4rem, 8vw, 8rem);
+      font-weight: 900; text-transform: uppercase; letter-spacing: 6px;
+      background: linear-gradient(to right, #ffd700, #ff8c00, #ff3300);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: ddShake 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate;
+    }
+    @keyframes ddShake {
+      0%   { transform: scale(0.97) rotate(-0.8deg); filter: brightness(0.9); }
+      100% { transform: scale(1.03) rotate(0.8deg);  filter: brightness(1.15); }
+    }
+
+    .dd-sub {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.2rem, 2vw, 2rem);
+      color: rgba(255,255,255,0.8); margin-top: 3vh;
+      text-align: center; max-width: 600px;
+    }
+    .dd-wager {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      font-weight: 700; color: var(--gold-bright);
+      margin-top: 2.5vh;
+      text-shadow: 0 0 30px rgba(255,215,0,0.5);
+    }
+
+    /* ─── FINAL JEOPARTY OVERLAY ─── */
+    #fj-overlay {
+      position: absolute; inset: 0;
+      background: rgba(10,0,20,0.97);
+      backdrop-filter: blur(20px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 8vh 10vw;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    #fj-overlay.show { opacity: 1; }
+
+    .fj-category-tag {
+      font-size: clamp(1rem, 1.5vw, 1.5rem);
+      font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
+      color: var(--magenta);
+      border: 1.5px solid var(--magenta);
+      padding: 8px 28px; border-radius: 30px;
+      box-shadow: 0 0 20px rgba(255,0,127,0.25);
+      margin-bottom: 3vh;
+      animation: pulseMagenta 2.5s ease-in-out infinite;
+    }
+    @keyframes pulseMagenta {
+      0%,100% { box-shadow: 0 0 10px rgba(255,0,127,0.2); }
+      50%      { box-shadow: 0 0 40px rgba(255,0,127,0.45); }
+    }
+
+    /* ─── HOW TO PLAY ─── */
+    #htp-overlay {
+      position: absolute; inset: 0;
+      background: rgba(8,5,17,0.97);
+      backdrop-filter: blur(20px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4vh;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #htp-overlay.show { opacity: 1; }
+
+    .htp-title {
+      font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+      font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
+      color: var(--cyan); text-shadow: 0 0 25px rgba(0,245,255,0.4);
+    }
+    .htp-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2.5rem); font-weight: 900;
+      width: 90px; height: 90px; border-radius: 50%;
+      background: rgba(0,245,255,0.08); border: 2.5px solid var(--cyan);
+      color: var(--cyan); display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 30px rgba(0,245,255,0.25);
+    }
+    .htp-slide-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2rem, 4vw, 4rem); font-weight: 800;
+      color: #fff; text-transform: uppercase; letter-spacing: 1.5px;
+      text-align: center;
+    }
+    .htp-slide-desc {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.2rem, 2vw, 2rem); font-weight: 600;
+      color: rgba(255,255,255,0.85); line-height: 1.5;
+      text-align: center; max-width: 70vw;
+    }
+
+    /* ─── ambient glows behind jeoparty ─── */
+    .jeoparty-glows {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    .jg1 {
+      position: absolute; width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(138,43,226,0.12) 0%, transparent 70%);
+      top: -200px; left: -100px;
+      animation: blobFloat 18s ease-in-out infinite alternate;
+    }
+    .jg2 {
+      position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,245,255,0.08) 0%, transparent 70%);
+      bottom: -150px; right: -100px;
+      animation: blobFloat 14s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes blobFloat {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.1); }
+    }
+
+    /* ─── Column reveal animation ─── */
+    @keyframes colReveal {
+      from { opacity: 0; transform: translateY(70px) rotateY(-12deg); filter: blur(8px); }
+      to   { opacity: 1; transform: translateY(0) rotateY(0);        filter: blur(0); }
+    }
+    .cat-col.anim-reveal {
+      opacity: 0;
+      animation: colReveal 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background PNG -->
+  <div id="bg-layer"></div>
+
+  <!-- Gold Particle Canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Vignette -->
+  <div id="vignette"></div>
+
+  <!-- Gold glow border -->
+  <div id="glow-border"></div>
+
+  <!-- Scanlines -->
+  <div id="scanlines"></div>
+
+  <!-- Jeoparty Full Overlay -->
+  <div id="jeoparty-overlay">
+    <div class="jeoparty-glows">
+      <div class="jg1"></div>
+      <div class="jg2"></div>
+    </div>
+
+    <!-- Board -->
+    <div id="board-wrap"></div>
+
+    <!-- Question -->
+    <div id="q-overlay">
+      <div class="q-category-tag" id="q-cat">Categoria</div>
+      <div class="q-points" id="q-pts">200€</div>
+      <div class="q-text" id="q-text">Pergunta...</div>
+      <div class="q-answer-box" id="q-ans-box">
+        <div class="q-answer-label">Resposta Correta</div>
+        <div class="q-answer-text" id="q-ans-text">Resposta</div>
+      </div>
+    </div>
+
+    <!-- Scores -->
+    <div id="scores-overlay">
+      <div class="scores-title">🏆 Pontuações</div>
+      <div class="scores-list" id="scores-list"></div>
+    </div>
+
+    <!-- Daily Double -->
+    <div id="dd-overlay">
+      <div class="dd-title">Daily Double</div>
+      <div class="dd-sub" id="dd-team">Equipa...</div>
+      <div class="dd-wager" id="dd-wager">0€</div>
+    </div>
+
+    <!-- Final Jeoparty -->
+    <div id="fj-overlay">
+      <div class="fj-category-tag" id="fj-cat">Final Jeoparty</div>
+      <div class="q-text" id="fj-text" style="color:#fff;">Aguardando...</div>
+      <div class="q-answer-box" id="fj-ans-box">
+        <div class="q-answer-label">Resposta Final Correta</div>
+        <div class="q-answer-text" id="fj-ans-text">Resposta</div>
+      </div>
+    </div>
+
+    <!-- How To Play -->
+    <div id="htp-overlay">
+      <div class="htp-title">Como Jogar</div>
+      <div class="htp-number" id="htp-num">1 / 5</div>
+      <div class="htp-slide-title" id="htp-slide-title">Categorias</div>
+      <div class="htp-slide-desc" id="htp-slide-desc">Descrição da regra.</div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    // ══════════════════════════════════════════════
+    //  GOLD PARTICLE SYSTEM
+    // ══════════════════════════════════════════════
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x   = Math.random() * W;
+        this.y   = H + Math.random() * 100;
+        this.vx  = (Math.random() - 0.5) * 0.4;
+        this.vy  = -(Math.random() * 0.6 + 0.2);
+        this.r   = Math.random() * 2.5 + 0.5;
+        this.a   = Math.random() * 0.6 + 0.2;
+        this.da  = -0.0008 * Math.random();
+        this.gold= Math.random() > 0.5;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        this.a += this.da;
+        if (this.a <= 0 || this.y < -10) this.reset();
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.a);
+        ctx.fillStyle   = this.gold ? '#c9a84c' : '#ffd700';
+        ctx.shadowBlur  = 8;
+        ctx.shadowColor = '#c9a84c';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 80; i++) {
+      const p = new Particle();
+      p.y = Math.random() * H; // scatter initially
+      particles.push(p);
+    }
+
+    function animParticles() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animParticles);
+    }
+    animParticles();
+
+    // ══════════════════════════════════════════════
+    //  FIREBASE
+    // ══════════════════════════════════════════════
+    import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const FB_CFG = {
+      apiKey:            "AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik",
+      authDomain:        "aawards.firebaseapp.com",
+      databaseURL:       "https://aawards-default-rtdb.firebaseio.com",
+      projectId:         "aawards",
+      storageBucket:     "aawards.firebasestorage.app",
+      messagingSenderId: "839334918366",
+      appId:             "1:839334918366:web:454a259fa3e2665b46ea4f",
+    };
+
+    const app = initializeApp(FB_CFG);
+    const db  = getDatabase(app);
+
+    let currentConfig = {};
+    let boardIntroPlayed = false;
+
+    // ── Listen to game session ──
+    onValue(ref(db, 'jeoparty/session'), snap => {
+      const val = snap.val() || {};
+      currentConfig = val.gameConfig || {};
+      handleSession(val.gameState || {});
+    });
+
+    // ── Listen to tela state ──
+    onValue(ref(db, 'telas/central'), snap => {
+      const mode = snap.val() || 'idle';
+      handleTelaMode(mode);
+    });
+
+    // ══════════════════════════════════════════════
+    //  MODE HANDLER
+    // ══════════════════════════════════════════════
+    let lastGameState = {};
+
+    function handleSession(state) {
+      lastGameState = state;
+      // If game is active, reflect the game screen in the jeoparty overlay
+      if (state.gameStarted) {
+        showJeoparty(true);
+        handleScreens(state);
+      } else if (state.lobbyActive) {
+        showJeoparty(false);
+      } else {
+        showJeoparty(false);
+      }
+    }
+
+    function handleTelaMode(mode) {
+      if (mode === 'idle') {
+        showJeoparty(false);
+      } else {
+        showJeoparty(true);
+        handleScreens(lastGameState);
+      }
+    }
+
+    function showJeoparty(show) {
+      const overlay = document.getElementById('jeoparty-overlay');
+      const bg      = document.getElementById('bg-layer');
+      if (show) {
+        overlay.classList.add('visible');
+        bg.style.opacity = '0.05';
+      } else {
+        overlay.classList.remove('visible');
+        bg.style.opacity = '1';
+        boardIntroPlayed = false;
+      }
+    }
+
+    // ══════════════════════════════════════════════
+    //  SCREEN ROUTING
+    // ══════════════════════════════════════════════
+    const SCREENS = ['board-wrap', 'q-overlay', 'scores-overlay', 'dd-overlay', 'fj-overlay', 'htp-overlay'];
+
+    function showScreen(id) {
+      SCREENS.forEach(s => {
+        const el = document.getElementById(s);
+        if (!el) return;
+        if (s === id) {
+          el.classList.add('show');
+        } else {
+          el.classList.remove('show');
+        }
+      });
+    }
+
+    function handleScreens(state) {
+      if (!state.gameStarted && !state.lobbyActive) {
+        showScreen(null);
+        return;
+      }
+
+      switch (state.currentScreen) {
+        case 'question':
+          renderQuestion(state);
+          showScreen('q-overlay');
+          break;
+        case 'dailydouble':
+          renderDD(state);
+          showScreen('dd-overlay');
+          break;
+        case 'finaljeopardy':
+          renderFJ(state);
+          showScreen('fj-overlay');
+          break;
+        case 'scores':
+          renderScores(state);
+          showScreen('scores-overlay');
+          break;
+        case 'howtoplay':
+          renderHTP(state);
+          showScreen('htp-overlay');
+          break;
+        default:
+          renderBoard(currentConfig, state);
+          showScreen('board-wrap');
+          break;
+      }
+    }
+
+    // ══════════════════════════════════════════════
+    //  BOARD
+    // ══════════════════════════════════════════════
+    function renderBoard(config, state) {
+      const grid = document.getElementById('board-wrap');
+      grid.innerHTML = '';
+
+      const cats = config.categories || [];
+      if (!cats.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.5rem;color:rgba(255,255,255,0.3);">Aguardando configuração...</div>`;
+        return;
+      }
+
+      cats.forEach((cat, ci) => {
+        const col = document.createElement('div');
+        col.className = boardIntroPlayed ? 'cat-col' : 'cat-col anim-reveal';
+        col.style.animationDelay = `${ci * 0.1}s`;
+
+        const hdr = document.createElement('div');
+        hdr.className = 'cat-header';
+        hdr.textContent = cat.name || `Categoria ${ci + 1}`;
+        col.appendChild(hdr);
+
+        for (let qi = 0; qi < 5; qi++) {
+          const card = document.createElement('div');
+          card.className = 'q-card';
+          const val = cat.questions?.[qi]?.value || (qi + 1) * 200;
+          card.textContent = `${val}€`;
+          const key = `${ci}_${qi}`;
+          if (state.played?.[key]) card.classList.add('played');
+          else if (state.activeQuestion?.categoryIndex === ci && state.activeQuestion?.questionIndex === qi && state.currentScreen === 'question') {
+            card.classList.add('active');
+          }
+          col.appendChild(card);
+        }
+        grid.appendChild(col);
+      });
+
+      boardIntroPlayed = true;
+      grid.classList.add('show');
+    }
+
+    // ══════════════════════════════════════════════
+    //  QUESTION
+    // ══════════════════════════════════════════════
+    function renderQuestion(state) {
+      const qi  = state.activeQuestion || {};
+      const cat = currentConfig.categories?.[qi.categoryIndex];
+      const q   = cat?.questions?.[qi.questionIndex];
+      if (!q) return;
+
+      document.getElementById('q-cat').textContent  = cat.name;
+      document.getElementById('q-pts').textContent  = `${q.value || (qi.questionIndex + 1) * 200}€`;
+      document.getElementById('q-text').textContent = q.q;
+      document.getElementById('q-ans-text').textContent = q.a;
+
+      const ansBox = document.getElementById('q-ans-box');
+      qi.state === 'answer' ? ansBox.classList.add('show') : ansBox.classList.remove('show');
+    }
+
+    // ══════════════════════════════════════════════
+    //  DAILY DOUBLE
+    // ══════════════════════════════════════════════
+    function renderDD(state) {
+      const teams = state.teams || [];
+      const ddTeamId = state.dailyDouble?.teamId;
+      const team = teams.find(t => t.id === ddTeamId);
+      document.getElementById('dd-team').textContent  = team ? team.name : 'Equipa...';
+      document.getElementById('dd-wager').textContent = state.dailyDouble?.wager ? `${state.dailyDouble.wager}€` : '???';
+    }
+
+    // ══════════════════════════════════════════════
+    //  FINAL JEOPARTY
+    // ══════════════════════════════════════════════
+    function renderFJ(state) {
+      const fj = state.finalJeopardy || {};
+      const config = currentConfig.finalJeopardy || {};
+      document.getElementById('fj-cat').textContent  = config.category || 'Final Jeoparty';
+      document.getElementById('fj-text').textContent = fj.state === 'clue' || fj.state === 'answer' ? (config.q || 'Aguardando pergunta...') : 'Aguardando...';
+      document.getElementById('fj-ans-text').textContent = config.a || '';
+
+      const fjAns = document.getElementById('fj-ans-box');
+      fj.state === 'answer' ? fjAns.classList.add('show') : fjAns.classList.remove('show');
+    }
+
+    // ══════════════════════════════════════════════
+    //  SCORES
+    // ══════════════════════════════════════════════
+    function renderScores(state) {
+      const teams = [...(state.teams || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
+      const list  = document.getElementById('scores-list');
+      const ranks = ['first', 'second', 'third'];
+
+      list.innerHTML = teams.map((t, i) => `
+        <div class="score-row" style="animation-delay:${i * 0.1}s">
+          <div class="score-rank ${ranks[i] || ''}">${i + 1}</div>
+          <div class="score-swatch" style="background:${t.color || '#ccc'}"></div>
+          <div class="score-name">${t.name}</div>
+          <div class="score-pts">${(t.score || 0).toLocaleString('pt-PT')}€</div>
+        </div>`).join('');
+    }
+
+    // ══════════════════════════════════════════════
+    //  HOW TO PLAY
+    // ══════════════════════════════════════════════
+    const HTP_RULES = [
+      { title: 'Categorias',    desc: 'O tabuleiro tem 5 colunas temáticas. Cada coluna contém 5 perguntas com valores de 200€ a 1000€.' },
+      { title: 'Escolha',       desc: 'A equipa com a vez escolhe uma categoria e um valor. O anfitrião lê a pista.' },
+      { title: 'Resposta',      desc: 'A equipa tem 15 segundos para responder. A resposta correta vale os pontos; a errada desconta.' },
+      { title: 'Daily Double',  desc: 'Algumas perguntas escondem o Daily Double! Podes apostar até ao teu saldo atual.' },
+      { title: 'Final Jeoparty', desc: 'No final, todas as equipas apostam secretamente e respondem à pergunta final. Quem tiver mais pontos vence!' },
+    ];
+
+    function renderHTP(state) {
+      const step  = (state.howToPlayStep || 1) - 1;
+      const rule  = HTP_RULES[Math.min(step, HTP_RULES.length - 1)];
+      document.getElementById('htp-num').textContent        = `${step + 1} / ${HTP_RULES.length}`;
+      document.getElementById('htp-slide-title').textContent = rule.title;
+      document.getElementById('htp-slide-desc').textContent  = rule.desc;
+    }
+  </script>
+</body>
+</html>

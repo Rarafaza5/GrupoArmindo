@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sub-Lateral Esquerda — Armindo Awards '26</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold:        #c9a84c;
+      --gold-bright: #ffd700;
+      --cyan:        #00f5ff;
+      --magenta:     #ff007f;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; cursor: none; user-select: none; -webkit-user-select: none; }
+
+    /* ─── Background PNG ─── */
+    #bg-layer {
+      position: fixed; inset: 0; z-index: 0;
+      background: url('fundos/Sub lateral.png') center center / cover no-repeat;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── Particle Canvas ─── */
+    #particle-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+    /* ─── Vignette ─── */
+    #vignette {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 20%),
+        linear-gradient(to top,    rgba(0,0,0,0.4) 0%, transparent 20%),
+        radial-gradient(ellipse 60% 100% at center, transparent 30%, rgba(0,0,0,0.4) 100%);
+    }
+
+    /* ─── Gold Glow Border ─── */
+    #glow-border { position: fixed; inset: 0; z-index: 3; pointer-events: none; animation: borderPulse 4.5s ease-in-out infinite alternate; }
+    @keyframes borderPulse {
+      0%   { box-shadow: inset 0 0 40px rgba(201,168,76,0.08), inset 0 0 80px rgba(201,168,76,0.03); }
+      100% { box-shadow: inset 0 0 60px rgba(201,168,76,0.18), inset 0 0 120px rgba(201,168,76,0.08); }
+    }
+
+    /* ─── Scanlines ─── */
+    #scanlines {
+      position: fixed; inset: 0; z-index: 4; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+    }
+
+    /* ═══════════════════════════════════════════
+       BRANDING MODE (sempre visível mas subtil)
+    ═══════════════════════════════════════════ */
+    #branding-overlay {
+      position: fixed; inset: 0; z-index: 5; pointer-events: none;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 8vmin;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    #branding-overlay.visible { opacity: 1; }
+
+    .brand-logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1rem, 4.5vw, 2.5rem); font-weight: 900;
+      text-transform: uppercase; letter-spacing: 4px;
+      color: rgba(201,168,76,0.85);
+      text-shadow: 0 0 30px rgba(201,168,76,0.4);
+      text-align: center; line-height: 1.2;
+    }
+    .brand-year {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(0.8rem, 3vw, 1.8rem); font-weight: 700;
+      letter-spacing: 6px; color: rgba(201,168,76,0.5);
+      margin-top: 1.5vmin;
+      text-align: center;
+    }
+    .brand-divider {
+      width: 50%; height: 1px; margin: 2vmin auto;
+      background: linear-gradient(to right, transparent, rgba(201,168,76,0.6), transparent);
+    }
+
+    /* ═══════════════════════════════════════════
+       JEOPARTY OVERLAY — Branding + mini score
+    ═══════════════════════════════════════════ */
+    #jeoparty-overlay {
+      position: fixed; inset: 0; z-index: 10;
+      background: linear-gradient(160deg, #100920 0%, #07060a 60%, #120a05 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 5vmin;
+      gap: 4vmin;
+    }
+    #jeoparty-overlay.visible { opacity: 1; }
+
+    /* Top — Armindo Awards branding */
+    .jeoparty-brand {
+      display: flex; flex-direction: column; align-items: center; gap: 1.5vmin;
+      margin-bottom: 2vmin;
+    }
+    .jb-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(0.7rem, 3vw, 1.5rem); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 4px;
+      color: rgba(201,168,76,0.7);
+    }
+    .jb-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.5rem, 7vw, 4rem); font-weight: 900;
+      text-transform: uppercase; letter-spacing: 2px;
+      text-align: center; line-height: 1.1;
+      background: linear-gradient(135deg, #ffd700, #c9a84c, #ffd700);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: none;
+      animation: shimmerText 3s linear infinite;
+      background-size: 200% auto;
+    }
+    @keyframes shimmerText {
+      from { background-position: 0% center; }
+      to   { background-position: 200% center; }
+    }
+
+    .gold-divider { width: 70%; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.6), transparent); }
+
+    /* Bottom — compact scores */
+    .mini-scores { display: flex; flex-direction: column; gap: 1.8vmin; width: 100%; }
+    .mini-score-row {
+      display: flex; align-items: center; gap: 2vmin;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-left: 3px solid transparent; border-radius: 10px;
+      padding: 2.5vmin 3vmin;
+    }
+    .mini-rank { font-family: 'Space Grotesk', sans-serif; font-size: clamp(0.9rem, 3.5vw, 2rem); font-weight: 900; color: rgba(255,255,255,0.25); min-width: 1.2em; text-align: center; }
+    .mini-rank.first  { color: #ffd700; }
+    .mini-rank.second { color: #c0c0c0; }
+    .mini-rank.third  { color: #cd7f32; }
+    .mini-swatch { width: clamp(8px,2.5vmin,14px); height: clamp(8px,2.5vmin,14px); border-radius: 50%; flex-shrink: 0; }
+    .mini-name   { flex:1; font-family: 'Outfit', sans-serif; font-size: clamp(0.9rem, 3.2vw, 1.8rem); font-weight: 800; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mini-pts    { font-family: 'Space Grotesk', sans-serif; font-size: clamp(0.9rem, 3.2vw, 1.8rem); font-weight: 700; color: #ffd700; }
+
+    /* Ambient glows */
+    .jg1 { position: fixed; width: 80vw; height: 80vw; border-radius: 50%; background: radial-gradient(circle, rgba(138,43,226,0.12) 0%, transparent 70%); top: -30vw; left: -20vw; pointer-events: none; z-index: 0; animation: blobFloat 20s ease-in-out infinite alternate; }
+    .jg2 { position: fixed; width: 60vw; height: 60vw; border-radius: 50%; background: radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 70%); bottom: -20vw; right: -10vw; pointer-events: none; z-index: 0; animation: blobFloat 15s ease-in-out infinite alternate-reverse; }
+    @keyframes blobFloat { from { transform: translate(0,0) scale(1); } to { transform: translate(15px,10px) scale(1.06); } }
+
+    /* Shimmer scanline that sweeps vertically */
+    #sweep {
+      position: fixed; inset: 0; z-index: 6; pointer-events: none;
+      background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.025) 50%, transparent 100%);
+      background-size: 100% 40%;
+      animation: sweep 8s ease-in-out infinite;
+    }
+    @keyframes sweep {
+      0%   { background-position: 0 -40%; }
+      100% { background-position: 0 140%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="jg1"></div>
+  <div class="jg2"></div>
+
+  <div id="bg-layer"></div>
+  <canvas id="particle-canvas"></canvas>
+  <div id="vignette"></div>
+  <div id="glow-border"></div>
+  <div id="scanlines"></div>
+  <div id="sweep"></div>
+
+  <!-- Branding overlay (shown on top of idle bg) -->
+  <div id="branding-overlay">
+    <div class="brand-divider"></div>
+    <div class="brand-logo-text">Armindo<br>Awards</div>
+    <div class="brand-year">2026</div>
+  </div>
+
+  <!-- Jeoparty overlay (branding + mini scoreboard) -->
+  <div id="jeoparty-overlay">
+    <div class="jeoparty-brand">
+      <div class="jb-label">Armindo</div>
+      <div class="jb-title">Awards<br>'26</div>
+    </div>
+    <div class="gold-divider"></div>
+    <div class="mini-scores" id="mini-scores"></div>
+  </div>
+
+  <script type="module">
+    // Particles
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, pts = [];
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+    class P {
+      constructor() { this.reset(); }
+      reset() { this.x=Math.random()*W; this.y=H+20; this.vx=(Math.random()-0.5)*0.25; this.vy=-(Math.random()*0.4+0.1); this.r=Math.random()*1.8+0.4; this.a=Math.random()*0.45+0.15; this.da=-0.0005; }
+      tick() { this.x+=this.vx; this.y+=this.vy; this.a+=this.da; if(this.a<=0||this.y<-10) this.reset(); }
+      draw() { ctx.save(); ctx.globalAlpha=Math.max(0,this.a); ctx.fillStyle='#c9a84c'; ctx.shadowBlur=5; ctx.shadowColor='#c9a84c'; ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+    }
+    for(let i=0;i<40;i++){const p=new P();p.y=Math.random()*H;pts.push(p);}
+    (function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.tick();p.draw();});requestAnimationFrame(loop);})();
+
+    // Firebase
+    import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    const FB_CFG = { apiKey:"AIzaSyA8azNy6GEgD190y_fW91ahUbKa1w5veik", authDomain:"aawards.firebaseapp.com", databaseURL:"https://aawards-default-rtdb.firebaseio.com", projectId:"aawards", storageBucket:"aawards.firebasestorage.app", messagingSenderId:"839334918366", appId:"1:839334918366:web:454a259fa3e2665b46ea4f" };
+    const db = getDatabase(initializeApp(FB_CFG));
+    let lastState={}, telaMode='idle';
+
+    onValue(ref(db,'jeoparty/session'), snap=>{
+      const val=snap.val()||{};
+      lastState=val.gameState||{};
+      applyMode();
+    });
+    onValue(ref(db,'telas/sublateral_esq'), snap=>{ telaMode=snap.val()||'idle'; applyMode(); });
+
+    function applyMode() {
+      const bg=document.getElementById('bg-layer');
+      const br=document.getElementById('branding-overlay');
+      const jp=document.getElementById('jeoparty-overlay');
+      const idle = telaMode==='idle' || (!lastState.gameStarted && !lastState.lobbyActive);
+
+      bg.style.opacity = idle ? '1' : '0.07';
+      br.classList.toggle('visible', idle);
+      jp.classList.toggle('visible', !idle && (telaMode==='branding'||telaMode==='auto'));
+
+      if(!idle) renderMiniScores(lastState);
+    }
+
+    function renderMiniScores(state) {
+      const teams=[...(state.teams||[])].sort((a,b)=>(b.score||0)-(a.score||0));
+      const ranks=['first','second','third'];
+      document.getElementById('mini-scores').innerHTML=teams.map((t,i)=>`
+        <div class="mini-score-row" style="border-left-color:${t.color||'#ccc'}">
+          <div class="mini-rank ${ranks[i]||''}">${i+1}</div>
+          <div class="mini-swatch" style="background:${t.color||'#ccc'}"></div>
+          <div class="mini-name">${t.name}</div>
+          <div class="mini-pts">${(t.score||0).toLocaleString('pt-PT')}€</div>
+        </div>`).join('');
+    }
+  </script>
+</body>
+</html>
