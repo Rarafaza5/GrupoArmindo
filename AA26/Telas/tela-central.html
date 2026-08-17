@@ -6,13 +6,12 @@
   <title>Tela Central — Armindo Awards '26</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --gold:        #c9a84c;
-      --gold-bright: #ffd700;
-      --cyan:        #00f5ff;
-      --magenta:     #ff007f;
+      --cyan:    #00f5ff;
+      --magenta: #ff007f;
+      --gold:    #ffd700;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,17 +25,11 @@
       -webkit-user-select: none;
     }
 
-    /* ─── Background PNG (Pure & Crisp, zero wash) ─── */
+    /* ─── Background PNG (100% puro) ─── */
     #bg-layer {
       position: fixed; inset: 0; z-index: 0;
       background: #000000 url('fundos/Central.png') center center / cover no-repeat;
-      transition: opacity 0.8s ease;
-    }
-
-    /* ─── Particle Canvas (Clean pinpoint gold dust, no bloom fog) ─── */
-    #particle-canvas {
-      position: fixed; inset: 0; z-index: 1;
-      pointer-events: none;
+      transition: opacity 0.5s ease;
     }
 
     /* ═══════════════════════════════════════════════
@@ -44,29 +37,14 @@
     ═══════════════════════════════════════════════ */
     #jeoparty-overlay {
       position: fixed; inset: 0; z-index: 10;
-      background: #06040d;
+      background: #070512;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.8s ease;
+      transition: opacity 0.5s ease;
     }
     #jeoparty-overlay.visible {
       opacity: 1;
-    }
-
-    /* ─── Ambient glows (strictly inside Jeoparty overlay only) ─── */
-    .jeoparty-glows {
-      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-    }
-    .jg1 {
-      position: absolute; width: 600px; height: 600px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(138,43,226,0.1) 0%, transparent 70%);
-      top: -150px; left: -100px;
-    }
-    .jg2 {
-      position: absolute; width: 500px; height: 500px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,245,255,0.06) 0%, transparent 70%);
-      bottom: -150px; right: -100px;
     }
 
     /* ─── BOARD ─── */
@@ -77,15 +55,14 @@
       gap: 1.2vh;
       padding: 2vh 1.5vw;
       opacity: 0;
-      transition: opacity 0.5s ease;
-      position: relative; z-index: 2;
+      transition: opacity 0.4s ease;
     }
     #board-wrap.show { opacity: 1; }
 
     .cat-col { display: flex; flex-direction: column; gap: 1.2vh; }
 
     .cat-header {
-      background: linear-gradient(135deg, rgba(30,20,60,0.95), rgba(15,10,35,0.95));
+      background: rgba(30,20,60,0.95);
       border: 1.5px solid rgba(138,43,226,0.4);
       border-radius: 10px;
       height: 13vh;
@@ -98,27 +75,26 @@
 
     .q-card {
       flex-grow: 1;
-      background: rgba(18,14,35,0.85);
-      border: 1.5px solid rgba(255,255,255,0.08);
+      background: rgba(20,16,38,0.9);
+      border: 1.5px solid rgba(255,255,255,0.1);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.6rem, 2.8vw, 3rem);
       font-weight: 700; color: var(--cyan);
-      transition: all 0.4s ease;
     }
-    .q-card.played  { opacity: 0.1; border-color: transparent; color: rgba(255,255,255,0.15); background: transparent; }
-    .q-card.active  { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,245,255,0.3); }
+    .q-card.played { opacity: 0.12; border-color: transparent; color: rgba(255,255,255,0.2); background: transparent; }
+    .q-card.active { border-color: var(--cyan); }
 
     /* ─── QUESTION OVERLAY ─── */
     #q-overlay {
       position: absolute; inset: 0; z-index: 5;
-      background: rgba(5,3,10,0.98);
+      background: #070512;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 8vh 10vw;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.3s ease;
     }
     #q-overlay.show { opacity: 1; }
 
@@ -126,8 +102,8 @@
       font-family: 'Outfit', sans-serif;
       font-size: clamp(1rem, 1.5vw, 1.5rem);
       font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
-      color: var(--gold-bright);
-      border: 1.5px solid var(--gold-bright);
+      color: var(--gold);
+      border: 1.5px solid var(--gold);
       padding: 8px 28px; border-radius: 30px;
       margin-bottom: 3vh;
     }
@@ -169,11 +145,11 @@
     /* ─── SCORES OVERLAY ─── */
     #scores-overlay {
       position: absolute; inset: 0; z-index: 5;
-      background: rgba(5,3,10,0.98);
+      background: #070512;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.4s ease;
       gap: 3vh;
     }
     #scores-overlay.show { opacity: 1; }
@@ -183,7 +159,7 @@
       font-size: clamp(2rem, 3.5vw, 3.5rem);
       font-weight: 900; letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--gold-bright);
+      color: var(--gold);
       margin-bottom: 2vh;
     }
 
@@ -204,7 +180,7 @@
       font-weight: 900; color: rgba(255,255,255,0.3);
       width: 2.5vw; text-align: center;
     }
-    .score-rank.first  { color: var(--gold-bright); }
+    .score-rank.first  { color: var(--gold); }
     .score-rank.second { color: #c0c0c0; }
     .score-rank.third  { color: #cd7f32; }
     .score-swatch { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
@@ -217,20 +193,19 @@
     .score-pts {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.5rem, 2.5vw, 2.5rem);
-      font-weight: 700; color: var(--gold-bright);
+      font-weight: 700; color: var(--gold);
     }
 
     /* ─── DAILY DOUBLE ─── */
     #dd-overlay {
       position: absolute; inset: 0; z-index: 5;
-      background: rgba(15,7,0,0.98);
+      background: #070512;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.3s ease;
     }
     #dd-overlay.show { opacity: 1; }
-
     .dd-title {
       font-family: 'Outfit', sans-serif;
       font-size: clamp(4rem, 8vw, 8rem);
@@ -245,22 +220,21 @@
     .dd-wager {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(2.5rem, 5vw, 5rem);
-      font-weight: 700; color: var(--gold-bright);
+      font-weight: 700; color: var(--gold);
       margin-top: 2.5vh;
     }
 
     /* ─── FINAL JEOPARTY ─── */
     #fj-overlay {
       position: absolute; inset: 0; z-index: 5;
-      background: rgba(10,0,18,0.98);
+      background: #070512;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 8vh 10vw;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.4s ease;
     }
     #fj-overlay.show { opacity: 1; }
-
     .fj-category-tag {
       font-size: clamp(1rem, 1.5vw, 1.5rem);
       font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
@@ -273,15 +247,14 @@
     /* ─── HOW TO PLAY ─── */
     #htp-overlay {
       position: absolute; inset: 0; z-index: 5;
-      background: rgba(5,3,10,0.98);
+      background: #070512;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 4vh;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.3s ease;
     }
     #htp-overlay.show { opacity: 1; }
-
     .htp-title {
       font-size: clamp(1.5rem, 2.5vw, 2.5rem);
       font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
@@ -291,7 +264,7 @@
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.5rem, 2.5vw, 2.5rem); font-weight: 900;
       width: 90px; height: 90px; border-radius: 50%;
-      background: rgba(0,245,255,0.08); border: 2.5px solid var(--cyan);
+      background: rgba(0,245,255,0.1); border: 2.5px solid var(--cyan);
       color: var(--cyan); display: flex; align-items: center; justify-content: center;
     }
     .htp-slide-title {
@@ -310,19 +283,11 @@
 </head>
 <body>
 
-  <!-- Clean Background PNG -->
+  <!-- Background PNG (Puro) -->
   <div id="bg-layer"></div>
-
-  <!-- Gold Particle Canvas (Clean & Pinpoint) -->
-  <canvas id="particle-canvas"></canvas>
 
   <!-- Jeoparty Overlay -->
   <div id="jeoparty-overlay">
-    <div class="jeoparty-glows">
-      <div class="jg1"></div>
-      <div class="jg2"></div>
-    </div>
-
     <!-- Board -->
     <div id="board-wrap"></div>
 
@@ -367,67 +332,9 @@
       <div class="htp-slide-title" id="htp-slide-title">Categorias</div>
       <div class="htp-slide-desc" id="htp-slide-desc">Descrição da regra.</div>
     </div>
-
   </div>
 
   <script type="module">
-    // ══════════════════════════════════════════════
-    //  PINPOINT GOLD PARTICLES (Clean, no fog)
-    // ══════════════════════════════════════════════
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    let W, H, particles = [];
-
-    function resize() {
-      W = canvas.width  = window.innerWidth;
-      H = canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    class Particle {
-      constructor() { this.reset(); }
-      reset() {
-        this.x   = Math.random() * W;
-        this.y   = H + Math.random() * 50;
-        this.vx  = (Math.random() - 0.5) * 0.3;
-        this.vy  = -(Math.random() * 0.4 + 0.15);
-        this.r   = Math.random() * 1.5 + 0.4;
-        this.a   = Math.random() * 0.4 + 0.1;
-        this.da  = -0.0006 * Math.random();
-      }
-      update() {
-        this.x += this.vx; this.y += this.vy;
-        this.a += this.da;
-        if (this.a <= 0 || this.y < -10) this.reset();
-      }
-      draw() {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.a);
-        ctx.fillStyle   = '#ffd700';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-
-    for (let i = 0; i < 45; i++) {
-      const p = new Particle();
-      p.y = Math.random() * H;
-      particles.push(p);
-    }
-
-    function animParticles() {
-      ctx.clearRect(0, 0, W, H);
-      particles.forEach(p => { p.update(); p.draw(); });
-      requestAnimationFrame(animParticles);
-    }
-    animParticles();
-
-    // ══════════════════════════════════════════════
-    //  FIREBASE
-    // ══════════════════════════════════════════════
     import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
