@@ -20,47 +20,23 @@
     html, body {
       width: 100%; height: 100%;
       overflow: hidden;
-      background: #000;
+      background: #000000;
       cursor: none;
       user-select: none;
       -webkit-user-select: none;
     }
 
-    /* ─── Background PNG ─── */
+    /* ─── Background PNG (Clean, full contrast) ─── */
     #bg-layer {
       position: fixed; inset: 0; z-index: 0;
-      background: url('fundos/Lateral Esquerdo.png') center center / cover no-repeat;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #000000 url('fundos/Lateral Esquerdo.png') center center / cover no-repeat;
+      transition: opacity 0.8s ease;
     }
 
-    /* ─── Particle Canvas ─── */
+    /* ─── Pinpoint Particle Canvas ─── */
     #particle-canvas {
       position: fixed; inset: 0; z-index: 1;
       pointer-events: none;
-    }
-
-    /* ─── Vignette ─── */
-    #vignette {
-      position: fixed; inset: 0; z-index: 2;
-      background: radial-gradient(ellipse 80% 120% at center,
-        transparent 40%, rgba(0,0,0,0.5) 100%);
-      pointer-events: none;
-    }
-
-    /* ─── Gold Glow Border ─── */
-    #glow-border {
-      position: fixed; inset: 0; z-index: 3; pointer-events: none;
-      animation: borderPulse 4s ease-in-out infinite alternate;
-    }
-    @keyframes borderPulse {
-      0%   { box-shadow: inset 0 0 50px rgba(201,168,76,0.10), inset 0 0 100px rgba(201,168,76,0.04); }
-      100% { box-shadow: inset 0 0 70px rgba(201,168,76,0.20), inset 0 0 140px rgba(201,168,76,0.09); }
-    }
-
-    /* ─── Scanlines ─── */
-    #scanlines {
-      position: fixed; inset: 0; z-index: 4; pointer-events: none;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
     }
 
     /* ═══════════════════════════════════════════
@@ -68,22 +44,20 @@
     ═══════════════════════════════════════════ */
     #jeoparty-overlay {
       position: fixed; inset: 0; z-index: 10;
-      background: radial-gradient(ellipse at 50% 30%, #140d2e 0%, #07060a 100%);
+      background: #06040d;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.8s ease;
       padding: 6vmin 5vmin;
     }
     #jeoparty-overlay.visible { opacity: 1; }
 
-    /* ─── Scoreboard ─── */
     .scores-header {
       font-family: 'Outfit', sans-serif;
       font-size: clamp(1.2rem, 4vw, 2.5rem);
       font-weight: 900; letter-spacing: 3px; text-transform: uppercase;
-      background: linear-gradient(to right, var(--gold-bright), #ff8c00);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      color: var(--gold-bright);
       margin-bottom: 5vmin; text-align: center;
     }
 
@@ -98,11 +72,6 @@
       border: 1px solid rgba(255,255,255,0.1);
       border-left: 4px solid transparent;
       border-radius: 14px; padding: 3.5vmin 4vmin;
-      animation: rowSlide 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
-    }
-    @keyframes rowSlide {
-      from { opacity: 0; transform: translateX(-30px); }
-      to   { opacity: 1; transform: translateX(0); }
     }
     .score-rank {
       font-family: 'Space Grotesk', sans-serif;
@@ -128,14 +97,14 @@
       color: var(--gold-bright);
     }
 
-    /* ─── Category highlight (used when mode = 'category') ─── */
+    /* ─── Category highlight ─── */
     #cat-overlay {
       position: fixed; inset: 0; z-index: 10;
-      background: radial-gradient(ellipse at 50% 30%, #0a1a2e 0%, #07060a 100%);
+      background: #06040d;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.8s ease;
       padding: 6vmin;
       gap: 4vmin;
     }
@@ -151,63 +120,28 @@
       font-family: 'Outfit', sans-serif;
       font-size: clamp(2rem, 8vw, 5rem);
       font-weight: 900; text-align: center; color: #fff;
-      text-shadow: 0 0 40px rgba(0,245,255,0.3);
       line-height: 1.1;
     }
     .cat-pts {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.5rem, 6vw, 4rem);
       font-weight: 700; color: var(--gold-bright);
-      text-shadow: 0 0 25px rgba(255,215,0,0.4);
     }
 
-    /* ─── ambient glows ─── */
-    .jg1 {
-      position: fixed; width: 60vw; height: 60vw; border-radius: 50%;
-      background: radial-gradient(circle, rgba(138,43,226,0.15) 0%, transparent 70%);
-      top: -20vw; left: -10vw; pointer-events: none; z-index: 0;
-      animation: blobFloat 18s ease-in-out infinite alternate;
-    }
-    .jg2 {
-      position: fixed; width: 50vw; height: 50vw; border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,245,255,0.08) 0%, transparent 70%);
-      bottom: -15vw; right: -10vw; pointer-events: none; z-index: 0;
-      animation: blobFloat 14s ease-in-out infinite alternate-reverse;
-    }
-    @keyframes blobFloat {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(20px,15px) scale(1.08); }
-    }
-
-    /* ─── Decorative gold line ─── */
     .gold-divider {
       width: 60%; height: 1px;
-      background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
+      background: rgba(201,168,76,0.4);
       margin: 3vmin auto;
-      opacity: 0.5;
-    }
-
-    /* ─── Branding at bottom ─── */
-    .brand-footer {
-      position: fixed; bottom: 5vmin; left: 0; right: 0;
-      text-align: center; z-index: 11;
-      font-family: 'Outfit', sans-serif;
-      font-size: clamp(0.6rem, 2.5vw, 1.2rem);
-      font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(201,168,76,0.5);
     }
   </style>
 </head>
 <body>
 
-  <div class="jg1"></div>
-  <div class="jg2"></div>
-
+  <!-- Clean Background PNG -->
   <div id="bg-layer"></div>
+
+  <!-- Pinpoint Particles -->
   <canvas id="particle-canvas"></canvas>
-  <div id="vignette"></div>
-  <div id="glow-border"></div>
-  <div id="scanlines"></div>
 
   <!-- Scores Overlay -->
   <div id="jeoparty-overlay">
@@ -224,12 +158,7 @@
     <div class="cat-pts" id="cat-pts"></div>
   </div>
 
-  <div class="brand-footer">Armindo Awards · 2026</div>
-
   <script type="module">
-    // ══════════════════════════════════════════════
-    //  PARTICLE SYSTEM (compact, gold)
-    // ══════════════════════════════════════════════
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d');
     let W, H, pts = [];
@@ -240,8 +169,8 @@
       constructor() { this.reset(); }
       reset() {
         this.x = Math.random() * W; this.y = H + 20;
-        this.vx = (Math.random() - 0.5) * 0.3; this.vy = -(Math.random() * 0.5 + 0.15);
-        this.r  = Math.random() * 2 + 0.5; this.a = Math.random() * 0.5 + 0.2; this.da = -0.0006;
+        this.vx = (Math.random() - 0.5) * 0.25; this.vy = -(Math.random() * 0.4 + 0.1);
+        this.r  = Math.random() * 1.3 + 0.3; this.a = Math.random() * 0.4 + 0.1; this.da = -0.0005;
       }
       tick() {
         this.x += this.vx; this.y += this.vy; this.a += this.da;
@@ -249,17 +178,14 @@
       }
       draw() {
         ctx.save(); ctx.globalAlpha = Math.max(0, this.a);
-        ctx.fillStyle = '#c9a84c'; ctx.shadowBlur = 6; ctx.shadowColor = '#c9a84c';
+        ctx.fillStyle = '#ffd700';
         ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       }
     }
-    for (let i = 0; i < 50; i++) { const p = new P(); p.y = Math.random() * H; pts.push(p); }
+    for (let i = 0; i < 30; i++) { const p = new P(); p.y = Math.random() * H; pts.push(p); }
     (function loop() { ctx.clearRect(0,0,W,H); pts.forEach(p=>{p.tick();p.draw();}); requestAnimationFrame(loop); })();
 
-    // ══════════════════════════════════════════════
-    //  FIREBASE
-    // ══════════════════════════════════════════════
     import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -289,27 +215,23 @@
       applyMode();
     });
 
-    // ══════════════════════════════════════════════
-    //  APPLY MODE
-    // ══════════════════════════════════════════════
     function applyMode() {
       const bg       = document.getElementById('bg-layer');
       const jpOverlay= document.getElementById('jeoparty-overlay');
       const catOverlay= document.getElementById('cat-overlay');
 
-      const showBg = telaMode === 'idle' || (!lastState.gameStarted && !lastState.lobbyActive);
+      const isGameActive = lastState.gameStarted === true;
+      const isAuto       = telaMode === 'auto';
+      const isScores     = telaMode === 'scores' || (isAuto && isGameActive);
+      const isCategory   = telaMode === 'category' && lastState.activeQuestion;
+      const isIdle       = telaMode === 'idle' || (!isScores && !isCategory);
 
-      bg.style.opacity = showBg ? '1' : '0.06';
+      bg.style.opacity = isIdle ? '1' : '0';
+      jpOverlay.classList.toggle('visible', isScores);
+      catOverlay.classList.toggle('visible', isCategory);
 
-      // scores mode: when game is active and mode is 'scores' or game is running (auto)
-      const showScores = !showBg && (telaMode === 'scores' || telaMode === 'auto') && lastState.gameStarted;
-      const showCat    = !showBg && telaMode === 'category' && lastState.activeQuestion;
-
-      jpOverlay.classList.toggle('visible', showScores);
-      catOverlay.classList.toggle('visible', showCat);
-
-      if (showScores) renderScores(lastState);
-      if (showCat)    renderCategory(lastState);
+      if (isScores)   renderScores(lastState);
+      if (isCategory) renderCategory(lastState);
     }
 
     function renderScores(state) {
@@ -317,7 +239,7 @@
       const list  = document.getElementById('scores-list');
       const ranks = ['first', 'second', 'third'];
       list.innerHTML = teams.map((t, i) => `
-        <div class="score-row" style="animation-delay:${i * 0.08}s; border-left-color:${t.color||'#ccc'}">
+        <div class="score-row" style="border-left-color:${t.color||'#ccc'}">
           <div class="score-rank ${ranks[i]||''}">${i + 1}</div>
           <div class="score-swatch" style="background:${t.color||'#ccc'}"></div>
           <div class="score-name">${t.name}</div>

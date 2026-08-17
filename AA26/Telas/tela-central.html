@@ -11,10 +11,8 @@
     :root {
       --gold:        #c9a84c;
       --gold-bright: #ffd700;
-      --gold-glow:   rgba(201, 168, 76, 0.4);
       --cyan:        #00f5ff;
       --magenta:     #ff007f;
-      --dark:        #07060a;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,63 +20,23 @@
     html, body {
       width: 100%; height: 100%;
       overflow: hidden;
-      background: #000;
+      background: #000000;
       cursor: none;
       user-select: none;
       -webkit-user-select: none;
     }
 
-    /* ─── LAYER STACK ─── */
-    /* z-index: 0 = PNG bg | 1 = canvas particles | 2 = vignette | 3 = glow border | 10 = jeoparty overlay */
-
-    /* ─── Background PNG ─── */
+    /* ─── Background PNG (Pure & Crisp, zero wash) ─── */
     #bg-layer {
       position: fixed; inset: 0; z-index: 0;
-      background: url('fundos/Central.png') center center / cover no-repeat;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #000000 url('fundos/Central.png') center center / cover no-repeat;
+      transition: opacity 0.8s ease;
     }
 
-    /* ─── Particle Canvas ─── */
+    /* ─── Particle Canvas (Clean pinpoint gold dust, no bloom fog) ─── */
     #particle-canvas {
       position: fixed; inset: 0; z-index: 1;
       pointer-events: none;
-    }
-
-    /* ─── Vignette Overlay ─── */
-    #vignette {
-      position: fixed; inset: 0; z-index: 2;
-      background: radial-gradient(ellipse at center,
-        transparent 50%,
-        rgba(0,0,0,0.45) 100%);
-      pointer-events: none;
-    }
-
-    /* ─── Gold Glow Border ─── */
-    #glow-border {
-      position: fixed; inset: 0; z-index: 3;
-      pointer-events: none;
-      box-shadow:
-        inset 0 0 60px rgba(201,168,76,0.12),
-        inset 0 0 120px rgba(201,168,76,0.06);
-      animation: borderPulse 4s ease-in-out infinite alternate;
-    }
-
-    @keyframes borderPulse {
-      0%   { box-shadow: inset 0 0 60px rgba(201,168,76,0.10), inset 0 0 120px rgba(201,168,76,0.04); }
-      100% { box-shadow: inset 0 0 80px rgba(201,168,76,0.22), inset 0 0 160px rgba(201,168,76,0.10); }
-    }
-
-    /* ─── Scanline effect ─── */
-    #scanlines {
-      position: fixed; inset: 0; z-index: 4;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.03) 2px,
-        rgba(0,0,0,0.03) 4px
-      );
     }
 
     /* ═══════════════════════════════════════════════
@@ -86,14 +44,29 @@
     ═══════════════════════════════════════════════ */
     #jeoparty-overlay {
       position: fixed; inset: 0; z-index: 10;
-      background: radial-gradient(ellipse at 50% 50%, #150f2e 0%, #07060a 100%);
+      background: #06040d;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.8s ease;
     }
     #jeoparty-overlay.visible {
       opacity: 1;
+    }
+
+    /* ─── Ambient glows (strictly inside Jeoparty overlay only) ─── */
+    .jeoparty-glows {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    .jg1 {
+      position: absolute; width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(138,43,226,0.1) 0%, transparent 70%);
+      top: -150px; left: -100px;
+    }
+    .jg2 {
+      position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,245,255,0.06) 0%, transparent 70%);
+      bottom: -150px; right: -100px;
     }
 
     /* ─── BOARD ─── */
@@ -104,15 +77,16 @@
       gap: 1.2vh;
       padding: 2vh 1.5vw;
       opacity: 0;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.5s ease;
+      position: relative; z-index: 2;
     }
     #board-wrap.show { opacity: 1; }
 
     .cat-col { display: flex; flex-direction: column; gap: 1.2vh; }
 
     .cat-header {
-      background: linear-gradient(135deg, rgba(30,20,60,0.9), rgba(15,10,35,0.9));
-      border: 1.5px solid rgba(138,43,226,0.35);
+      background: linear-gradient(135deg, rgba(30,20,60,0.95), rgba(15,10,35,0.95));
+      border: 1.5px solid rgba(138,43,226,0.4);
       border-radius: 10px;
       height: 13vh;
       display: flex; align-items: center; justify-content: center;
@@ -120,34 +94,31 @@
       font-family: 'Outfit', sans-serif;
       font-weight: 800; font-size: clamp(0.9rem, 1.5vw, 1.5rem);
       text-transform: uppercase; letter-spacing: 1px; color: #fff;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     .q-card {
       flex-grow: 1;
-      background: rgba(20,16,38,0.65);
+      background: rgba(18,14,35,0.85);
       border: 1.5px solid rgba(255,255,255,0.08);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1.6rem, 2.8vw, 3rem);
       font-weight: 700; color: var(--cyan);
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transition: all 0.4s ease;
     }
-    .q-card.played  { opacity: 0.12; border-color: transparent; color: rgba(255,255,255,0.2); }
-    .q-card.active  { border-color: var(--cyan); box-shadow: 0 0 25px rgba(0,245,255,0.3); }
+    .q-card.played  { opacity: 0.1; border-color: transparent; color: rgba(255,255,255,0.15); background: transparent; }
+    .q-card.active  { border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,245,255,0.3); }
 
     /* ─── QUESTION OVERLAY ─── */
     #q-overlay {
-      position: absolute; inset: 0;
-      background: rgba(7,6,15,0.97);
-      backdrop-filter: blur(20px);
+      position: absolute; inset: 0; z-index: 5;
+      background: rgba(5,3,10,0.98);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 8vh 10vw;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.4s ease;
     }
     #q-overlay.show { opacity: 1; }
 
@@ -158,13 +129,7 @@
       color: var(--gold-bright);
       border: 1.5px solid var(--gold-bright);
       padding: 8px 28px; border-radius: 30px;
-      box-shadow: 0 0 20px rgba(255,215,0,0.2);
       margin-bottom: 3vh;
-      animation: pulseGold 2.5s ease-in-out infinite;
-    }
-    @keyframes pulseGold {
-      0%,100% { box-shadow: 0 0 10px rgba(255,215,0,0.15); }
-      50%      { box-shadow: 0 0 35px rgba(255,215,0,0.40); }
     }
 
     .q-points {
@@ -179,28 +144,17 @@
       font-size: clamp(2rem, 4vw, 4.5rem);
       font-weight: 800; line-height: 1.25;
       color: #fff; text-align: center;
-      text-shadow: 0 4px 30px rgba(0,0,0,0.6);
       max-width: 90%;
-      animation: textReveal 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-    }
-    @keyframes textReveal {
-      from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
-      to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
     }
 
     .q-answer-box {
       margin-top: 5vh;
       padding: 20px 50px; border-radius: 14px;
-      background: rgba(255,0,127,0.08);
+      background: rgba(255,0,127,0.1);
       border: 1.5px dashed var(--magenta);
       display: none;
-      animation: ansReveal 0.5s ease forwards;
     }
     .q-answer-box.show { display: block; }
-    @keyframes ansReveal {
-      from { opacity: 0; transform: translateY(12px); filter: blur(4px); }
-      to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
-    }
     .q-answer-label {
       font-size: 0.85rem; color: var(--magenta);
       text-transform: uppercase; letter-spacing: 2.5px;
@@ -214,13 +168,12 @@
 
     /* ─── SCORES OVERLAY ─── */
     #scores-overlay {
-      position: absolute; inset: 0;
-      background: rgba(7,6,15,0.95);
-      backdrop-filter: blur(20px);
+      position: absolute; inset: 0; z-index: 5;
+      background: rgba(5,3,10,0.98);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.5s ease;
       gap: 3vh;
     }
     #scores-overlay.show { opacity: 1; }
@@ -230,8 +183,7 @@
       font-size: clamp(2rem, 3.5vw, 3.5rem);
       font-weight: 900; letter-spacing: 3px;
       text-transform: uppercase;
-      background: linear-gradient(to right, var(--gold-bright), #ff8c00);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      color: var(--gold-bright);
       margin-bottom: 2vh;
     }
 
@@ -242,10 +194,9 @@
 
     .score-row {
       display: flex; align-items: center; gap: 2vw;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px; padding: 2.5vh 2vw;
-      transition: all 0.4s ease;
     }
     .score-rank {
       font-family: 'Space Grotesk', sans-serif;
@@ -256,9 +207,7 @@
     .score-rank.first  { color: var(--gold-bright); }
     .score-rank.second { color: #c0c0c0; }
     .score-rank.third  { color: #cd7f32; }
-    .score-swatch {
-      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
-    }
+    .score-swatch { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
     .score-name {
       flex: 1;
       font-family: 'Outfit', sans-serif;
@@ -271,15 +220,14 @@
       font-weight: 700; color: var(--gold-bright);
     }
 
-    /* ─── DAILY DOUBLE OVERLAY ─── */
+    /* ─── DAILY DOUBLE ─── */
     #dd-overlay {
-      position: absolute; inset: 0;
-      background: rgba(20,10,0,0.97);
-      backdrop-filter: blur(20px);
+      position: absolute; inset: 0; z-index: 5;
+      background: rgba(15,7,0,0.98);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.4s ease;
     }
     #dd-overlay.show { opacity: 1; }
 
@@ -287,39 +235,29 @@
       font-family: 'Outfit', sans-serif;
       font-size: clamp(4rem, 8vw, 8rem);
       font-weight: 900; text-transform: uppercase; letter-spacing: 6px;
-      background: linear-gradient(to right, #ffd700, #ff8c00, #ff3300);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: ddShake 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate;
+      color: #ffd700;
     }
-    @keyframes ddShake {
-      0%   { transform: scale(0.97) rotate(-0.8deg); filter: brightness(0.9); }
-      100% { transform: scale(1.03) rotate(0.8deg);  filter: brightness(1.15); }
-    }
-
     .dd-sub {
       font-family: 'Outfit', sans-serif;
       font-size: clamp(1.2rem, 2vw, 2rem);
       color: rgba(255,255,255,0.8); margin-top: 3vh;
-      text-align: center; max-width: 600px;
     }
     .dd-wager {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(2.5rem, 5vw, 5rem);
       font-weight: 700; color: var(--gold-bright);
       margin-top: 2.5vh;
-      text-shadow: 0 0 30px rgba(255,215,0,0.5);
     }
 
-    /* ─── FINAL JEOPARTY OVERLAY ─── */
+    /* ─── FINAL JEOPARTY ─── */
     #fj-overlay {
-      position: absolute; inset: 0;
-      background: rgba(10,0,20,0.97);
-      backdrop-filter: blur(20px);
+      position: absolute; inset: 0; z-index: 5;
+      background: rgba(10,0,18,0.98);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 8vh 10vw;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.5s ease;
     }
     #fj-overlay.show { opacity: 1; }
 
@@ -329,32 +267,25 @@
       color: var(--magenta);
       border: 1.5px solid var(--magenta);
       padding: 8px 28px; border-radius: 30px;
-      box-shadow: 0 0 20px rgba(255,0,127,0.25);
       margin-bottom: 3vh;
-      animation: pulseMagenta 2.5s ease-in-out infinite;
-    }
-    @keyframes pulseMagenta {
-      0%,100% { box-shadow: 0 0 10px rgba(255,0,127,0.2); }
-      50%      { box-shadow: 0 0 40px rgba(255,0,127,0.45); }
     }
 
     /* ─── HOW TO PLAY ─── */
     #htp-overlay {
-      position: absolute; inset: 0;
-      background: rgba(8,5,17,0.97);
-      backdrop-filter: blur(20px);
+      position: absolute; inset: 0; z-index: 5;
+      background: rgba(5,3,10,0.98);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 4vh;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.4s ease;
     }
     #htp-overlay.show { opacity: 1; }
 
     .htp-title {
       font-size: clamp(1.5rem, 2.5vw, 2.5rem);
       font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
-      color: var(--cyan); text-shadow: 0 0 25px rgba(0,245,255,0.4);
+      color: var(--cyan);
     }
     .htp-number {
       font-family: 'Space Grotesk', sans-serif;
@@ -362,7 +293,6 @@
       width: 90px; height: 90px; border-radius: 50%;
       background: rgba(0,245,255,0.08); border: 2.5px solid var(--cyan);
       color: var(--cyan); display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 30px rgba(0,245,255,0.25);
     }
     .htp-slide-title {
       font-family: 'Outfit', sans-serif;
@@ -376,57 +306,17 @@
       color: rgba(255,255,255,0.85); line-height: 1.5;
       text-align: center; max-width: 70vw;
     }
-
-    /* ─── ambient glows behind jeoparty ─── */
-    .jeoparty-glows {
-      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-    }
-    .jg1 {
-      position: absolute; width: 700px; height: 700px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(138,43,226,0.12) 0%, transparent 70%);
-      top: -200px; left: -100px;
-      animation: blobFloat 18s ease-in-out infinite alternate;
-    }
-    .jg2 {
-      position: absolute; width: 500px; height: 500px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,245,255,0.08) 0%, transparent 70%);
-      bottom: -150px; right: -100px;
-      animation: blobFloat 14s ease-in-out infinite alternate-reverse;
-    }
-    @keyframes blobFloat {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(40px, 30px) scale(1.1); }
-    }
-
-    /* ─── Column reveal animation ─── */
-    @keyframes colReveal {
-      from { opacity: 0; transform: translateY(70px) rotateY(-12deg); filter: blur(8px); }
-      to   { opacity: 1; transform: translateY(0) rotateY(0);        filter: blur(0); }
-    }
-    .cat-col.anim-reveal {
-      opacity: 0;
-      animation: colReveal 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
   </style>
 </head>
 <body>
 
-  <!-- Background PNG -->
+  <!-- Clean Background PNG -->
   <div id="bg-layer"></div>
 
-  <!-- Gold Particle Canvas -->
+  <!-- Gold Particle Canvas (Clean & Pinpoint) -->
   <canvas id="particle-canvas"></canvas>
 
-  <!-- Vignette -->
-  <div id="vignette"></div>
-
-  <!-- Gold glow border -->
-  <div id="glow-border"></div>
-
-  <!-- Scanlines -->
-  <div id="scanlines"></div>
-
-  <!-- Jeoparty Full Overlay -->
+  <!-- Jeoparty Overlay -->
   <div id="jeoparty-overlay">
     <div class="jeoparty-glows">
       <div class="jg1"></div>
@@ -482,7 +372,7 @@
 
   <script type="module">
     // ══════════════════════════════════════════════
-    //  GOLD PARTICLE SYSTEM
+    //  PINPOINT GOLD PARTICLES (Clean, no fog)
     // ══════════════════════════════════════════════
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d');
@@ -499,13 +389,12 @@
       constructor() { this.reset(); }
       reset() {
         this.x   = Math.random() * W;
-        this.y   = H + Math.random() * 100;
-        this.vx  = (Math.random() - 0.5) * 0.4;
-        this.vy  = -(Math.random() * 0.6 + 0.2);
-        this.r   = Math.random() * 2.5 + 0.5;
-        this.a   = Math.random() * 0.6 + 0.2;
-        this.da  = -0.0008 * Math.random();
-        this.gold= Math.random() > 0.5;
+        this.y   = H + Math.random() * 50;
+        this.vx  = (Math.random() - 0.5) * 0.3;
+        this.vy  = -(Math.random() * 0.4 + 0.15);
+        this.r   = Math.random() * 1.5 + 0.4;
+        this.a   = Math.random() * 0.4 + 0.1;
+        this.da  = -0.0006 * Math.random();
       }
       update() {
         this.x += this.vx; this.y += this.vy;
@@ -515,9 +404,7 @@
       draw() {
         ctx.save();
         ctx.globalAlpha = Math.max(0, this.a);
-        ctx.fillStyle   = this.gold ? '#c9a84c' : '#ffd700';
-        ctx.shadowBlur  = 8;
-        ctx.shadowColor = '#c9a84c';
+        ctx.fillStyle   = '#ffd700';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
         ctx.fill();
@@ -525,9 +412,9 @@
       }
     }
 
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 45; i++) {
       const p = new Particle();
-      p.y = Math.random() * H; // scatter initially
+      p.y = Math.random() * H;
       particles.push(p);
     }
 
@@ -558,83 +445,57 @@
     const db  = getDatabase(app);
 
     let currentConfig = {};
-    let boardIntroPlayed = false;
+    let lastGameState = {};
+    let customMode    = 'idle';
 
-    // ── Listen to game session ──
     onValue(ref(db, 'jeoparty/session'), snap => {
       const val = snap.val() || {};
       currentConfig = val.gameConfig || {};
-      handleSession(val.gameState || {});
+      lastGameState = val.gameState || {};
+      applyScreenState();
     });
 
-    // ── Listen to tela state ──
     onValue(ref(db, 'telas/central'), snap => {
-      const mode = snap.val() || 'idle';
-      handleTelaMode(mode);
+      customMode = snap.val() || 'idle';
+      applyScreenState();
     });
 
-    // ══════════════════════════════════════════════
-    //  MODE HANDLER
-    // ══════════════════════════════════════════════
-    let lastGameState = {};
-
-    function handleSession(state) {
-      lastGameState = state;
-      // If game is active, reflect the game screen in the jeoparty overlay
-      if (state.gameStarted) {
-        showJeoparty(true);
-        handleScreens(state);
-      } else if (state.lobbyActive) {
-        showJeoparty(false);
-      } else {
-        showJeoparty(false);
-      }
-    }
-
-    function handleTelaMode(mode) {
-      if (mode === 'idle') {
-        showJeoparty(false);
-      } else {
-        showJeoparty(true);
-        handleScreens(lastGameState);
-      }
-    }
-
-    function showJeoparty(show) {
+    function applyScreenState() {
       const overlay = document.getElementById('jeoparty-overlay');
       const bg      = document.getElementById('bg-layer');
-      if (show) {
+
+      const isGameActive = lastGameState.gameStarted === true;
+      const isAuto       = customMode === 'auto';
+      const isCustomOn   = customMode !== 'idle';
+
+      const showJeoparty = (isAuto && isGameActive) || (isCustomOn && !isAuto);
+
+      if (showJeoparty) {
         overlay.classList.add('visible');
-        bg.style.opacity = '0.05';
+        bg.style.opacity = '0';
+        handleScreens(lastGameState);
       } else {
         overlay.classList.remove('visible');
         bg.style.opacity = '1';
-        boardIntroPlayed = false;
       }
     }
 
-    // ══════════════════════════════════════════════
-    //  SCREEN ROUTING
-    // ══════════════════════════════════════════════
     const SCREENS = ['board-wrap', 'q-overlay', 'scores-overlay', 'dd-overlay', 'fj-overlay', 'htp-overlay'];
 
     function showScreen(id) {
       SCREENS.forEach(s => {
         const el = document.getElementById(s);
         if (!el) return;
-        if (s === id) {
-          el.classList.add('show');
-        } else {
-          el.classList.remove('show');
-        }
+        if (s === id) el.classList.add('show');
+        else el.classList.remove('show');
       });
     }
 
     function handleScreens(state) {
-      if (!state.gameStarted && !state.lobbyActive) {
-        showScreen(null);
-        return;
-      }
+      if (customMode === 'board') { renderBoard(currentConfig, state); showScreen('board-wrap'); return; }
+      if (customMode === 'question') { renderQuestion(state); showScreen('q-overlay'); return; }
+      if (customMode === 'scores') { renderScores(state); showScreen('scores-overlay'); return; }
+      if (customMode === 'finaljeoparty') { renderFJ(state); showScreen('fj-overlay'); return; }
 
       switch (state.currentScreen) {
         case 'question':
@@ -664,23 +525,18 @@
       }
     }
 
-    // ══════════════════════════════════════════════
-    //  BOARD
-    // ══════════════════════════════════════════════
     function renderBoard(config, state) {
       const grid = document.getElementById('board-wrap');
       grid.innerHTML = '';
-
       const cats = config.categories || [];
       if (!cats.length) {
-        grid.innerHTML = `<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.5rem;color:rgba(255,255,255,0.3);">Aguardando configuração...</div>`;
+        grid.innerHTML = `<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.5rem;color:rgba(255,255,255,0.3);">Aguardando categorias...</div>`;
         return;
       }
 
       cats.forEach((cat, ci) => {
         const col = document.createElement('div');
-        col.className = boardIntroPlayed ? 'cat-col' : 'cat-col anim-reveal';
-        col.style.animationDelay = `${ci * 0.1}s`;
+        col.className = 'cat-col';
 
         const hdr = document.createElement('div');
         hdr.className = 'cat-header';
@@ -701,14 +557,9 @@
         }
         grid.appendChild(col);
       });
-
-      boardIntroPlayed = true;
       grid.classList.add('show');
     }
 
-    // ══════════════════════════════════════════════
-    //  QUESTION
-    // ══════════════════════════════════════════════
     function renderQuestion(state) {
       const qi  = state.activeQuestion || {};
       const cat = currentConfig.categories?.[qi.categoryIndex];
@@ -724,9 +575,6 @@
       qi.state === 'answer' ? ansBox.classList.add('show') : ansBox.classList.remove('show');
     }
 
-    // ══════════════════════════════════════════════
-    //  DAILY DOUBLE
-    // ══════════════════════════════════════════════
     function renderDD(state) {
       const teams = state.teams || [];
       const ddTeamId = state.dailyDouble?.teamId;
@@ -735,9 +583,6 @@
       document.getElementById('dd-wager').textContent = state.dailyDouble?.wager ? `${state.dailyDouble.wager}€` : '???';
     }
 
-    // ══════════════════════════════════════════════
-    //  FINAL JEOPARTY
-    // ══════════════════════════════════════════════
     function renderFJ(state) {
       const fj = state.finalJeopardy || {};
       const config = currentConfig.finalJeopardy || {};
@@ -749,16 +594,13 @@
       fj.state === 'answer' ? fjAns.classList.add('show') : fjAns.classList.remove('show');
     }
 
-    // ══════════════════════════════════════════════
-    //  SCORES
-    // ══════════════════════════════════════════════
     function renderScores(state) {
       const teams = [...(state.teams || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
       const list  = document.getElementById('scores-list');
       const ranks = ['first', 'second', 'third'];
 
       list.innerHTML = teams.map((t, i) => `
-        <div class="score-row" style="animation-delay:${i * 0.1}s">
+        <div class="score-row">
           <div class="score-rank ${ranks[i] || ''}">${i + 1}</div>
           <div class="score-swatch" style="background:${t.color || '#ccc'}"></div>
           <div class="score-name">${t.name}</div>
@@ -766,9 +608,6 @@
         </div>`).join('');
     }
 
-    // ══════════════════════════════════════════════
-    //  HOW TO PLAY
-    // ══════════════════════════════════════════════
     const HTP_RULES = [
       { title: 'Categorias',    desc: 'O tabuleiro tem 5 colunas temáticas. Cada coluna contém 5 perguntas com valores de 200€ a 1000€.' },
       { title: 'Escolha',       desc: 'A equipa com a vez escolhe uma categoria e um valor. O anfitrião lê a pista.' },
